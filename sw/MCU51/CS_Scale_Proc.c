@@ -628,7 +628,7 @@ u8_t CS_Scale_JudgeLowBat(u8_t option)
 {
 	static	u8_t xdata B_Weight_LowBat;			//µÕµÁ±Í÷æ
 	
-	if(R_1186sys_state&CS_Scale_LowBatBit==true)
+	if(R_1186sys_state&CS_Scale_LowBatBit)
 		{
 		B_Weight_LowBat = true;
 		R_Display_Err=CS_ScaleDisplay_L_err;

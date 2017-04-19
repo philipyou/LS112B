@@ -183,7 +183,7 @@ void CS_ScaleDisplay_FreshBuf(u8_t option,u16_t showdata)
 		}
 
 	/*
-	if( xxxStatus==xxxx)
+	if( R_1186sys_state&0x02)
 		CS_Lcd_Buf_SIGN |=S_DAT;
 	else
 		CS_Lcd_Buf_SIGN &=~S_DAT;
