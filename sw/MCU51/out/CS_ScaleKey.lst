@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 1   
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 18:27:29 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE CS_SCALEKEY
@@ -17,9 +17,9 @@ line level    source
    7          #include "CS_ScaleKey.h"
    8          
    9          
-  10          #define KEY_SHORT_PUSH_CNT              3
-  11          #define KEY_LONG_PUSH_CNT                       50
-  12          #define KEY_SHORT_PRESS_TIME            15
+  10          #define KEY_SHORT_PUSH_CNT              3                       
+  11          #define KEY_LONG_PUSH_CNT                       150             //10ms  为单位
+  12          #define KEY_SHORT_PRESS_TIME            18
   13          #define KEY_DOWN                                        0
   14          #define KEY_UP                                          1
   15          
@@ -51,73 +51,73 @@ line level    source
   41   2                      
   42   2                      KeyPressDeal=0;
   43   2                      KeyLongPressDeal=0;
-  44   2                      
-  45   2                      if(Press == true)
+  44   2      
+  45   2                      if(ShortPressCount>KEY_SHORT_PRESS_TIME&&PressTimesCount==1)
   46   2                              {
-  47   3                              Press = false;
-  48   3                                                      
-  49   3                              //短按弹起处理
-  50   3                              if(ShortPressCount <KEY_SHORT_PRESS_TIME)
-  51   3                                      PressTimesCount++;
-  52   3                              else
-  53   3                                      {
-  54   4                                      PressTimesCount = 0;
-C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 2   
+  47   3                              PressTimesCount = 0;
+  48   3                              CS_Scale_ChangeUnit();  
+  49   3                              }
+  50   2                      
+  51   2                      if(Press == true)
+  52   2                              {
+  53   3                              Press = false;
+  54   3                                                      
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 18:27:29 PAGE 2   
 
-  55   4                                      CS_Scale_ChangeUnit();  
-  56   4                                      }
-  57   3                              ShortPressCount =0;     
-  58   3                              }
-  59   2                      }
-  60   1              else
-  61   1                      {
-  62   2                      if(keyState_prev == KEY_DOWN)
-  63   2                              {       
-  64   3                              if(keyStateCnt<255)
-  65   3                                      keyStateCnt++;
-  66   3                               if(keyStateCnt > KEY_SHORT_PUSH_CNT)
-  67   3                                      {
-  68   4                                      Press =true;
-  69   4                                      if(KeyPressDeal==0)
-  70   4                                              {
-  71   5                                              KeyPressDeal=1;
-  72   5                                              //按键刚按下的处理
-  73   5                                              if(ShortPressCount > KEY_SHORT_PRESS_TIME)
-  74   5                                                      PressTimesCount = 0;
-  75   5                                              ShortPressCount=0;
-  76   5                                              }
-  77   4                                      }
-  78   3                               if(keyStateCnt > KEY_LONG_PUSH_CNT)
-  79   3                                      {
-  80   4                                      if(KeyLongPressDeal==0)
-  81   4                                              {
-  82   5                                              //按键刚长按下的处理    
-  83   5                                              KeyLongPressDeal=1;                                     
-  84   5                                              if(PressTimesCount==3)
-  85   5                                                      {
-  86   6                                                      R_Scale_state = CS_Scale_state_caling;  
-  87   6                                                      CS_Scale_CaliProc(CaliProcReset);
-  88   6                                                      Press = false;
-  89   6                                                      keyStateCnt=0;
-  90   6                                                      }
-  91   5                                              PressTimesCount = 0;
-  92   5                                              ShortPressCount =0;
-  93   5                                              }
-  94   4                                      }
-  95   3                              }
-  96   2                      else
-  97   2                              {
-  98   3                              keyState_prev = KEY_DOWN;
-  99   3                              Press = false;
- 100   3                              }
- 101   2                      }
- 102   1      }
- 103          
- 104          
- 105          
- 106          
- 107          
- 108          
+  55   3                              //短按弹起处理
+  56   3                              if(ShortPressCount <KEY_SHORT_PRESS_TIME)
+  57   3                                      PressTimesCount++;
+  58   3                              else
+  59   3                                      {
+  60   4                                      PressTimesCount = 0;
+  61   4                                      CS_Scale_ChangeUnit();  
+  62   4                                      }
+  63   3                              ShortPressCount =0;     
+  64   3                              }
+  65   2                      }
+  66   1              else
+  67   1                      {
+  68   2                      if(keyState_prev == KEY_DOWN)
+  69   2                              {       
+  70   3                              if(keyStateCnt<255)
+  71   3                                      keyStateCnt++;
+  72   3                               if(keyStateCnt > KEY_SHORT_PUSH_CNT)
+  73   3                                      {
+  74   4                                      Press =true;
+  75   4                                      if(KeyPressDeal==0)
+  76   4                                              {
+  77   5                                              KeyPressDeal=1;
+  78   5                                              //按键刚按下的处理
+  79   5                                              if(ShortPressCount > KEY_SHORT_PRESS_TIME)
+  80   5                                                      PressTimesCount = 0;
+  81   5                                              ShortPressCount=0;
+  82   5                                              }
+  83   4                                      }
+  84   3                               if(keyStateCnt > KEY_LONG_PUSH_CNT)
+  85   3                                      {
+  86   4                                      if(KeyLongPressDeal==0)
+  87   4                                              {
+  88   5                                              //按键刚长按下的处理    
+  89   5                                              KeyLongPressDeal=1;                                     
+  90   5                                              if(PressTimesCount==3)
+  91   5                                                      {
+  92   6                                                      R_Scale_state = CS_Scale_state_caling;  
+  93   6                                                      CS_Scale_CaliProc(CaliProcReset);
+  94   6                                                      Press = false;
+  95   6                                                      keyStateCnt=0;
+  96   6                                                      }
+  97   5                                              PressTimesCount = 0;
+  98   5                                              ShortPressCount =0;
+  99   5                                              }
+ 100   4                                      }
+ 101   3                              }
+ 102   2                      else
+ 103   2                              {
+ 104   3                              keyState_prev = KEY_DOWN;
+ 105   3                              Press = false;
+ 106   3                              }
+ 107   2                      }
+ 108   1      }
  109          
  110          
  111          
@@ -126,7 +126,7 @@ line level    source
  114          
  115          
  116          
-C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 3   
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 18:27:29 PAGE 3   
 
  117          
  118          
@@ -154,7 +154,13 @@ line level    source
  140          
  141          
  142          
-C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 4   
+ 143          
+ 144          
+ 145          
+ 146          
+ 147          
+ 148          
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 18:27:29 PAGE 4   
 
 ASSEMBLY LISTING OF GENERATED OBJECT CODE
 
@@ -210,167 +216,184 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 45
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       SETB    C
+                       SUBB    A,#012H
+                 R     xJLT    ?C0004
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#01H,?C0004
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 18:27:29 PAGE 5   
+
+                                           ; SOURCE LINE # 46
+                                           ; SOURCE LINE # 47
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 48
+                 E     CALL    CS_Scale_ChangeUnit
+                                           ; SOURCE LINE # 49
+             ?C0004:
+                                           ; SOURCE LINE # 51
                  R     MOV     DPTR,#Press
                        MOVX    A,@DPTR
                        XRL     A,#01H
-                 R     xJNZ    ?C0017
-                                           ; SOURCE LINE # 46
-                                           ; SOURCE LINE # 47
+                 R     xJNZ    ?C0018
+                                           ; SOURCE LINE # 52
+                                           ; SOURCE LINE # 53
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 50
-C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 5   
-
+                                           ; SOURCE LINE # 56
                  R     MOV     DPTR,#ShortPressCount
                        MOVX    A,@DPTR
                        CLR     C
-                       SUBB    A,#0FH
-                 R     xJGE    ?C0005
-                                           ; SOURCE LINE # 51
+                       SUBB    A,#012H
+                 R     xJGE    ?C0006
+                                           ; SOURCE LINE # 57
                        INC     DPTR
                        MOVX    A,@DPTR
                        INC     A
                        MOVX    @DPTR,A
-                 R     xJMP    ?C0006
-             ?C0005:
-                                           ; SOURCE LINE # 53
-                                           ; SOURCE LINE # 54
+                 R     xJMP    ?C0007
+             ?C0006:
+                                           ; SOURCE LINE # 59
+                                           ; SOURCE LINE # 60
                        CLR     A
                  R     MOV     DPTR,#PressTimesCount
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 55
+                                           ; SOURCE LINE # 61
                  E     CALL    CS_Scale_ChangeUnit
-                                           ; SOURCE LINE # 56
-             ?C0006:
-                                           ; SOURCE LINE # 57
+                                           ; SOURCE LINE # 62
+             ?C0007:
+                                           ; SOURCE LINE # 63
                        CLR     A
                  R     MOV     DPTR,#ShortPressCount
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 58
-                                           ; SOURCE LINE # 59
+                                           ; SOURCE LINE # 64
+                                           ; SOURCE LINE # 65
                        RET     
              ?C0002:
-                                           ; SOURCE LINE # 61
-                                           ; SOURCE LINE # 62
+                                           ; SOURCE LINE # 67
+                                           ; SOURCE LINE # 68
                  R     MOV     DPTR,#keyState_prev
                        MOVX    A,@DPTR
-                 R     xJNZ    ?C0008
-                                           ; SOURCE LINE # 63
-                                           ; SOURCE LINE # 64
+                 R     xJNZ    ?C0009
+                                           ; SOURCE LINE # 69
+                                           ; SOURCE LINE # 70
                        INC     DPTR
                        MOVX    A,@DPTR
                        CLR     C
                        SUBB    A,#0FFH
-                 R     xJGE    ?C0009
-                                           ; SOURCE LINE # 65
+                 R     xJGE    ?C0010
+                                           ; SOURCE LINE # 71
                        MOVX    A,@DPTR
                        INC     A
                        MOVX    @DPTR,A
-             ?C0009:
-                                           ; SOURCE LINE # 66
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 18:27:29 PAGE 6   
+
+             ?C0010:
+                                           ; SOURCE LINE # 72
                  R     MOV     DPTR,#keyStateCnt
                        MOVX    A,@DPTR
                        MOV     R7,A
                        SETB    C
                        SUBB    A,#03H
-                 R     xJLT    ?C0010
-                                           ; SOURCE LINE # 67
-                                           ; SOURCE LINE # 68
+                 R     xJLT    ?C0011
+                                           ; SOURCE LINE # 73
+                                           ; SOURCE LINE # 74
                  R     MOV     DPTR,#Press
                        MOV     A,#01H
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 69
+                                           ; SOURCE LINE # 75
                  R     MOV     DPTR,#KeyPressDeal
                        MOVX    A,@DPTR
-                 R     xJNZ    ?C0010
-C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 6   
-
-                                           ; SOURCE LINE # 70
-                                           ; SOURCE LINE # 71
+                 R     xJNZ    ?C0011
+                                           ; SOURCE LINE # 76
+                                           ; SOURCE LINE # 77
                        INC     A
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 73
+                                           ; SOURCE LINE # 79
                  R     MOV     DPTR,#ShortPressCount
                        MOVX    A,@DPTR
                        SETB    C
-                       SUBB    A,#0FH
-                 R     xJLT    ?C0012
-                                           ; SOURCE LINE # 74
+                       SUBB    A,#012H
+                 R     xJLT    ?C0013
+                                           ; SOURCE LINE # 80
                        CLR     A
                        INC     DPTR
                        MOVX    @DPTR,A
-             ?C0012:
-                                           ; SOURCE LINE # 75
+             ?C0013:
+                                           ; SOURCE LINE # 81
                        CLR     A
                  R     MOV     DPTR,#ShortPressCount
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 76
-                                           ; SOURCE LINE # 77
-             ?C0010:
-                                           ; SOURCE LINE # 78
+                                           ; SOURCE LINE # 82
+                                           ; SOURCE LINE # 83
+             ?C0011:
+                                           ; SOURCE LINE # 84
                        MOV     A,R7
                        SETB    C
-                       SUBB    A,#032H
-                 R     xJLT    ?C0017
-                                           ; SOURCE LINE # 79
-                                           ; SOURCE LINE # 80
-                 R     MOV     DPTR,#KeyLongPressDeal
-                       MOVX    A,@DPTR
-                 R     xJNZ    ?C0017
-                                           ; SOURCE LINE # 81
-                                           ; SOURCE LINE # 83
-                       INC     A
-                       MOVX    @DPTR,A
-                                           ; SOURCE LINE # 84
-                 R     MOV     DPTR,#PressTimesCount
-                       MOVX    A,@DPTR
-                 R     xJNE    A,#03H,?C0015
+                       SUBB    A,#096H
+                 R     xJLT    ?C0018
                                            ; SOURCE LINE # 85
                                            ; SOURCE LINE # 86
+                 R     MOV     DPTR,#KeyLongPressDeal
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0018
+                                           ; SOURCE LINE # 87
+                                           ; SOURCE LINE # 89
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 90
+                 R     MOV     DPTR,#PressTimesCount
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#03H,?C0016
+                                           ; SOURCE LINE # 91
+                                           ; SOURCE LINE # 92
                  E     MOV     DPTR,#R_Scale_state
                        MOV     A,#03H
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 87
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 18:27:29 PAGE 7   
+
+                                           ; SOURCE LINE # 93
                        MOV     R7,#05H
                  E     CALL    _CS_Scale_CaliProc
-                                           ; SOURCE LINE # 88
+                                           ; SOURCE LINE # 94
                        CLR     A
                  R     MOV     DPTR,#Press
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 89
+                                           ; SOURCE LINE # 95
                  R     MOV     DPTR,#keyStateCnt
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 90
-             ?C0015:
-                                           ; SOURCE LINE # 91
+                                           ; SOURCE LINE # 96
+             ?C0016:
+                                           ; SOURCE LINE # 97
                        CLR     A
                  R     MOV     DPTR,#PressTimesCount
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 92
-C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 7   
-
+                                           ; SOURCE LINE # 98
                  R     MOV     DPTR,#ShortPressCount
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 93
-                                           ; SOURCE LINE # 94
-                                           ; SOURCE LINE # 95
+                                           ; SOURCE LINE # 99
+                                           ; SOURCE LINE # 100
+                                           ; SOURCE LINE # 101
                        RET     
-             ?C0008:
-                                           ; SOURCE LINE # 97
-                                           ; SOURCE LINE # 98
+             ?C0009:
+                                           ; SOURCE LINE # 103
+                                           ; SOURCE LINE # 104
                        CLR     A
                  R     MOV     DPTR,#keyState_prev
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 99
+                                           ; SOURCE LINE # 105
                  R     MOV     DPTR,#Press
                        MOVX    @DPTR,A
-                                           ; SOURCE LINE # 100
-                                           ; SOURCE LINE # 101
-                                           ; SOURCE LINE # 102
-             ?C0017:
+                                           ; SOURCE LINE # 106
+                                           ; SOURCE LINE # 107
+                                           ; SOURCE LINE # 108
+             ?C0018:
                        RET     
              ; FUNCTION CS_KeyScan (END)
 
-C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 8   
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 18:27:29 PAGE 8   
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -433,7 +456,7 @@ s16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  INT      -----  2
 xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
 u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
 dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
-C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 9   
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 18:27:29 PAGE 9   
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -467,7 +490,7 @@ _CS_ComState . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  3
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    252    ----
+   CODE SIZE        =    277    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =      7    ----
    PDATA SIZE       =   ----    ----

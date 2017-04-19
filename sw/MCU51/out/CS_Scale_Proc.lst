@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 1   
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE CS_SCALE_PROC
@@ -62,7 +62,7 @@ line level    source
   52          #define CS_Scale_TimeOut_LowBat         3                       //低电关机时间3s
   53          #define SameZeroRange                                   10                      //认为是同一个零点的误差范围
   54          #define ScaleWeightMin                                  10                      //秤体重量左边界值
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 2   
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 2   
 
   55          #define ScaleWeightMax                                  15                      //秤体重量右边界值
   56          #define ScaleStartMemoryWeight                  600                     //秤开始记忆重量范围
@@ -71,7 +71,7 @@ line level    source
   59          #define   CS_PowerOnAD_Steadytimes              10                      //稳定开机稳定次数
   60          #define   CS_SmallWeight_Steadytimes            6                       //判断稳定的次数
   61          #define   CS_BigWeight_Steadytimes              6                       //判断稳定的次数
-  62          #define   CS_Cali_Steadytimes                           15                      //标定时判断稳定的次数
+  62          #define   CS_Cali_Steadytimes                           12                      //标定时判断稳定的次数
   63          #define CS_MemoryRange                          25                      //记忆重量范围
   64          
   65          
@@ -126,7 +126,7 @@ line level    source
  114          CS_ScaleDisplay_Debug();
  115          while(1);
  116          
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 3   
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 3   
 
  117          */
  118          
@@ -190,7 +190,7 @@ line level    source
  176   2                      R_Weight_Com_Coo.now = CS_CommTo1186_Null;      
  177   2                      //R_Scale_state =       CS_Scale_state_weighting;
  178   2                      R_Selet_Unit = CS_ScaleDisplay_L_kg;
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 4   
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 4   
 
  179   2      
  180   2                      R_Debug_temp = 0;
@@ -254,7 +254,7 @@ line level    source
  238   1              return ad_temp;
  239   1      }
  240          
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 5   
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 5   
 
  241          
  242          
@@ -318,7 +318,7 @@ line level    source
  300   2                              if(R_AD_FilTimes<=7)
  301   2                                      R_AD_F7 = R_AD_BUF;
  302   2                              if(R_AD_FilTimes<=8)
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 6   
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 6   
 
  303   2                                      R_AD_F8 = R_AD_BUF;
  304   2                              if(R_AD_FilTimes>8)
@@ -382,7 +382,7 @@ line level    source
  362   1      
  363   1              
  364   1      }
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 7   
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 7   
 
  365          
  366          
@@ -446,7 +446,7 @@ line level    source
  424   1              if(option==ClrLockDownCheckFlag)
  425   1                      {
  426   2                      B_LockDownCheck=false;
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 8   
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 8   
 
  427   2                      return 0;
  428   2                      }
@@ -510,7 +510,7 @@ line level    source
  486   5                                                      }
  487   4                                              //锁定状态下秤第一次追零做防提起处理
  488   4                                              else                    
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 9   
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 9   
 
  489   4                                                      {
  490   5                                                      if(B_LockDownCheck==false)
@@ -574,7 +574,7 @@ line level    source
  548   2                      B_Weight_Downing_Lock =LockProcLock;
  549   2                      return 0;
  550   2                      }
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 10  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 10  
 
  551   1      
  552   1              if(option==GetIfLock)
@@ -638,7 +638,7 @@ line level    source
  610                          {
  611                          B_Weight_PowerOn = true;
  612                          B_Weight_AutoOpen = false;
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 11  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 11  
 
  613                          }
  614          }       
@@ -702,7 +702,7 @@ line level    source
  672          u8_t CS_Scale_JudgeSteady(u8_t option)
  673          {
  674   1      
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 12  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 12  
 
  675   1              u16_t   weight_temp;
  676   1              u16_t   R_Weight_Temp;
@@ -766,7 +766,7 @@ line level    source
  734   4                                      //在记忆范围内记忆
  735   4                                      if(R_UnitWeight.origin > ScaleStartMemoryWeight)
  736   4                                              {
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 13  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 13  
 
  737   5                                              if(R_Weight_Temp<CS_MemoryRange)
  738   5                                              R_UnitWeight.origin = R_Weight_Mem;
@@ -830,7 +830,7 @@ line level    source
  796   3                                      {
  797   4                                      
  798   4                                      if(ReadUTC==false)
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 14  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 14  
 
  799   4                                              {
  800   5                                              ReadUTC=true;
@@ -894,7 +894,7 @@ line level    source
  858   1              
  859   1              if( R_UnitWeight.origin > R_Weight_Lock)
  860   1                      {
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 15  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 15  
 
  861   2                      weight_temp = R_UnitWeight.origin -R_Weight_Lock;
  862   2                      if(weight_temp >= CS_Scale_RetLockWeightInc)
@@ -958,7 +958,7 @@ line level    source
  920          #define CS_CaliState_GetCal2                    4
  921          #define CS_CaliState_ShowCal3                   5
  922          #define CS_CaliState_GetCal3                    6
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 16  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 16  
 
  923          #define CS_CaliState_ShowCal4                   7
  924          #define CS_CaliState_SaveData                   8
@@ -1022,7 +1022,7 @@ line level    source
  982   2      
  983   2                      
  984   2      
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 17  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 17  
 
  985   2                      if(R_AD_CaliDot1<CS_CaliStateData_Down || R_AD_CaliDot1>CS_CaliStateData_Up)
  986   2                              if(R_AD_CaliDot2<CS_CaliStateData_Down||R_AD_CaliDot2>CS_CaliStateData_Up)
@@ -1086,7 +1086,7 @@ line level    source
 1044   2                              R_AD_PowerOnZero =CS_Scale_ZeroProc(GetPowerOnZero,0);  
 1045   2                              R_AD_CaliDot1 = R_AD_BUF - R_AD_PowerOnZero;
 1046   2                                      
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 18  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 18  
 
 1047   2                              if((R_AD_CaliDot1 < R_OpenWeight_Ad)||(R_AD_BUF < R_AD_PowerOnZero))
 1048   2                                      {
@@ -1099,7 +1099,7 @@ line level    source
 1055   3                                      }
 1056   2                              else
 1057   2                                      {
-1058   3                                      if((R_AD_CaliDot1> 750)&&(R_AdFilTimes>=60))
+1058   3                                      if((R_AD_CaliDot1> 750)&&(R_AdFilTimes>=CS_Cali_Steadytimes))
 1059   3                                              {                               
 1060   4                                              CS_SoftTimer(ResetSoftTimer);
 1061   4                                              CS_Scale_AdcFilter(ScaleAdcFilterReset,R_AD_BUF);
@@ -1150,7 +1150,7 @@ line level    source
 1106   1              if(R_CaliState==CS_CaliState_GetCal3)
 1107   1                      {               
 1108   2                              R_AD_PowerOnZero =CS_Scale_ZeroProc(GetPowerOnZero,0);          
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 19  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 19  
 
 1109   2                              weight_temp = R_AD_BUF - R_AD_PowerOnZero;
 1110   2                                              
@@ -1214,7 +1214,7 @@ line level    source
 1168   2      
 1169   2                      }
 1170   1              return 0;
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 20  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 20  
 
 1171   1              
 1172   1      }
@@ -1278,7 +1278,7 @@ line level    source
 1230   3                              }       
 1231   2                      break;
 1232   2              case CS_Standby_S2_WakeUp:
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 21  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 21  
 
 1233   2                      if(comm_doing==false)
 1234   2                              {
@@ -1342,7 +1342,7 @@ line level    source
 1292   2                      comm_doing=false;
 1293   2                      return;
 1294   2                      }
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 22  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 22  
 
 1295   1              
 1296   1              //-----------S1
@@ -1406,7 +1406,7 @@ line level    source
 1354   3                              comm_doing=false;
 1355   3                              PowerOnState =  CS_PowerOn_State6_ShowOpenPic;
 1356   3                              }
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 23  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 23  
 
 1357   2                      }
 1358   1              //-----------S6
@@ -1470,7 +1470,7 @@ line level    source
 1416   1              return 0;
 1417   1      
 1418   1      }
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 24  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 24  
 
 1419          
 1420          
@@ -1534,7 +1534,7 @@ line level    source
 1478   3                              R_TimeOut.lowbat++;
 1479   3      
 1480   3                              if(R_TimeOut.lowbat>=CS_Scale_TimeOut_LowBat)
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 25  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 25  
 
 1481   3                              {
 1482   4                                      R_Scale_state = CS_Scale_state_standby;
@@ -1598,7 +1598,7 @@ line level    source
 1540   3                              R_TimeOut.lock++;
 1541   3                              
 1542   3                              if(R_TimeOut.lock>=CS_Scale_TimeOut_Lock)
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 26  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 26  
 
 1543   3                              {
 1544   4                                      
@@ -1624,7 +1624,7 @@ line level    source
 1564          
 1565          
 1566          
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 27  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 27  
 
 ASSEMBLY LISTING OF GENERATED OBJECT CODE
 
@@ -1688,7 +1688,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     CALL    CS_Scale_WeightProc
                                            ; SOURCE LINE # 146
                  E     CALL    CS_ScaleDisplay
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 28  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 28  
 
                                            ; SOURCE LINE # 147
              ?C0006:
@@ -1752,7 +1752,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 181
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 29  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 29  
 
                  R     CLR     B_Debug_Test
                                            ; SOURCE LINE # 183
@@ -1816,7 +1816,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     CALL    _CS_Scale_JudgeSteady
                                            ; SOURCE LINE # 211
                        RET     
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 30  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 30  
 
              ; FUNCTION CS_Scale_WeightProc (END)
 
@@ -1880,7 +1880,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        SUBB    A,R4
                  R     MOV     DPTR,#ad_temp
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 31  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 31  
 
                        INC     DPTR
                        MOV     A,R7
@@ -1944,7 +1944,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 264
                  R     MOV     DPTR,#R_AD_BUF_OLD
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 32  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 32  
 
                        MOV     R6,A
                        INC     DPTR
@@ -2008,7 +2008,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    A,@DPTR
                  R     MOV     DPTR,#R_AD_BUF_OLD
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 33  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 33  
 
                        XCH     A,R7
                        MOVX    @DPTR,A
@@ -2072,7 +2072,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                        INC     DPTR
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 34  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 34  
 
                                            ; SOURCE LINE # 279
                        INC     DPTR
@@ -2136,7 +2136,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        XCH     A,R5
                        MOVX    @DPTR,A
                        INC     DPTR
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 35  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 35  
 
                        MOV     A,R5
                        MOVX    @DPTR,A
@@ -2200,7 +2200,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                        MOV     R5,A
                        INC     DPTR
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 36  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 36  
 
                        MOVX    A,@DPTR
                  R     MOV     DPTR,#R_AD_F4
@@ -2264,7 +2264,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,R6
                        SUBB    A,#00H
                  R     xJGE    ?C0031
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 37  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 37  
 
                                            ; SOURCE LINE # 301
                  R     MOV     DPTR,#R_AD_BUF
@@ -2328,7 +2328,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    A,@DPTR
                  R     MOV     DPTR,#R_AD_F2
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 38  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 38  
 
                        XCH     A,R7
                        MOVX    @DPTR,A
@@ -2392,7 +2392,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#R_AD_F7
                        XCH     A,R7
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 39  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 39  
 
                        INC     DPTR
                        MOV     A,R7
@@ -2456,7 +2456,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R5,A
                        MOV     A,R4
                        ADDC    A,R0
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 40  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 40  
 
                        MOV     R4,A
                  R     MOV     DPTR,#ad_temp
@@ -2520,7 +2520,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R4,A
                        MOV     R5,A
                        MOV     A,R3
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 41  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 41  
 
                        ADD     A,R7
                        MOV     R7,A
@@ -2584,7 +2584,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    A,@DPTR
                        MOV     R3,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 42  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 42  
 
                  R     MOV     DPTR,#R_AD_F6
                        MOVX    A,@DPTR
@@ -2648,7 +2648,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 323
                  R     MOV     DPTR,#ad_temp
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 43  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 43  
 
                        MOV     R0,A
                        INC     DPTR
@@ -2712,7 +2712,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#R_AD_BUF_OLD
                        MOV     A,R6
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 44  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 44  
 
                        INC     DPTR
                        MOV     A,R7
@@ -2776,7 +2776,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R7,A
                  R     MOV     DPTR,#R_AD_BUF
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 45  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 45  
 
                        MOV     R4,A
                        INC     DPTR
@@ -2840,7 +2840,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                        SUBB    A,R7
                        MOV     R7,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 46  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 46  
 
                  R     MOV     DPTR,#R_AD_BUF
                        MOVX    A,@DPTR
@@ -2904,7 +2904,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,R6
                        ADDC    A,#013H
                  R     MOV     DPTR,#R_UnitWeight
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 47  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 47  
 
                        MOVX    @DPTR,A
                        INC     DPTR
@@ -2968,7 +2968,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R3,A
                        MOV     R2,AR6
                        CLR     A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 48  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 48  
 
                        MOV     R1,A
                        MOV     R0,A
@@ -3032,7 +3032,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 376
                        RET     
                                            ; SOURCE LINE # 377
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 49  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 49  
 
              ?C0040:
                                            ; SOURCE LINE # 378
@@ -3096,7 +3096,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,R5
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 417
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 50  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 50  
 
                        CLR     A
                        MOV     R6,A
@@ -3160,7 +3160,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                        MOV     R6,A
                        INC     DPTR
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 51  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 51  
 
                        MOVX    A,@DPTR
                        MOV     R7,A
@@ -3224,7 +3224,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 448
                  R     xJMP    ?C0049
              ?C0050:
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 52  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 52  
 
                                            ; SOURCE LINE # 450
                                            ; SOURCE LINE # 451
@@ -3288,7 +3288,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                  R     xJNZ    ?C0054
              ?C0055:
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 53  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 53  
 
                                            ; SOURCE LINE # 466
                  R     MOV     DPTR,#B_Weight_Zero
@@ -3352,7 +3352,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#weight_temp
                        MOVX    @DPTR,A
                        INC     DPTR
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 54  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 54  
 
                        MOV     A,R7
                        MOVX    @DPTR,A
@@ -3416,7 +3416,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R5,A
                        SETB    C
                        SUBB    A,R7
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 55  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 55  
 
                        MOV     A,R4
                        SUBB    A,R6
@@ -3480,7 +3480,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 504
                  R     MOV     DPTR,#B_WeightZeroErr
                        MOV     A,#01H
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 56  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 56  
 
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 505
@@ -3544,7 +3544,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    A,@DPTR
                        MOV     R7,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 57  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 57  
 
                        RET     
              ?C0070:
@@ -3608,7 +3608,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
              ?C0075:
                                            ; SOURCE LINE # 556
                        MOV     A,R7
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 58  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 58  
 
                  R     xJNE    A,#03H,?C0076
                                            ; SOURCE LINE # 557
@@ -3672,7 +3672,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOV     A,R5
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 59  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 59  
 
                  R     xJMP    ?C0079
              ?C0080:
@@ -3736,7 +3736,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 648
                        INC     DPTR
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 60  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 60  
 
                                            ; SOURCE LINE # 649
                        MOV     R7,A
@@ -3800,7 +3800,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        RET     
              ; FUNCTION _CS_Scale_JudgeOverLoad (END)
 
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 61  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 61  
 
              ; FUNCTION _CS_Scale_JudgeSteady (BEGIN)
                                            ; SOURCE LINE # 672
@@ -3864,7 +3864,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R5,A
                        SETB    C
                        SUBB    A,R7
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 62  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 62  
 
                        MOV     A,R4
                        SUBB    A,R6
@@ -3928,7 +3928,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
              ?C0099:
                                            ; SOURCE LINE # 710
                        CLR     A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 63  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 63  
 
                  R     MOV     DPTR,#R_Weight_SameTimes
                        MOVX    @DPTR,A
@@ -3992,7 +3992,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    A,@DPTR
                        MOV     R7,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 64  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 64  
 
                  R     MOV     DPTR,#R_UnitWeight
                        MOVX    A,@DPTR
@@ -4056,7 +4056,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#R_Weight_Temp
                        MOVX    A,@DPTR
                        SUBB    A,#00H
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 65  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 65  
 
                  R     xJGE    ?C0108
                                            ; SOURCE LINE # 738
@@ -4120,7 +4120,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
 
              ; FUNCTION _CS_Scale_SteadyProc (BEGIN)
                                            ; SOURCE LINE # 761
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 66  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 66  
 
 ;---- Variable 'option' assigned to Register 'R7' ----
                                            ; SOURCE LINE # 762
@@ -4184,7 +4184,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 804
                  E     CALL    CS_If1186ComSucess
                        MOV     A,R7
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 67  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 67  
 
                        XRL     A,#01H
                  R     xJNZ    ?C0111
@@ -4248,7 +4248,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
              ?C0115:
                                            ; SOURCE LINE # 826
                                            ; SOURCE LINE # 827
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 68  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 68  
 
                        CLR     A
                        MOV     R7,A
@@ -4312,7 +4312,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,R6
                        SUBB    A,#03H
                  R     xJLT    ?C0123
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 69  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 69  
 
                                            ; SOURCE LINE # 863
                                            ; SOURCE LINE # 864
@@ -4376,7 +4376,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 887
 ;---- Variable 'option' assigned to Register 'R7' ----
                                            ; SOURCE LINE # 888
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 70  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 70  
 
                                            ; SOURCE LINE # 892
                        MOV     A,R7
@@ -4440,7 +4440,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 928
 ;---- Variable 'option' assigned to Register 'R5' ----
                        MOV     R5,AR7
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 71  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 71  
 
                                            ; SOURCE LINE # 929
                                            ; SOURCE LINE # 941
@@ -4504,7 +4504,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                        MOV     R3,A
                        MOV     A,R6
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 72  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 72  
 
                        MOV     A,R3
                        MOV     R7,A
@@ -4568,7 +4568,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        CLR     C
                        SUBB    A,#0E8H
                        MOV     A,R6
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 73  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 73  
 
                        SUBB    A,#03H
                  R     xJLT    ?C0136
@@ -4632,7 +4632,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R4,#00H
                        MOV     R5,#0AH
                  E     CALL    ?C?UIDIV
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 74  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 74  
 
                  R     MOV     DPTR,#R_OpenWeight_Ad
                        MOV     A,R6
@@ -4696,7 +4696,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    A,@DPTR
                        MOV     R7,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 75  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 75  
 
                        RET     
              ?C0141:
@@ -4760,7 +4760,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOV     A,R7
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 76  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 76  
 
                                            ; SOURCE LINE # 1021
                  R     MOV     DPTR,#R_CaliState
@@ -4784,7 +4784,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        CLR     C
                  R     MOV     DPTR,#R_AdFilTimes+01H
                        MOVX    A,@DPTR
-                       SUBB    A,#0FH
+                       SUBB    A,#0CH
                  R     MOV     DPTR,#R_AdFilTimes
                        MOVX    A,@DPTR
                        SUBB    A,#00H
@@ -4824,7 +4824,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
              ?C0144:
                                            ; SOURCE LINE # 1035
                  R     MOV     DPTR,#R_CaliState
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 77  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 77  
 
                        MOVX    A,@DPTR
                  R     xJNE    A,#01H,?C0146
@@ -4888,7 +4888,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        SUBB    A,R7
                  R     MOV     DPTR,#R_OpenWeight_Ad
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 78  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 78  
 
                        SUBB    A,R6
                  R     xJGE    ?C0150
@@ -4912,7 +4912,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        CLR     C
                  R     MOV     DPTR,#R_AdFilTimes+01H
                        MOVX    A,@DPTR
-                       SUBB    A,#0FH
+                       SUBB    A,#0CH
                  R     MOV     DPTR,#R_AdFilTimes
                        MOVX    A,@DPTR
                        SUBB    A,#00H
@@ -4952,7 +4952,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        SETB    C
                  R     MOV     DPTR,#R_AD_CaliDot1+01H
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 79  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 79  
 
                        SUBB    A,#0EEH
                  R     MOV     DPTR,#R_AD_CaliDot1
@@ -4961,7 +4961,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     xJLT    ?C0152
                  R     MOV     DPTR,#R_AdFilTimes+01H
                        MOVX    A,@DPTR
-                       SUBB    A,#03CH
+                       SUBB    A,#0CH
                  R     MOV     DPTR,#R_AdFilTimes
                        MOVX    A,@DPTR
                        SUBB    A,#00H
@@ -5016,7 +5016,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
              ?C0155:
                                            ; SOURCE LINE # 1073
                        CLR     A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 80  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 80  
 
                        MOV     R5,A
                        MOV     R4,A
@@ -5080,7 +5080,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        SUBB    A,R7
                  R     MOV     DPTR,#R_AD_BUF
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 81  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 81  
 
                        SUBB    A,R6
                  R     xJGE    ?C0157
@@ -5119,7 +5119,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     xJLT    ?C0159
                  R     MOV     DPTR,#R_AdFilTimes+01H
                        MOVX    A,@DPTR
-                       SUBB    A,#0FH
+                       SUBB    A,#0CH
                  R     MOV     DPTR,#R_AdFilTimes
                        MOVX    A,@DPTR
                        SUBB    A,#00H
@@ -5144,7 +5144,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 1094
                                            ; SOURCE LINE # 1095
              ?C0159:
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 82  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 82  
 
                                            ; SOURCE LINE # 1096
                  R     MOV     DPTR,#R_AD_CaliDot2
@@ -5208,7 +5208,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#R_AD_BUF
                        MOVX    A,@DPTR
                        SUBB    A,R6
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 83  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 83  
 
                        MOV     R6,A
                  R     MOV     DPTR,#weight_temp
@@ -5272,7 +5272,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#R_AD_CaliDot2
                        MOVX    A,@DPTR
                        MOV     R4,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 84  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 84  
 
                        INC     DPTR
                        MOVX    A,@DPTR
@@ -5316,7 +5316,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     xJLT    ?C0166
                  R     MOV     DPTR,#R_AdFilTimes+01H
                        MOVX    A,@DPTR
-                       SUBB    A,#0FH
+                       SUBB    A,#0CH
                  R     MOV     DPTR,#R_AdFilTimes
                        MOVX    A,@DPTR
                        SUBB    A,#00H
@@ -5336,7 +5336,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 1135
                  R     MOV     DPTR,#R_AD_CaliDot3
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 85  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 85  
 
                        MOV     R4,A
                        INC     DPTR
@@ -5400,7 +5400,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 1150
                  R     MOV     DPTR,#R_Scale_state
                        MOV     A,#01H
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 86  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 86  
 
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 1151
@@ -5464,7 +5464,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  E     CALL    _SpiFlashOperator
                                            ; SOURCE LINE # 1169
              ?C0172:
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 87  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 87  
 
                                            ; SOURCE LINE # 1170
                        CLR     A
@@ -5528,7 +5528,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 1210
                        MOV     R7,#0A0H
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 88  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 88  
 
                  E     CALL    _CS_Scale_1186ComSend
                                            ; SOURCE LINE # 1212
@@ -5592,7 +5592,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 1242
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 89  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 89  
 
                  E     MOV     DPTR,#sys_state
                        MOV     A,#02H
@@ -5656,7 +5656,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                  R     xJNZ    ?C0187
                                            ; SOURCE LINE # 1300
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 90  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 90  
 
                                            ; SOURCE LINE # 1301
                        INC     A
@@ -5720,7 +5720,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 1328
                        MOV     A,#03H
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 91  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 91  
 
                                            ; SOURCE LINE # 1329
              ?C0192:
@@ -5784,7 +5784,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#comm_doing
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 1355
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 92  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 92  
 
                        INC     DPTR
                        MOV     A,#05H
@@ -5848,7 +5848,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     xJLT    ?C0185
                                            ; SOURCE LINE # 1378
                                            ; SOURCE LINE # 1379
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 93  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 93  
 
                  R     MOV     DPTR,#R_Scale_state
                        MOV     A,#01H
@@ -5912,7 +5912,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        SUBB    A,#096H
                  R     xJLT    ?C0209
                                            ; SOURCE LINE # 1411
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 94  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 94  
 
                        INC     DPTR
                        MOV     A,#01H
@@ -5976,7 +5976,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#R_TimeOut+02H
                        MOVX    @DPTR,A
              ?C0216:
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 95  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 95  
 
                                            ; SOURCE LINE # 1456
                        MOV     A,R7
@@ -6040,7 +6040,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                        CLR     C
                        SUBB    A,#03H
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 96  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 96  
 
                  R     xJLT    ?C0212
                                            ; SOURCE LINE # 1481
@@ -6104,7 +6104,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,R7
                        XRL     A,#01H
                        ORL     A,R6
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 97  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 97  
 
                  R     xJNZ    ?C0226
                                            ; SOURCE LINE # 1510
@@ -6168,7 +6168,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     xJNE    A,#04H,?C0212
                                            ; SOURCE LINE # 1538
                                            ; SOURCE LINE # 1539
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 98  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 98  
 
                        CLR     A
                  R     MOV     DPTR,#R_TimeOut+02H
@@ -6203,7 +6203,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        RET     
              ; FUNCTION _CS_Scale_TimeOutProc (END)
 
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 99  
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 99  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -6266,7 +6266,7 @@ YC_UtilTimer . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  61
   callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
   timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
   last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 100 
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 100 
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -6329,7 +6329,7 @@ _CS_Scale_AdcFilter. . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
   R_AD_F5. . . . . . . . . . . . . . .  STATIC   XDATA  U_INT    000DH  2
   R_AD_F6. . . . . . . . . . . . . . .  STATIC   XDATA  U_INT    000FH  2
   R_AD_F7. . . . . . . . . . . . . . .  STATIC   XDATA  U_INT    0011H  2
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 101 
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 101 
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -6392,7 +6392,7 @@ _CS_TimeOut_T. . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  5
   unstable . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
   overload . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
   lowbat . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0004H  1
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 102 
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 102 
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -6455,7 +6455,7 @@ _CS_Weight_T . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  10
   st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
   jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
 _CS_ComState . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  3
-C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 16:09:39 PAGE 103 
+C51 COMPILER V9.01   CS_SCALE_PROC                                                         04/18/2017 17:46:10 PAGE 103 
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====

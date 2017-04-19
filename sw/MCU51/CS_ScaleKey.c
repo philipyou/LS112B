@@ -7,9 +7,9 @@
 #include "CS_ScaleKey.h"
 
 
-#define KEY_SHORT_PUSH_CNT		3
-#define KEY_LONG_PUSH_CNT			50
-#define KEY_SHORT_PRESS_TIME		15
+#define KEY_SHORT_PUSH_CNT		3			
+#define KEY_LONG_PUSH_CNT			150		//10ms	Îªµ¥Î»
+#define KEY_SHORT_PRESS_TIME		18
 #define KEY_DOWN					0
 #define KEY_UP						1
 
@@ -41,6 +41,12 @@ void CS_KeyScan(void)
 		
 		KeyPressDeal=0;
 		KeyLongPressDeal=0;
+
+		if(ShortPressCount>KEY_SHORT_PRESS_TIME&&PressTimesCount==1)
+			{
+			PressTimesCount = 0;
+			CS_Scale_ChangeUnit();	
+			}
 		
 		if(Press == true)
 			{

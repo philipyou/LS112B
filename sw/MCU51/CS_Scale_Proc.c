@@ -59,7 +59,7 @@ CS_Weight_T  xdata R_UnitWeight;	//重量值
 #define   CS_PowerOnAD_Steadytimes		10			//稳定开机稳定次数
 #define   CS_SmallWeight_Steadytimes		6			//判断稳定的次数
 #define   CS_BigWeight_Steadytimes		6			//判断稳定的次数
-#define   CS_Cali_Steadytimes				15			//标定时判断稳定的次数
+#define   CS_Cali_Steadytimes				12			//标定时判断稳定的次数
 #define	CS_MemoryRange				25			//记忆重量范围
 
 
@@ -1055,7 +1055,7 @@ u16_t CS_Scale_CaliProc(u8_t option)
 				}
 			else
 				{
-				if((R_AD_CaliDot1> 750)&&(R_AdFilTimes>=60))
+				if((R_AD_CaliDot1> 750)&&(R_AdFilTimes>=CS_Cali_Steadytimes))
 					{				
 					CS_SoftTimer(ResetSoftTimer);
 					CS_Scale_AdcFilter(ScaleAdcFilterReset,R_AD_BUF);
