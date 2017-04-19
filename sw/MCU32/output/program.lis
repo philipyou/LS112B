@@ -1,0 +1,1456 @@
+include "bt_format "
+org 0x0000
+0000 c5128009 bmark1 mark_ext_patch ,patch_ext 
+0001 c00303f9 beq patch00_6 ,p_connection_incontext 
+0002 c0688334 beq patch1a_1 ,p_hci_init_common 
+0003 c0580424 beq patch16_0 ,p_lpm_sleep 
+0004 c04a0068 beq patch12_4 ,p_set_freq_tx 
+0005 c0490043 beq patch12_2 ,p_setfreq_rx 
+0006 c0480046 beq patch12_0 ,p_shutdown_radio 
+0007 c057802e beq patch15_7 ,p_lpm_hibernate 
+0008 202000a1 branch p_assert 
+
+patch_ext:
+0009 c06680ff beq patch39_5 ,p_module_init 
+000a c067013b beq patch39_6 ,p_module_lpm_init 
+000b c032833b beq patch2c_5 ,p_le_prepare_att 
+000c c03781ba beq patch2d_7 ,p_le_parse_att 
+000d c01e81b9 beq patch27_5 ,p_debug_test 
+000e c025841a beq patch29_3 ,p_le_transmit_receive_sifs 
+000f c01f0421 beq patch27_6 ,p_le_enable 
+0010 c026009b beq patch29_4 ,p_le_transmit 
+0011 c0270458 beq patch29_6 ,p_le_send_adv_ind 
+0012 c043803c beq patch30_7 ,p_ui_timer_check 
+0013 c0448018 beq patch31_1 ,p_ui_ipc_send_event 
+0014 c0468426 beq patch31_5 ,p_check_51cmd_once 
+0015 c031843d beq patch2c_3 ,p_le_prepare_tx_cmd 
+0016 c035801a beq patch2d_3 ,p_le_parse_ll 
+0017 202000a1 branch p_assert 
+
+p_ui_ipc_send_event:
+0018 70416e7f jam 0x7f ,mem_seqi 
+0019 20207c29 branch ui_ipc_send_event + 2 
+
+p_le_parse_ll:
+001a 1a627e00 copy regc ,pdata 
+001b c0005924 beq ll_connection_update_req ,le_parse_connection_update_req 
+001c c000d92c beq ll_channel_map_req ,le_parse_channel_map_req 
+001d c001002c beq ll_terminate_ind ,p_le_parse_terminate_ind 
+001e c001d938 beq ll_enc_req ,le_parse_enc_req 
+001f c002593f beq ll_enc_rsp ,le_parse_enc_rsp 
+0020 c002d944 beq ll_start_enc_req ,le_parse_start_enc_req 
+0021 c0035949 beq ll_start_enc_rsp ,le_parse_start_enc_rsp 
+0022 c003d94c beq ll_unknown_rsp ,le_parse_unknown_rsp 
+0023 c004594d beq ll_feature_req ,le_parse_feature_req 
+0024 c004d94f beq ll_feature_rsp ,le_parse_feature_rsp 
+0025 c0055950 beq ll_pause_enc_req ,le_parse_pause_enc_req 
+0026 c005d951 beq ll_pause_enc_rsp ,le_parse_pause_enc_rsp 
+0027 c0065952 beq ll_version_ind ,le_parse_version_ind 
+0028 c006d955 beq ll_reject_ind ,le_parse_reject_ind 
+0029 6000c9e7 store 1 ,mem_le_ll_unknow_type 
+002a 700b7d27 jam xt_ll_unknown_rsp ,mem_fifo_temp 
+002b 20205620 branch le_xtype_fifo_in 
+
+p_le_parse_terminate_ind:
+002c 7049e801 jam 1 ,mem_le_disc_reson 
+002d 20205934 branch le_parse_terminate_ind 
+
+p_lpm_hibernate:
+002e 20403db8 call lpm_write_gpio_wakeup 
+002f 68120138 hfetch 4 ,0x8138 
+0030 793ffe0f set0 15 ,pdata 
+0031 6012004c hstore 4 ,0x804c 
+0032 20403db0 call lpm_write_ctrl 
+0033 d85fffff arg param_hibernate_clks ,temp 
+0034 6800c9fd fetch 1 ,mem_le_sleep_flag 
+0035 c0013cd5 beq 2 ,lpm_hibernate_normal + 1 
+0036 20203cda branch lpm_sleep 
+
+p_ui_timer_timeout:
+0037 58000010 setarg 0x10 
+0038 d8e00003 arg 3 ,queue 
+0039 20407e68 call lshift8_queue 
+003a 9a40a400 iadd regb ,regb 
+003b 20600000 rtn 
+
+p_ui_timer_check:
+003c da200000 arg 0 ,rega 
+003d 680a47ec fetcht 4 ,mem_ui_timer_last_btclk 
+003e 1c422400 copy clkn_bt ,regb 
+003f 1a427e00 copy regb ,pdata 
+0040 98467c00 isub temp ,null 
+0041 24410037 ncall p_ui_timer_timeout ,positive 
+0042 20207c09 branch ui_timer_check_loop 
+
+p_setfreq_rx:
+0043 60088017 storet 1 ,mem_last_freq 
+0044 1840a204 add temp ,rx_freq_offset ,rega 
+0045 20203a86 branch set_freq_rx + 4 
+
+p_shutdown_radio:
+0046 20203a6f branch shutdown_radio + 2 
+0047 2030ba6f branch shutdown_radio + 2 ,33 
+0048 6800c9ce fetch 1 ,mem_txdb 
+0049 c0000056 beq 0x0 ,p_shutdown_radio0db 
+004a c002805f beq 0x5 ,p_shutdown_radio5db 
+004b c07d804d beq 0xfb ,p_shutdown_radiof5db 
+004c 20200056 branch p_shutdown_radio0db 
+
+p_shutdown_radiof5db:
+004d 708955d8 hjam 0xd8 ,0x955 
+004e 20000004 nop 4 
+004f 708955d7 hjam 0xd7 ,0x955 
+0050 20000004 nop 4 
+0051 708955d6 hjam 0xd6 ,0x955 
+0052 20000004 nop 4 
+0053 708955d0 hjam 0xd0 ,0x955 
+0054 708956c0 hjam 0xc0 ,0x956 
+0055 20203a6f branch shutdown_radio + 2 
+
+p_shutdown_radio0db:
+0056 708955d8 hjam 0xd8 ,0x955 
+0057 20000004 nop 4 
+0058 708955d7 hjam 0xd7 ,0x955 
+0059 20000004 nop 4 
+005a 708955d6 hjam 0xd6 ,0x955 
+005b 20000004 nop 4 
+005c 708955d0 hjam 0xd0 ,0x955 
+005d 708956e0 hjam 0xe0 ,0x956 
+005e 20203a6f branch shutdown_radio + 2 
+
+p_shutdown_radio5db:
+005f 708955df hjam 0xdf ,0x955 
+0060 20000004 nop 4 
+0061 708955dd hjam 0xdd ,0x955 
+0062 20000004 nop 4 
+0063 708955db hjam 0xdb ,0x955 
+0064 20000004 nop 4 
+0065 708955d0 hjam 0xd0 ,0x955 
+0066 708956e0 hjam 0xe0 ,0x956 
+0067 20203a6f branch shutdown_radio + 2 
+
+p_set_freq_tx:
+0068 60088017 storet 1 ,mem_last_freq 
+0069 1840a202 add temp ,tx_freq_offset ,rega 
+006a 20403ab6 call rf_write_freq 
+006b 58000500 setarg 0x500 
+006c 20403bf3 call sleep 
+
+p_txon:
+006d 70890601 hjam 0x1 ,0x8906 
+006e 7089003c hjam 0x3c ,0x8900 
+006f 708901e0 hjam 0xe0 ,0x8901 
+0070 70896d12 hjam 0x12 ,0x96d 
+0071 2000000a nop 10 
+0072 70890201 hjam 0x01 ,0x8902 
+0073 7089023d hjam 0x3d ,0x8902 
+0074 2000000a nop 10 
+0075 708903b7 hjam 0xb7 ,0x8903 
+0076 2000000a nop 10 
+0077 7089027d hjam 0x7d ,0x8902 
+0078 6800c9ce fetch 1 ,mem_txdb 
+0079 c0000087 beq 0x0 ,p_txon0db 
+007a c0028091 beq 0x5 ,p_txon5db 
+007b c07d807d beq 0xfb ,p_txonf5db 
+007c 20200087 branch p_txon0db 
+
+p_txonf5db:
+007d 708956cb hjam 0xcb ,0x956 
+007e 20000004 nop 4 
+007f 708955d1 hjam 0xd1 ,0x955 
+0080 20000004 nop 4 
+0081 708955d2 hjam 0xd2 ,0x955 
+0082 20000004 nop 4 
+0083 708955d3 hjam 0xd3 ,0x955 
+0084 20000004 nop 4 
+0085 708955d8 hjam 0xd8 ,0x955 
+0086 20600000 rtn 
+
+p_txon0db:
+0087 708956f0 hjam 0xf0 ,0x956 
+0088 20000004 nop 4 
+0089 708955d1 hjam 0xd1 ,0x955 
+008a 20000004 nop 4 
+008b 708955d2 hjam 0xd2 ,0x955 
+008c 20000004 nop 4 
+008d 708955d3 hjam 0xd3 ,0x955 
+008e 20000004 nop 4 
+008f 708955d8 hjam 0xd8 ,0x955 
+0090 20600000 rtn 
+
+p_txon5db:
+0091 708956ff hjam 0xff ,0x956 
+0092 20000004 nop 4 
+0093 708955d1 hjam 0xd1 ,0x955 
+0094 20000004 nop 4 
+0095 708955d2 hjam 0xd2 ,0x955 
+0096 20000004 nop 4 
+0097 708955d8 hjam 0xd8 ,0x955 
+0098 20000004 nop 4 
+0099 708955df hjam 0xdf ,0x955 
+009a 20600000 rtn 
+
+p_le_transmit:
+009b 204053dd call le_prep 
+009c 2040009e call p_letx_setfreq 
+009d 202054c1 branch le_transmit + 4 
+
+p_letx_setfreq:
+009e 2036806d branch p_txon ,match 
+009f 204053ee call le_setfreq 
+00a0 20203a91 branch set_freq_tx 
+
+p_assert:
+00a1 202000a1 branch p_assert 
+
+p_loop:
+00a2 202000a2 branch p_loop 
+
+p_gpio_check_active:
+00a3 d8c08074 arg core_gpio_out0 ,contr 
+00a4 18410e07 and temp ,0x07 ,queue 
+00a5 18497e00 rshift3 temp ,pdata 
+00a6 1fe17e03 and_into 3 ,pdata 
+00a7 98c08c00 iadd contr ,contr 
+00a8 e8c08000 ifetch 1 ,contr 
+00a9 284ffe07 isolate1 7 ,temp 
+00aa 202080ad branch p_gpio_check_active_1 ,true 
+00ab afec0000 qisolate0 pdata 
+00ac 20600000 rtn 
+
+p_gpio_check_active_1:
+00ad afefffff qisolate1 pdata 
+00ae 20600000 rtn 
+
+p_sleep_out_set:
+00af 204067b9 call spid_init_flash 
+00b0 20600000 rtn 
+
+p_sleep_in_set:
+00b1 70828001 hjam 1 ,core_docd_ctrl 
+00b2 68108081 hfetch 1 ,core_gpio_sel1 
+00b3 793ffe00 set0 0 ,pdata 
+00b4 793ffe01 set0 1 ,pdata 
+00b5 60108081 hstore 1 ,core_gpio_sel1 
+00b6 68120078 hfetch 4 ,core_gpio_pu0 
+00b7 793ffe17 set0 23 ,pdata 
+00b8 79207e18 set1 24 ,pdata 
+00b9 793ffe19 set0 25 ,pdata 
+00ba 793ffe1a set0 26 ,pdata 
+00bb 60120078 hstore 4 ,core_gpio_pu0 
+00bc 6812007c hfetch 4 ,core_gpio_pd0 
+00bd 79207e17 set1 23 ,pdata 
+00be 793ffe18 set0 24 ,pdata 
+00bf 79207e19 set1 25 ,pdata 
+00c0 79207e1a set1 26 ,pdata 
+00c1 6012007c hstore 4 ,core_gpio_pd0 
+00c2 68120070 hfetch 4 ,core_gpio_oe0 
+00c3 79207e17 set1 23 ,pdata 
+00c4 79207e18 set1 24 ,pdata 
+00c5 79207e19 set1 25 ,pdata 
+00c6 79207e1a set1 26 ,pdata 
+00c7 60120070 hstore 4 ,core_gpio_oe0 
+00c8 68020074 fetch 4 ,core_gpio_out0 
+00c9 793ffe17 set0 23 ,pdata 
+00ca 79207e18 set1 24 ,pdata 
+00cb 793ffe19 set0 25 ,pdata 
+00cc 793ffe1a set0 26 ,pdata 
+00cd 60120074 hstore 4 ,core_gpio_out0 
+00ce 20600000 rtn 
+
+p_module_before_lpm:
+00cf 202000d0 branch gpio_set_before_lpm_common 
+
+gpio_set_before_lpm_common:
+00d0 da3fffff arg -1 ,rega 
+00d1 68108081 hfetch 1 ,core_gpio_sel1 
+00d2 2feffe01 isolate1 1 ,pdata 
+00d3 204080e6 call neglact4_from_23_pin ,true 
+00d4 1fe12403 and pdata ,0x3 ,regb 
+00d5 1a467c01 sub regb ,1 ,null 
+00d6 204280e8 call neglact2_form_25_pin ,zero 
+00d7 2feffe02 isolate1 2 ,pdata 
+00d8 204080e2 call neglect2_from_6_pin ,true 
+00d9 2feffe03 isolate1 3 ,pdata 
+00da 204080e4 call neglect4_from_9_pin ,true 
+00db 68120078 hfetch 4 ,core_gpio_pu0 
+00dc 681a007c hfetcht 4 ,core_gpio_pd0 
+00dd 9841fe00 ior temp ,pdata 
+00de 1fe47e00 invert pdata ,pdata 
+00df 9a217e00 iand rega ,pdata 
+00e0 60120070 hstore 4 ,core_gpio_oe0 
+00e1 20600000 rtn 
+
+neglect2_from_6_pin:
+00e2 d8e00006 arg 6 ,queue 
+00e3 202000ec branch neglect_2_pin 
+
+neglect4_from_9_pin:
+00e4 d8e00009 arg 9 ,queue 
+00e5 202000ea branch neglact_4_pin 
+
+neglact4_from_23_pin:
+00e6 d8e00017 arg 23 ,queue 
+00e7 202000ea branch neglact_4_pin 
+
+neglact2_form_25_pin:
+00e8 d8e00017 arg 23 ,queue 
+00e9 202000ec branch neglect_2_pin 
+
+neglact_4_pin:
+00ea df200004 arg 4 ,loopcnt 
+00eb 202000ed branch neglect_pin_loop 
+
+neglect_2_pin:
+00ec df200002 arg 2 ,loopcnt 
+
+neglect_pin_loop:
+00ed f93fa200 qset0 rega 
+00ee 18e08e01 increase 1 ,queue 
+00ef c20000ed loop neglect_pin_loop 
+00f0 20600000 rtn 
+
+p_wakeup_c51:
+00f1 204000af call p_sleep_out_set 
+00f2 70828003 hjam 3 ,core_docd_ctrl 
+00f3 7049fe00 jam not_enter_lpm ,mem_lpm_lock 
+00f4 20600000 rtn 
+
+p_module_lpm_wake_init:
+00f5 6800c9fd fetch 1 ,mem_le_sleep_flag 
+00f6 1fe67c01 sub pdata ,1 ,null 
+00f7 20428142 call p_module_wakeup ,zero 
+00f8 6808c7fd fetcht 1 ,mem_ui_button_gpio 
+00f9 204069e5 call gpio_get_bit 
+00fa 202080f1 branch p_wakeup_c51 ,true 
+00fb 6808c801 fetcht 1 ,mem_module_wake_up_gpio 
+00fc 204069e5 call gpio_get_bit 
+00fd 202080f1 branch p_wakeup_c51 ,true 
+00fe 20600000 rtn 
+
+p_module_init:
+00ff 203580f5 branch p_module_lpm_wake_init ,wake 
+0100 1ce27e00 copy auxcnt ,pdata 
+0101 243a0106 nbranch p_module_init_poweron_iowake ,blank 
+0102 6810813e hfetch 1 ,0x813e 
+0103 2fec0003 isolate0 ,3 ,pdata 
+0104 20208108 branch p_module_init_poweron_reset ,true 
+0105 2020002e branch p_lpm_hibernate 
+
+p_module_init_poweron_iowake:
+0106 7049fc16 jam cs_notify_iowake ,mem_poweron_flag 
+0107 20200109 branch p_module_init_poweron_common 
+
+p_module_init_poweron_reset:
+0108 7049fc10 jam cs_notify_poweron ,mem_poweron_flag 
+
+p_module_init_poweron_common:
+0109 70481300 jam 0 ,mem_module_task 
+010a 2040012c call p_scale_gpio_init 
+010b 580001ed setarg scale_process_idle 
+010c 60014290 store 2 ,mem_cb_idle_process 
+010d 580001c1 setarg scale_process_bb_event 
+010e 60014292 store 2 ,mem_cb_bb_event_process 
+010f 580001ec setarg scale_process 
+0110 6001428c store 2 ,mem_cb_le_process 
+0111 58000130 setarg p_scale_lpm_lock 
+0112 60014286 store 2 ,mem_cb_check_wakelock 
+0113 580000cf setarg p_module_before_lpm 
+0114 6001428a store 2 ,mem_cb_before_lpm 
+0115 58004f80 setarg mem_event_buf 
+0116 60014a06 store 2 ,mem_event_wptr 
+0117 60014a04 store 2 ,mem_event_rptr 
+0118 58004f00 setarg mem_cmd_buf 
+0119 60014a02 store 2 ,mem_cmd_wptr 
+011a 58004f00 setarg mem_cmd_buf 
+011b 60014a00 store 2 ,mem_cmd_rptr 
+011c 204001e6 call scale_hardware_init 
+011d 6800c9d3 fetch 1 ,mem_conn_latency 
+011e 6000c213 store 1 ,mem_lpm_mult 
+011f 680141f5 fetch 2 ,mem_lpm_interval 
+0120 1fe0fffc increase -4 ,pdata 
+0121 600144d7 store 2 ,mem_le_adv_interval_min 
+0122 600144d9 store 2 ,mem_le_adv_interval_max 
+0123 20400325 call p_le_modified_name 
+0124 680344f9 fetch 6 ,mem_le_lap 
+0125 20400216 call p_byteswap 
+0126 20400212 call p_updata_mac 
+0127 58000000 setarg 0 
+0128 6001c9e4 store 3 ,mem_att_send_handle 
+0129 204000f1 call p_wakeup_c51 
+012a 204002f0 call p_cs_poweron_notify 
+012b 20203e2b branch check_module_disabled 
+
+p_scale_gpio_init:
+012c 6808c7fd fetcht 1 ,mem_ui_button_gpio 
+012d 204069d1 call gpio_config_input 
+012e 6808c801 fetcht 1 ,mem_module_wake_up_gpio 
+012f 202069d1 branch gpio_config_input 
+
+p_scale_lpm_lock:
+0130 6800c9fe fetch 1 ,mem_lpm_lock 
+0131 c0003f5a beq not_enter_lpm ,app_get_lpm_wake_lock 
+0132 6808c7fd fetcht 1 ,mem_ui_button_gpio 
+0133 204069e5 call gpio_get_bit 
+0134 2020bf5a branch app_get_lpm_wake_lock ,true 
+0135 6808c801 fetcht 1 ,mem_module_wake_up_gpio 
+0136 204069e5 call gpio_get_bit 
+0137 2020bf5a branch app_get_lpm_wake_lock ,true 
+0138 70828001 hjam 1 ,core_docd_ctrl 
+0139 20203f5c branch app_put_lpm_wake_lock 
+013a 20600000 rtn 
+
+p_module_lpm_init:
+013b 70001627 jam 39 ,mem_le_ch_mapped 
+013c 70015300 jam 0 ,mem_tester_emulate 
+013d 70018900 jam 0 ,mem_debug_config 
+013e 70018a00 jam 0 ,mem_lch_code 
+013f 58000000 setarg 0 
+0140 600287da store 5 ,mem_sp_state_start 
+0141 20200147 branch p_module_lpm_uart_init 
+
+p_module_wakeup:
+0142 1ce27e00 copy auxcnt ,pdata 
+0143 203a002e branch p_lpm_hibernate ,blank 
+0144 7049fc16 jam cs_notify_iowake ,mem_poweron_flag 
+0145 7049fd00 jam 0 ,mem_le_sleep_flag 
+0146 20600000 rtn 
+
+p_module_lpm_uart_init:
+0147 20406a0d call init_filter_ram 
+0148 58004b00 setarg mem_module_rx_buf_custom 
+0149 60110054 hstore 2 ,core_uart_rsaddr 
+014a 58004bff setarg mem_module_rx_buf_end_custom 
+014b 60110056 hstore 2 ,core_uart_readdr 
+014c 58001c00 setarg mem_module_tx_buf 
+014d 6011005a hstore 2 ,core_uart_tsaddr 
+014e 58001fff setarg mem_module_tx_buf_end 
+014f 6011005c hstore 2 ,core_uart_teaddr 
+0150 68108081 hfetch 1 ,core_gpio_sel1 
+0151 79207e02 set1 0x02 ,pdata 
+0152 60108081 hstore 1 ,core_gpio_sel1 
+0153 70029fff jam 0xff ,mem_ucode_id_local 
+0154 70806200 hjam 0x0 ,core_uart_ctrl 
+0155 58001c00 setarg mem_module_tx_buf 
+0156 6011005e hstore 2 ,core_uart_twptr 
+0157 60110060 hstore 2 ,core_uart_trptrp 
+0158 58004b00 setarg mem_module_rx_buf_custom 
+0159 60110058 hstore 2 ,core_uart_rrptr 
+015a 20204480 branch hci_init_common 
+
+p_le_send_att_handle_value_indication:
+
+p_le_send_att_handle_value_notification:
+015b 6808c9cc fetcht 1 ,mem_scale_tx_length 
+015c 20205892 branch le_send_packet 
+
+p_le_parse_att_write_request:
+015d 68090347 fetcht 2 ,mem_le_rxbuf + 7 
+015e 20405a88 call le_att_get_handle_ptr 
+015f 18c0a401 add contr ,1 ,regb 
+0160 18c08dfe increase -2 ,contr 
+0161 e8c10000 ifetch 2 ,contr 
+0162 d8402902 arg client_charactertic_configuration ,temp 
+0163 98467c00 isub temp ,null 
+0164 20228171 branch p_le_parse_write_req_configuration ,zero 
+0165 68008341 fetch 1 ,mem_le_rxbuf + 1 
+0166 1fe0fff9 increase -7 ,pdata 
+0167 203a59d8 branch le_parse_att_write_request_fail ,blank 
+0168 1fe27200 icopy loopcnt 
+0169 1f222200 copy loopcnt ,rega 
+016a 1a420a00 copy regb ,contw 
+016b d8c00349 arg mem_le_rxbuf + 9 ,contr 
+016c 20407e45 call memcpy 
+016d 1a227200 copy rega ,loopcnt 
+016e da200349 arg mem_le_rxbuf + 9 ,rega 
+016f 2040018d call p_le_cs_rev_data 
+0170 202059d8 branch le_parse_att_write_request_fail 
+
+p_le_parse_write_req_configuration:
+0171 df200002 arg 2 ,loopcnt 
+0172 1a420a00 copy regb ,contw 
+0173 d8c00349 arg mem_le_rxbuf + 9 ,contr 
+0174 20407e45 call memcpy 
+0175 68090347 fetcht 2 ,mem_le_rxbuf + 7 
+0176 20400280 call le_att_find_notifyhandle 
+0177 243459d8 nbranch le_parse_att_write_request_fail ,user 
+0178 600949e4 storet 2 ,mem_att_send_handle 
+0179 68008349 fetch 1 ,mem_le_rxbuf + 9 
+017a 6000c9e6 store 1 ,mem_att_send_option 
+017b 2040017d call p_le_open_tx_handle 
+017c 202059d8 branch le_parse_att_write_request_fail 
+
+p_le_open_tx_handle:
+017d d8a00103 arg mem_tmp_buffer ,contw 
+017e 580000c6 setarg cs_prefix_event 
+017f e0a08000 istore 1 ,contw 
+0180 58000004 setarg 0x04 
+0181 e0a08000 istore 1 ,contw 
+0182 58000014 setarg cs_notify_openhandle 
+0183 e0a08000 istore 1 ,contw 
+0184 680149e4 fetch 2 ,mem_att_send_handle 
+0185 e0a10000 istore 2 ,contw 
+0186 6800c9e6 fetch 1 ,mem_att_send_option 
+0187 e0a08000 istore 1 ,contw 
+0188 2020030a branch p_cs_mem_to_event 
+
+p_le_parse_att_write_command:
+0189 68008341 fetch 1 ,mem_le_rxbuf + 1 
+018a 1fe0fff9 increase -7 ,pdata 
+018b 1fe27200 icopy loopcnt 
+018c da200349 arg mem_le_rxbuf + 9 ,rega 
+
+p_le_cs_rev_data:
+018d d8a00103 arg mem_tmp_buffer ,contw 
+018e 580000c6 setarg cs_prefix_event 
+018f e0a08000 istore 1 ,contw 
+0190 1f20fe03 add loopcnt ,3 ,pdata 
+0191 e0a08000 istore 1 ,contw 
+0192 58000013 setarg cs_notify_data 
+0193 e0a08000 istore 1 ,contw 
+0194 68010347 fetch 2 ,mem_le_rxbuf + 7 
+0195 e0a10000 istore 2 ,contw 
+0196 d8c00349 arg mem_le_rxbuf + 9 ,contr 
+0197 20407e45 call memcpy 
+0198 2020030a branch p_cs_mem_to_event 
+
+p_le_parse_att_handle_value_confirm:
+0199 d8a00103 arg mem_tmp_buffer ,contw 
+019a 580000c6 setarg cs_prefix_event 
+019b e0a08000 istore 1 ,contw 
+019c 58000001 setarg 1 
+019d e0a08000 istore 1 ,contw 
+019e 58000018 setarg cs_notify_indicate_confirm 
+019f e0a08000 istore 1 ,contw 
+01a0 2020030a branch p_cs_mem_to_event 
+
+le_parse_att_read_request:
+01a1 68010347 fetch 2 ,mem_le_rxbuf + 7 
+01a2 600103fa store 2 ,mem_le_att_handle 
+01a3 600149e9 store 2 ,mem_le_readhandle 
+01a4 1fe20e00 copy pdata ,queue 
+01a5 1fe67c3f sub pdata ,0x3F ,null 
+01a6 202101a9 branch le_parse_att_read_request_2 ,positive 
+
+le_parse_att_read_request_1:
+01a7 680449f4 fetch 8 ,mem_le_readreqhandleflag + 8 
+01a8 202001aa branch le_parse_att_read_request_2 + 1 
+
+le_parse_att_read_request_2:
+01a9 680449ec fetch 8 ,mem_le_readreqhandleflag 
+01aa afefffff qisolate1 pdata 
+01ab 202081ae branch p_le_le_att_read_notify ,true 
+
+le_parse_att_read_request_ok:
+01ac 700b7d0b jam attop_read_response ,mem_fifo_temp 
+01ad 20205620 branch le_xtype_fifo_in 
+
+p_le_le_att_read_notify:
+01ae 7049eb14 jam 20 ,mem_le_readreq_timeout 
+01af d8a00103 arg mem_tmp_buffer ,contw 
+01b0 580000c6 setarg cs_prefix_event 
+01b1 e0a08000 istore 1 ,contw 
+01b2 58000003 setarg 0x03 
+01b3 e0a08000 istore 1 ,contw 
+01b4 58000015 setarg cs_notify_read_req 
+01b5 e0a08000 istore 1 ,contw 
+01b6 680149e9 fetch 2 ,mem_le_readhandle 
+01b7 e0a10000 istore 2 ,contw 
+01b8 2020030a branch p_cs_mem_to_event 
+
+p_debug_test:
+01b9 202053bc branch le_disconnect0 
+
+p_le_parse_att:
+01ba e8c18000 ifetch 3 ,contr 
+01bb 600183f9 store 3 ,mem_le_att_opcode 
+01bc c009015d beq attop_write_request ,p_le_parse_att_write_request 
+01bd c0290189 beq attop_write_command ,p_le_parse_att_write_command 
+01be c00501a1 beq attop_read_request ,le_parse_att_read_request 
+01bf c00f0199 beq attop_handle_value_confirmation ,p_le_parse_att_handle_value_confirm 
+01c0 20205907 branch le_parse_att0 
+
+scale_process_bb_event:
+01c1 1a627e00 copy regc ,pdata 
+01c2 c00a01d2 beq bt_evt_le_connected ,scale_process_le_conn 
+01c3 c00a81d6 beq bt_evt_le_disconnected ,scale_process_le_discon 
+01c4 1fe1040f and pdata ,0x0f ,temp 
+01c5 1fe17ef0 and_into bt_evt_timer_mask ,pdata 
+01c6 c02801c8 beq bt_evt_timer_init ,p_cs_module_bb_event_timer 
+01c7 20600000 rtn 
+
+p_cs_module_bb_event_timer:
+01c8 204063ec call module_bb_event_timer 
+01c9 202001ca branch p_cs_read_req_timeout 
+
+p_cs_read_req_timeout:
+01ca 6800c9eb fetch 1 ,mem_le_readreq_timeout 
+01cb 207a0000 rtn blank 
+01cc 1fe0ffff increase -1 ,pdata 
+01cd 6000c9eb store 1 ,mem_le_readreq_timeout 
+01ce 247a0000 nrtn blank 
+01cf 58000000 setarg 0x00 
+01d0 600149e9 store 2 ,mem_le_readhandle 
+01d1 202001ac branch le_parse_att_read_request_ok 
+
+scale_process_le_conn:
+01d2 7049e800 jam 0 ,mem_le_disc_reson 
+01d3 204002f8 call p_cs_conn_notify 
+01d4 2040043a call p_app_updata_le_param 
+01d5 20206397 branch module_stop_adv_discovery 
+
+scale_process_le_discon:
+01d6 58000000 setarg 0x00 
+01d7 600149e9 store 2 ,mem_le_readhandle 
+01d8 7049eb00 jam 0 ,mem_le_readreq_timeout 
+01d9 6800c9d3 fetch 1 ,mem_conn_latency 
+01da 6000c213 store 1 ,mem_lpm_mult 
+01db 58000000 setarg 0 
+01dc 600102c4 store 2 ,mem_l2cap_rxbuff1_len 
+01dd 58000000 setarg 0 
+01de 600102c6 store 2 ,mem_l2cap_rxbuff2_len 
+01df 58000000 setarg 0 
+01e0 6001c9e4 store 3 ,mem_att_send_handle 
+01e1 20400291 call le_att_client_clr 
+01e2 2040638c call module_start_adv_discovery 
+01e3 6800c9fd fetch 1 ,mem_le_sleep_flag 
+01e4 c080023b bne 0 ,p_cs_sleep_enter 
+01e5 20200300 branch p_cs_dis_notify 
+
+scale_hardware_init:
+01e6 20758000 rtn wake 
+01e7 204067b9 call spid_init_flash 
+01e8 68108043 hfetch 1 ,core_uart_clksel 
+01e9 793ffe00 set0 0 ,pdata 
+01ea 60108043 hstore 1 ,core_uart_clksel 
+01eb 20200147 branch p_module_lpm_uart_init 
+
+scale_process:
+01ec 20200200 branch scale_normal_dispatch 
+
+scale_process_idle:
+01ed 20200200 branch scale_normal_dispatch 
+
+scale_debug:
+01ee 58000001 setarg 1 
+01ef 6001480e store 2 ,mem_current_packet_length 
+01f0 2020428c branch at_rev_end 
+
+scale_normal_dispatch_ignore:
+01f1 20400320 call p_cs_cmd_mem_zero 
+01f2 18c27e00 copy contr ,pdata 
+01f3 60014a00 store 2 ,mem_cmd_rptr 
+01f4 20600000 rtn 
+
+p_cs_cmd_to_mem:
+01f5 e8c08000 ifetch 1 ,contr 
+01f6 e0a08000 istore 1 ,contw 
+01f7 1fe27200 copy pdata ,loopcnt 
+01f8 20400320 call p_cs_cmd_mem_zero 
+
+p_cs_cmd_to_mem_loop:
+01f9 e8c08000 ifetch 1 ,contr 
+01fa e0a08000 istore 1 ,contw 
+01fb 20400320 call p_cs_cmd_mem_zero 
+01fc c20001f9 loop p_cs_cmd_to_mem_loop 
+01fd 18c27e00 copy contr ,pdata 
+01fe 60014a00 store 2 ,mem_cmd_rptr 
+01ff 20600000 rtn 
+
+scale_normal_dispatch:
+0200 68014a00 fetch 2 ,mem_cmd_rptr 
+0201 68094a02 fetcht 2 ,mem_cmd_wptr 
+0202 98467c00 isub temp ,null 
+0203 20628000 rtn zero 
+0204 1fe20c00 copy pdata ,contr 
+0205 e8c08000 ifetch 1 ,contr 
+0206 c0e281f1 bne cs_prefix_cmd ,scale_normal_dispatch_ignore 
+0207 20400320 call p_cs_cmd_mem_zero 
+0208 d8a00103 arg mem_tmp_buffer ,contw 
+0209 204001f5 call p_cs_cmd_to_mem 
+020a 68008104 fetch 1 ,mem_tmp_buffer + 1 
+020b c0100234 beq cs_cmd_sleep_req ,p_cs_sleep_req 
+020c c0110243 beq cs_cmd_adv_interv_set_req ,p_cs_adv_interv_set_req 
+020d c011824c beq cs_cmd_conn_interv_set_req ,p_cs_conn_interval_set_req 
+020e c014025d beq cs_cmd_txpower_set_req ,p_cs_tx_power_set_req 
+020f c014827b beq cs_cmd_le_disc_req ,p_cs_le_dis_req 
+0210 c01802b4 beq cs_cmd_le_tx_dat ,p_cs_tx_dat 
+0211 c01902b2 beq cs_cmd_le_wr_dat ,p_cs_wr_dat 
+
+p_updata_mac:
+0212 680949e2 fetcht 2 ,mem_adv_lap_ptr 
+0213 207a0000 rtn blank 
+0214 e0430000 istore 6 ,temp 
+0215 20600000 rtn 
+
+p_byteswap:
+0216 600349d6 store 6 ,mem_swap 
+0217 6800c9d6 fetch 1 ,mem_swap 
+0218 6000c9e1 store 1 ,mem_swap + 11 
+0219 e8c08000 ifetch 1 ,contr 
+021a 6000c9e0 store 1 ,mem_swap + 10 
+021b e8c08000 ifetch 1 ,contr 
+021c 6000c9df store 1 ,mem_swap + 9 
+021d e8c08000 ifetch 1 ,contr 
+021e 6000c9de store 1 ,mem_swap + 8 
+021f e8c08000 ifetch 1 ,contr 
+0220 6000c9dd store 1 ,mem_swap + 7 
+0221 e8c08000 ifetch 1 ,contr 
+0222 6000c9dc store 1 ,mem_swap + 6 
+0223 680349dc fetch 6 ,mem_swap + 6 
+0224 20600000 rtn 
+
+wait_wakeup_pin_notactive:
+0225 6808c801 fetcht 1 ,mem_module_wake_up_gpio 
+0226 204069e5 call gpio_get_bit 
+0227 24608000 nrtn true 
+0228 20002710 nop 10000 
+0229 20200225 branch wait_wakeup_pin_notactive 
+
+p_cs_sleep_clr:
+022a 7049eb00 jam 0 ,mem_le_readreq_timeout 
+022b 6800c9d3 fetch 1 ,mem_conn_latency 
+022c 6000c213 store 1 ,mem_lpm_mult 
+022d 58000000 setarg 0 
+022e 600102c4 store 2 ,mem_l2cap_rxbuff1_len 
+022f 600102c6 store 2 ,mem_l2cap_rxbuff2_len 
+0230 6001c9e4 store 3 ,mem_att_send_handle 
+0231 600149e9 store 2 ,mem_le_readhandle 
+0232 7049e800 jam 0 ,mem_le_disc_reson 
+0233 20200291 branch le_att_client_clr 
+
+p_cs_sleep_req:
+0234 68008105 fetch 1 ,mem_tmp_buffer + 2 
+0235 c0008238 beq 1 ,p_cs_sleep_req_hibernate 
+
+p_cs_sleep_req_retation:
+0236 7049fd81 jam 0x81 ,mem_le_sleep_flag 
+0237 20200239 branch p_cs_sleep_req_ok 
+
+p_cs_sleep_req_hibernate:
+0238 7049fd82 jam 0x82 ,mem_le_sleep_flag 
+
+p_cs_sleep_req_ok:
+0239 680147f4 fetch 2 ,mem_ui_state_map 
+023a c284bf90 bbit1 ui_state_ble_connected ,app_ble_disconnect 
+
+p_cs_sleep_enter:
+023b 2040022a call p_cs_sleep_clr 
+023c 20407f68 call wait_uarttx 
+023d 20400225 call wait_wakeup_pin_notactive 
+023e 6800c9fd fetch 1 ,mem_le_sleep_flag 
+023f 793ffe07 set0 7 ,pdata 
+0240 6000c9fd store 1 ,mem_le_sleep_flag 
+0241 204000b1 call p_sleep_in_set 
+0242 20203f10 branch app_bb_hibernate 
+
+p_cs_adv_interv_set_req:
+0243 d8c00105 arg mem_tmp_buffer + 2 ,contr 
+0244 e8c10000 ifetch 2 ,contr 
+0245 1fe67c1f sub pdata ,0x1f ,null 
+0246 20610000 rtn positive 
+0247 600141f5 store 2 ,mem_lpm_interval 
+0248 1fe0fffc increase -4 ,pdata 
+0249 600144d7 store 2 ,mem_le_adv_interval_min 
+024a 600144d9 store 2 ,mem_le_adv_interval_max 
+024b 20600000 rtn 
+
+p_cs_conn_interval_set_req:
+024c d8c00105 arg mem_tmp_buffer + 2 ,contr 
+024d e8c10000 ifetch 2 ,contr 
+024e 600149cf store 2 ,mem_conn_min_interv 
+024f e8c10000 ifetch 2 ,contr 
+0250 600149d1 store 2 ,mem_conn_max_interv 
+0251 e8c08000 ifetch 1 ,contr 
+0252 6000c9d3 store 1 ,mem_conn_latency 
+0253 e8c10000 ifetch 2 ,contr 
+0254 600149d4 store 2 ,mem_conn_timeout 
+0255 680147f4 fetch 2 ,mem_ui_state_map 
+0256 2feffe09 isolate1 ui_state_ble_connected ,pdata 
+0257 2020825b branch p_cs_conn_interval_send ,true 
+0258 6800c9d3 fetch 1 ,mem_conn_latency 
+0259 6000c213 store 1 ,mem_lpm_mult 
+025a 20600000 rtn 
+
+p_cs_conn_interval_send:
+025b 700b7d12 jam bt_cmd_le_update_conn ,mem_fifo_temp 
+025c 20207c33 branch ui_ipc_send_cmd 
+
+p_cs_tx_power_set_req:
+025d 68008105 fetch 1 ,mem_tmp_buffer + 2 
+025e 6000c9ce store 1 ,mem_txdb 
+025f c0000263 beq 0x00 ,p_cs_tx_power_set_req0 
+0260 c002826a beq 0x05 ,p_cs_tx_power_set_req5 
+0261 c07d8271 beq 0xfb ,p_cs_tx_power_set_reqfb 
+0262 20600000 rtn 
+
+p_cs_tx_power_set_req0:
+0263 7089574c hjam 0x4c ,0x957 
+0264 7089586c hjam 0x6c ,0x958 
+0265 70895950 hjam 0x50 ,0x959 
+0266 7049a44c jam 0x4c ,mem_module_uuid_list + 260 
+0267 7049a66c jam 0x6c ,mem_module_uuid_list + 262 
+0268 7049a850 jam 0x50 ,mem_module_uuid_list + 264 
+0269 20600000 rtn 
+
+p_cs_tx_power_set_req5:
+026a 7089574c hjam 0x4c ,0x957 
+026b 7089586c hjam 0x6c ,0x958 
+026c 70895910 hjam 0x10 ,0x959 
+026d 7049a44c jam 0x4c ,mem_module_uuid_list + 260 
+026e 7049a66c jam 0x6c ,mem_module_uuid_list + 262 
+026f 7049a810 jam 0x10 ,mem_module_uuid_list + 264 
+0270 20600000 rtn 
+
+p_cs_tx_power_set_reqfb:
+0271 7089574c hjam 0x4c ,0x957 
+0272 7089586c hjam 0x6c ,0x958 
+0273 70895950 hjam 0x50 ,0x959 
+0274 7049a44c jam 0x4c ,mem_module_uuid_list + 260 
+0275 7049a66c jam 0x6c ,mem_module_uuid_list + 262 
+0276 7049a850 jam 0x50 ,mem_module_uuid_list + 264 
+0277 20600000 rtn 
+
+custom_ble_disconnect:
+0278 7049e802 jam 2 ,mem_le_disc_reson 
+0279 700b7d22 jam xt_ll_terminate_ind ,mem_fifo_temp 
+027a 20205620 branch le_xtype_fifo_in 
+
+p_cs_le_dis_req:
+027b 680147f4 fetch 2 ,mem_ui_state_map 
+027c c284bf90 bbit1 ui_state_ble_connected ,app_ble_disconnect 
+027d 20600000 rtn 
+
+p_reset_mcu:
+027e 70801001 hjam 0x1 ,0x8010 
+027f 20002710 nop 10000 
+
+le_att_find_notifyhandle:
+0280 78547c00 disable user 
+
+le_att_find_notifyhandle_loop:
+0281 184085ff increase -1 ,temp 
+0282 20628000 rtn zero 
+0283 20405a88 call le_att_get_handle_ptr 
+0284 207a0000 rtn blank 
+0285 24628000 nrtn zero 
+0286 18c08dfe increase -2 ,contr 
+0287 e8c10000 ifetch 2 ,contr 
+0288 da202900 arg 0x2900 ,rega 
+0289 9a267c00 isub rega ,null 
+028a 2421028f nbranch le_att_find_notifyhandle_ok ,positive 
+028b da202905 arg 0x2905 ,rega 
+028c 9a267c00 isub rega ,null 
+028d 2021028f branch le_att_find_notifyhandle_ok ,positive 
+028e 20200281 branch le_att_find_notifyhandle_loop 
+
+le_att_find_notifyhandle_ok:
+028f 78347c00 enable user 
+0290 20600000 rtn 
+
+le_att_client_clr:
+0291 d8c04504 arg mem_le_att_list ,contr 
+0292 d8402902 arg client_charactertic_configuration ,temp 
+
+le_att_client_clr_loop:
+0293 e8c10000 ifetch 2 ,contr 
+0294 207a0000 rtn blank 
+0295 e8c10000 ifetch 2 ,contr 
+0296 98467c00 isub temp ,null 
+0297 2422829d nbranch le_att_client_clr_next ,zero 
+0298 58000000 setarg 0 
+0299 18c08c01 increase 1 ,contr 
+029a e0c10000 istore 2 ,contr 
+029b 18c08c02 increase 2 ,contr 
+029c 20200293 branch le_att_client_clr_loop 
+
+le_att_client_clr_next:
+029d e8c08000 ifetch 1 ,contr 
+029e 98c08c00 iadd contr ,contr 
+029f 20200293 branch le_att_client_clr_loop 
+
+le_att_get_client:
+02a0 20405a88 call le_att_get_handle_ptr 
+02a1 e8c08000 ifetch 1 ,contr 
+02a2 98c08c00 iadd contr ,contr 
+02a3 78547c00 disable user 
+
+le_att_get_client_loop:
+02a4 e8c10000 ifetch 2 ,contr 
+02a5 207a0000 rtn blank 
+02a6 e8c10000 ifetch 2 ,contr 
+02a7 d8402902 arg client_charactertic_configuration ,temp 
+02a8 98467c00 isub temp ,null 
+02a9 202282b0 branch le_att_get_client_ok ,zero 
+02aa d8402800 arg uuid_gatt_primary_service ,temp 
+02ab 98467c00 isub temp ,null 
+02ac 20628000 rtn zero 
+02ad e8c08000 ifetch 1 ,contr 
+02ae 98c08c00 iadd contr ,contr 
+02af 202002a4 branch le_att_get_client_loop 
+
+le_att_get_client_ok:
+02b0 78347c00 enable user 
+02b1 20600000 rtn 
+
+p_cs_wr_dat:
+02b2 78547c00 disable user 
+02b3 202002b5 branch p_cs_tx_dat_common 
+
+p_cs_tx_dat:
+02b4 78347c00 enable user 
+
+p_cs_tx_dat_common:
+02b5 68090105 fetcht 2 ,mem_tmp_buffer + 2 
+02b6 18422200 copy temp ,rega 
+02b7 20405a88 call le_att_get_handle_ptr 
+02b8 24628000 nrtn ,zero 
+02b9 e8c88000 ifetcht 1 ,contr 
+02ba 18c22400 copy contr ,regb 
+02bb 68008103 fetch 1 ,mem_tmp_buffer 
+02bc da600004 arg 4 ,regc 
+02bd 9a667e00 isub regc ,pdata 
+02be 24610000 nrtn positive 
+02bf 98462600 isub temp ,regc 
+02c0 20610000 rtn positive 
+02c1 1fe0fe01 increase 1 ,pdata 
+02c2 1fe27200 icopy loopcnt 
+02c3 1a420a00 copy regb ,contw 
+02c4 d8c00107 arg mem_tmp_buffer + 4 ,contr 
+02c5 20407e45 call memcpy 
+02c6 1a6627ff sub regc ,-1 ,regc 
+02c7 1a627200 copy regc ,loopcnt 
+02c8 20407e3f call clear_mem 
+02c9 243402d5 nbranch p_cs_wr_dat_end ,user 
+02ca 680147f4 fetch 2 ,mem_ui_state_map 
+02cb 2feffe09 isolate1 ui_state_ble_connected ,pdata 
+02cc 24608000 nrtn ,true 
+02cd 1a220400 copy rega ,temp 
+02ce 204002a0 call le_att_get_client 
+02cf 24740000 nrtn ,user 
+02d0 18c08c01 increase 1 ,contr 
+02d1 e8c10000 ifetch 2 ,contr 
+
+p_cs_tx_dat_common_send:
+02d2 c28002df bbit1 att_bit_notification ,p_cs_le_tx_notification 
+02d3 c28082dd bbit1 att_bit_indication ,p_cs_le_tx_indication 
+02d4 20600000 rtn 
+
+p_cs_wr_dat_end:
+02d5 680149e9 fetch 2 ,mem_le_readhandle 
+02d6 9a267c00 isub rega ,null 
+02d7 24628000 nrtn zero 
+02d8 600103fa store 2 ,mem_le_att_handle 
+02d9 58000000 setarg 0x00 
+02da 600149e9 store 2 ,mem_le_readhandle 
+02db 7049eb00 jam 0 ,mem_le_readreq_timeout 
+02dc 202001ac branch le_parse_att_read_request_ok 
+
+p_cs_le_tx_indication:
+02dd 700b7d1d jam attop_handle_value_indication ,mem_fifo_temp 
+02de 202002e0 branch p_cs_le_tx_common 
+
+p_cs_le_tx_notification:
+02df 700b7d1b jam attop_handle_value_notification ,mem_fifo_temp 
+
+p_cs_le_tx_common:
+02e0 6000c9e6 store 1 ,mem_att_send_option 
+02e1 1a227e00 copy rega ,pdata 
+02e2 600149e4 store 2 ,mem_att_send_handle 
+02e3 68008103 fetch 1 ,mem_tmp_buffer 
+02e4 d8400003 arg 3 ,temp 
+02e5 98467e00 isub temp ,pdata 
+02e6 1fe27200 copy pdata ,loopcnt 
+02e7 1fe0fe07 increase 7 ,pdata 
+02e8 6000c9cc store 1 ,mem_scale_tx_length 
+02e9 d8a04445 arg mem_le_l2cap + 1 ,contw 
+02ea 680149e4 fetch 2 ,mem_att_send_handle 
+02eb e0a10000 istore 2 ,contw 
+02ec d8c00107 arg mem_tmp_buffer + 4 ,contr 
+02ed 20407e45 call memcpy 
+02ee 20405620 call le_xtype_fifo_in 
+02ef 20600000 rtn 
+
+p_cs_poweron_notify:
+02f0 d8a00103 arg mem_tmp_buffer ,contw 
+02f1 580000c6 setarg cs_prefix_event 
+02f2 e0a08000 istore 1 ,contw 
+02f3 58000001 setarg 0x01 
+02f4 e0a08000 istore 1 ,contw 
+02f5 58000010 setarg cs_notify_poweron 
+02f6 e0a08000 istore 1 ,contw 
+02f7 2020030a branch p_cs_mem_to_event 
+
+p_cs_conn_notify:
+02f8 d8a00103 arg mem_tmp_buffer ,contw 
+02f9 580000c6 setarg cs_prefix_event 
+02fa e0a08000 istore 1 ,contw 
+02fb 58000001 setarg 0x01 
+02fc e0a08000 istore 1 ,contw 
+02fd 58000012 setarg cs_notify_conn 
+02fe e0a08000 istore 1 ,contw 
+02ff 2020030a branch p_cs_mem_to_event 
+
+p_cs_dis_notify:
+0300 d8a00103 arg mem_tmp_buffer ,contw 
+0301 580000c6 setarg cs_prefix_event 
+0302 e0a08000 istore 1 ,contw 
+0303 58000002 setarg 0x02 
+0304 e0a08000 istore 1 ,contw 
+0305 58000011 setarg cs_notify_disc 
+0306 e0a08000 istore 1 ,contw 
+0307 6800c9e8 fetch 1 ,mem_le_disc_reson 
+0308 e0a08000 istore 1 ,contw 
+0309 2020030a branch p_cs_mem_to_event 
+
+p_cs_mem_to_event:
+030a 204000f1 call p_wakeup_c51 
+030b 68014a06 fetch 2 ,mem_event_wptr 
+030c 1fe20a00 copy pdata ,contw 
+030d 68008103 fetch 1 ,mem_tmp_buffer 
+030e e0a08000 istore 1 ,contw 
+030f 2040031b call p_cs_event_mem_zero 
+0310 e8c08000 ifetch 1 ,contr 
+0311 e0a08000 istore 1 ,contw 
+0312 1fe27200 copy pdata ,loopcnt 
+0313 2040031b call p_cs_event_mem_zero 
+
+p_cs_mem_to_event_loop:
+0314 e8c08000 ifetch 1 ,contr 
+0315 e0a08000 istore 1 ,contw 
+0316 2040031b call p_cs_event_mem_zero 
+0317 c2000314 loop p_cs_mem_to_event_loop 
+0318 18a27e00 copy contw ,pdata 
+0319 60014a06 store 2 ,mem_event_wptr 
+031a 20600000 rtn 
+
+p_cs_event_mem_zero:
+031b 58005000 setarg mem_event_buf_end + 1 
+031c 98a67c00 isub contw ,null 
+031d 24628000 nrtn zero 
+031e d8a04f80 arg mem_event_buf ,contw 
+031f 20600000 rtn 
+
+p_cs_cmd_mem_zero:
+0320 58004f80 setarg mem_cmd_buf_end + 1 
+0321 98c67c00 isub contr ,null 
+0322 24628000 nrtn zero 
+0323 d8c04f00 arg mem_cmd_buf ,contr 
+0324 20600000 rtn 
+
+p_le_modified_name:
+0325 20405adf call le_modified_name_att_list 
+
+p_le_modified_scan_rsp:
+0326 6800c3fb fetch 1 ,mem_le_scan_data + 1 
+0327 1fe67c09 sub pdata ,gap_adtype_local_name_complete ,null 
+0328 24628000 nrtn zero 
+0329 6800c419 fetch 1 ,mem_le_name_len 
+032a 1fe27200 copy pdata ,loopcnt 
+032b 1fe0fe01 increase 1 ,pdata 
+032c 6000c3fa store 1 ,mem_le_scan_data 
+032d d8a043fc arg mem_le_scan_data + 2 ,contw 
+032e d8c0441a arg mem_le_name ,contr 
+032f 20407e45 call memcpy 
+0330 6800c3fa fetch 1 ,mem_le_scan_data 
+0331 1fe0fe01 increase 1 ,pdata 
+0332 6000c3f9 store 1 ,mem_le_scan_data_len 
+0333 20600000 rtn 
+
+p_hci_init_common:
+0334 68110050 hfetch 2 ,core_clkoff 
+0335 793ffe0f set0 0x0f ,pdata 
+0336 60110050 hstore 2 ,core_clkoff 
+0337 20406909 call uart_set_baud_by_mem 
+0338 70804300 hjam 0 ,core_uart_clksel 
+0339 70806281 hjam uart_ctrl_h4 ,core_uart_ctrl 
+033a 20204497 branch hci_init_queue_ack 
+
+p_le_prepare_att:
+033b 6800c444 fetch 1 ,mem_le_l2cap 
+033c c00d815b beq attop_handle_value_notification ,p_le_send_att_handle_value_notification 
+033d c00e815b beq attop_handle_value_indication ,p_le_send_att_handle_value_indication 
+033e c008838d beq attop_read_by_group_type_response ,p_le_send_att_read_by_group_type_response 
+033f c0048353 beq attop_read_by_type_response ,p_le_send_att_read_by_type_response 
+0340 c0098342 beq attop_write_response ,p_le_send_att_write_response 
+0341 20205666 branch le_prepare_att0 
+
+p_le_send_att_write_response:
+0342 680903fa fetcht 2 ,mem_le_att_handle 
+0343 20405a88 call le_att_get_handle_ptr 
+0344 203a585c branch le_send_att_write_response_go ,blank 
+0345 18c08dfe increase -2 ,contr 
+0346 e8c90000 ifetcht 2 ,contr 
+0347 58002902 setarg client_charactertic_configuration 
+0348 98467c00 isub temp ,null 
+0349 2422d85c nbranch le_send_att_write_response_go ,zero 
+034a 18c08c01 increase 1 ,contr 
+034b e8c90000 ifetcht 2 ,contr 
+034c 58000001 setarg 0x0001 
+034d 98467c00 isub temp ,null 
+034e 2022d85c branch le_send_att_write_response_go ,zero 
+034f 58000000 setarg 0x0000 
+0350 98467c00 isub temp ,null 
+0351 2422d85c nbranch le_send_att_write_response_go ,zero 
+0352 2020585c branch le_send_att_write_response_go 
+
+p_le_send_att_read_by_type_response:
+0353 680944c0 fetcht 2 ,mem_le_search_att_type 
+0354 58002803 setarg uuid_gatt_characteristic 
+0355 98467c00 isub temp ,null 
+0356 2422d728 nbranch le_send_att_error_response_notfound ,zero 
+0357 680144bc fetch 2 ,mem_le_search_handle_start 
+0358 600102a0 store 2 ,mem_temp 
+0359 78347c00 enable user 
+
+p_le_send_att_read_by_type_response_loop:
+035a 204003e3 call p_le_att_handle_inrange 
+035b 24210369 nbranch p_le_send_att_read_by_type_response_end ,positive 
+035c 680902a0 fetcht 2 ,mem_temp 
+035d 204003d1 call p_le_att_get_handle_info 
+035e c0008369 beq 1 ,p_le_send_att_read_by_type_response_end 
+035f 204003e7 call p_le_att_same_type 
+0360 24228367 nbranch p_le_send_att_read_by_type_response_next_handle ,zero 
+0361 78547c00 disable user 
+0362 2040036b call p_le_send_att_read_by_type_write_properties 
+0363 204003bf call p_le_att_next_handle 
+0364 204003d1 call p_le_att_get_handle_info 
+0365 20400373 call p_le_send_att_read_by_type_write_uuid 
+0366 20200369 branch p_le_send_att_read_by_type_response_end 
+
+p_le_send_att_read_by_type_response_next_handle:
+0367 204003bf call p_le_att_next_handle 
+0368 2020035a branch p_le_send_att_read_by_type_response_loop 
+
+p_le_send_att_read_by_type_response_end:
+0369 20345728 branch le_send_att_error_response_notfound ,user 
+036a 202003eb branch p_le_send_auto_len_by_mem 
+
+p_le_send_att_read_by_type_write_properties:
+036b 680102a0 fetch 2 ,mem_temp 
+036c 60014446 store 2 ,mem_le_l2cap_response + 1 
+036d 68008b85 fetch 1 ,mem_le_search_len 
+036e 1fe27200 copy pdata ,loopcnt 
+036f 204003f0 call p_get_contr 
+0370 d8a04448 arg mem_le_l2cap_response + 3 ,contw 
+0371 20407e45 call memcpy 
+0372 202003f3 branch p_store_contw 
+
+p_le_send_att_read_by_type_write_uuid:
+0373 68090b82 fetcht 2 ,mem_le_cur_att_type 
+0374 184cfe00 rshift8 temp ,pdata 
+0375 c0818385 bne 0x03 ,p_le_send_att_read_by_type_write_short_uuid 
+0376 204003ed call p_get_contw 
+0377 680102a0 fetch 2 ,mem_temp 
+0378 e0a10000 istore 2 ,contw 
+0379 204003f3 call p_store_contw 
+037a 58004504 setarg mem_le_att_list 
+037b 98408c00 iadd temp ,contr 
+037c e8c08000 ifetch 1 ,contr 
+037d 18c20400 copy contr ,temp 
+037e 1fe27200 copy pdata ,loopcnt 
+037f 1fe0fe05 increase 5 ,pdata 
+0380 6000c445 store 1 ,mem_le_l2cap_response 
+0381 204003ed call p_get_contw 
+0382 18420c00 copy temp ,contr 
+0383 20407e45 call memcpy 
+0384 202003f3 branch p_store_contw 
+
+p_le_send_att_read_by_type_write_short_uuid:
+0385 204003ed call p_get_contw 
+0386 680102a0 fetch 2 ,mem_temp 
+0387 e0a10000 istore 2 ,contw 
+0388 68010b82 fetch 2 ,mem_le_cur_att_type 
+0389 e0a10000 istore 2 ,contw 
+038a 204003f3 call p_store_contw 
+038b 70444507 jam 7 ,mem_le_l2cap_response 
+038c 20600000 rtn 
+
+p_le_send_att_read_by_group_type_response:
+038d d9600003 arg 3 ,timeup 
+038e 680144bc fetch 2 ,mem_le_search_handle_start 
+038f 600102a0 store 2 ,mem_temp 
+0390 700b8400 jam 0 ,mem_le_search_res 
+0391 78347c00 enable user 
+
+p_le_send_att_read_by_group_type_response_loop:
+0392 204003e3 call p_le_att_handle_inrange 
+0393 242103b5 nbranch p_le_send_att_read_by_group_type_end0 ,positive 
+0394 680902a0 fetcht 2 ,mem_temp 
+0395 204003d1 call p_le_att_get_handle_info 
+0396 c00083b8 beq 1 ,p_le_send_att_read_by_group_type_end1 
+0397 204003e7 call p_le_att_same_type 
+0398 242283b1 nbranch p_le_send_att_read_by_group_type_next_handle ,zero 
+0399 68008b84 fetch 1 ,mem_le_search_res 
+039a c00083b8 beq 1 ,p_le_send_att_read_by_group_type_end1 
+039b 243403a2 nbranch p_le_send_att_read_by_group_type_store_write_record ,user 
+039c 78547c00 disable user 
+039d 68008b85 fetch 1 ,mem_le_search_len 
+039e 1fe0fe04 increase 4 ,pdata 
+039f 6000c445 store 1 ,mem_le_l2cap_response 
+03a0 204003f3 call p_store_contw 
+03a1 202003ac branch p_le_send_att_read_by_group_type_store_record 
+
+p_le_send_att_read_by_group_type_store_write_record:
+03a2 68008b85 fetch 1 ,mem_le_search_len 
+03a3 1fe67c10 sub pdata ,0x10 ,null 
+03a4 202283b8 branch p_le_send_att_read_by_group_type_end1 ,zero 
+03a5 6800c445 fetch 1 ,mem_le_l2cap_response 
+03a6 1fe67c10 sub pdata ,0x10 ,null 
+03a7 202283b8 branch p_le_send_att_read_by_group_type_end1 ,zero 
+03a8 680102a0 fetch 2 ,mem_temp 
+03a9 1fe0ffff increase -1 ,pdata 
+03aa 60010b80 store 2 ,mem_le_cur_handle_end 
+03ab 204003c8 call p_le_write_att_record 
+
+p_le_send_att_read_by_group_type_store_record:
+03ac 680102a0 fetch 2 ,mem_temp 
+03ad 60010b7e store 2 ,mem_le_cur_handle_start 
+03ae 204003c3 call p_le_store_att_record 
+03af 196097ff increase -1 ,timeup 
+03b0 202283b3 branch p_le_send_att_read_by_group_type_last_find ,zero 
+
+p_le_send_att_read_by_group_type_next_handle:
+03b1 204003bf call p_le_att_next_handle 
+03b2 20200392 branch p_le_send_att_read_by_group_type_response_loop 
+
+p_le_send_att_read_by_group_type_last_find:
+03b3 700b8401 jam 1 ,mem_le_search_res 
+03b4 202003b1 branch p_le_send_att_read_by_group_type_next_handle 
+
+p_le_send_att_read_by_group_type_end0:
+03b5 680102a0 fetch 2 ,mem_temp 
+03b6 60010b80 store 2 ,mem_le_cur_handle_end 
+03b7 202003bc branch p_le_send_att_read_by_group_type_end_common 
+
+p_le_send_att_read_by_group_type_end1:
+03b8 680102a0 fetch 2 ,mem_temp 
+03b9 1fe0ffff increase -1 ,pdata 
+03ba 60010b80 store 2 ,mem_le_cur_handle_end 
+03bb 202003bc branch p_le_send_att_read_by_group_type_end_common 
+
+p_le_send_att_read_by_group_type_end_common:
+03bc 20345728 branch le_send_att_error_response_notfound ,user 
+03bd 204003c8 call p_le_write_att_record 
+03be 202003eb branch p_le_send_auto_len_by_mem 
+
+p_le_att_next_handle:
+03bf 680902a0 fetcht 2 ,mem_temp 
+03c0 18408401 increase 1 ,temp 
+03c1 600902a0 storet 2 ,mem_temp 
+03c2 20600000 rtn 
+
+p_le_store_att_record:
+03c3 68008b85 fetch 1 ,mem_le_search_len 
+03c4 60008103 store 1 ,mem_tmp_buffer 
+03c5 1fe27200 copy pdata ,loopcnt 
+03c6 204003f0 call p_get_contr 
+03c7 20207e45 branch memcpy 
+
+p_le_write_att_record:
+03c8 204003ed call p_get_contw 
+03c9 68010b7e fetch 2 ,mem_le_cur_handle_start 
+03ca e0a10000 istore 2 ,contw 
+03cb 68010b80 fetch 2 ,mem_le_cur_handle_end 
+03cc e0a10000 istore 2 ,contw 
+03cd 68008103 fetch 1 ,mem_tmp_buffer 
+03ce 1fe27200 copy pdata ,loopcnt 
+03cf 20407e45 call memcpy 
+03d0 202003f3 branch p_store_contw 
+
+p_le_att_get_handle_info:
+03d1 d8c04504 arg mem_le_att_list ,contr 
+03d2 18422200 copy temp ,rega 
+
+p_le_att_get_handle_loop:
+03d3 e8c10000 ifetch 2 ,contr 
+03d4 203a03dc branch p_le_att_unfind_handle ,blank 
+03d5 e8c90000 ifetcht 2 ,contr 
+03d6 60090b82 storet 2 ,mem_le_cur_att_type 
+03d7 9a267c00 isub rega ,null 
+03d8 202283de branch p_le_att_finded_handle ,zero 
+03d9 e8c08000 ifetch 1 ,contr 
+03da 98c08c00 iadd contr ,contr 
+03db 202003d3 branch p_le_att_get_handle_loop 
+
+p_le_att_unfind_handle:
+03dc 58000001 setarg 1 
+03dd 20600000 rtn 
+
+p_le_att_finded_handle:
+03de e8c08000 ifetch 1 ,contr 
+03df 60008b85 store 1 ,mem_le_search_len 
+03e0 204003f6 call p_store_contr 
+03e1 58000000 setarg 0 
+03e2 20600000 rtn 
+
+p_le_att_handle_inrange:
+03e3 680902a0 fetcht 2 ,mem_temp 
+03e4 680144be fetch 2 ,mem_le_search_handle_end 
+03e5 98467c00 isub temp ,null 
+03e6 20600000 rtn 
+
+p_le_att_same_type:
+03e7 680144c0 fetch 2 ,mem_le_search_att_type 
+03e8 68090b82 fetcht 2 ,mem_le_cur_att_type 
+03e9 98467c00 isub temp ,null 
+03ea 20600000 rtn 
+
+p_le_send_auto_len_by_mem:
+03eb 204003ed call p_get_contw 
+03ec 2020588a branch le_send_autolen 
+
+p_get_contw:
+03ed 680102b9 fetch 2 ,mem_contw 
+03ee 1fe20a00 copy pdata ,contw 
+03ef 20600000 rtn 
+
+p_get_contr:
+03f0 680102b7 fetch 2 ,mem_contr 
+03f1 1fe20c00 copy pdata ,contr 
+03f2 20600000 rtn 
+
+p_store_contw:
+03f3 18a27e00 copy contw ,pdata 
+03f4 600102b9 store 2 ,mem_contw 
+03f5 20600000 rtn 
+
+p_store_contr:
+03f6 18c27e00 copy contr ,pdata 
+03f7 600102b7 store 2 ,mem_contr 
+03f8 20600000 rtn 
+
+p_connection_incontext:
+03f9 204003fb call p_context_search_insniff 
+03fa 2020302c branch connection_incontext + 3 
+
+p_context_search_insniff:
+03fb da6003fd arg p_context_search_sniff ,regc 
+03fc 20203301 branch context_search 
+
+p_context_search_sniff:
+03fd c300b307 bbit0 1 ,context_search_next 
+
+p_context_search_sniff_loop:
+03fe 2040333d call context_get_anchor 
+03ff 2040040a call sign_pdata_temp 
+0400 98467e00 isub temp ,pdata 
+0401 1fe0fe01 increase 1 ,pdata 
+0402 20210404 branch p_context_search_sniff_miss ,positive 
+0403 20203325 branch context_search_sniff_cont + 3 
+
+p_context_search_sniff_miss:
+0404 98002400 iforce regb 
+0405 1a208c02 add rega ,2 ,contr 
+0406 e8c10000 ifetch 2 ,contr 
+0407 203a3327 branch context_search_meet ,blank 
+0408 20403349 call context_next_anchor 
+0409 202003fe branch p_context_search_sniff_loop 
+
+sign_pdata_temp:
+040a 1ff11600 rshift16 pdata ,timeup 
+040b 196c9600 rshift8 timeup ,timeup 
+040c 20228414 branch sign_pdata_temp_p0 ,zero 
+040d 29601e0f compare 0xf ,timeup ,0xf 
+040e 24608000 nrtn true 
+040f 18511600 rshift16 temp ,timeup 
+0410 196c9600 rshift8 timeup ,timeup 
+0411 24628000 nrtn zero 
+0412 7920041c set1 28 ,temp 
+0413 20600000 rtn 
+
+sign_pdata_temp_p0:
+0414 18511600 rshift16 temp ,timeup 
+0415 196c9600 rshift8 timeup ,timeup 
+0416 29601e0f compare 0xf ,timeup ,0xf 
+0417 24608000 nrtn true 
+0418 79207e1c set1 28 ,pdata 
+0419 20600000 rtn 
+
+p_le_transmit_receive_sifs:
+041a 204054bd call le_transmit 
+041b 68088017 fetcht 1 ,mem_last_freq 
+041c 20403a82 call set_freq_rx 
+041d 20403a87 call rf_rx_enable 
+041e 78287c00 enable swfine 
+041f d960157c arg 5500 ,timeup 
+0420 2020547f branch le_receive_rxon 
+
+p_le_enable:
+0421 70890f36 hjam 0x36 ,0x90f 
+0422 70890b5f hjam 0x5f ,0x90b 
+0423 202053d4 branch 0x53d4 
+
+p_lpm_sleep:
+0424 20403b36 call xtal_fast_wake 
+0425 20203cdc branch lpm_sleep + 2 
+
+p_check_51cmd_once:
+0426 20407c20 call ui_ipc_get_lock 
+0427 da2047e4 arg mem_ipc_fifo_c512bt ,rega 
+0428 20407f9f call fifo_out 
+0429 1fe20400 copy pdata ,temp 
+042a 20407c24 call ui_ipc_put_lock 
+042b 18427e00 copy temp ,pdata 
+042c 207a0000 rtn blank 
+042d c000fc97 beq bt_cmd_start_discovery ,check_51cmd_start_discovery 
+042e c0017c9c beq bt_cmd_stop_discovery ,check_51cmd_stop_discovery 
+042f c001fca2 beq bt_cmd_reconnect ,check_51cmd_reconnect 
+0430 c003fca7 beq bt_cmd_enter_sniff_subrating ,check_51cmd_enter_sniff_subrating 
+0431 c0047ca8 beq bt_cmd_exit_sniff_subrating ,check_51cmd_exit_sniff_subrating 
+0432 c004fca9 beq bt_cmd_sniff_test ,check_51cmd_sniff_test 
+0433 c005fcac beq bt_cmd_start_inquiry ,check_51cmd_inq 
+0434 c0067cad beq bt_cmd_stop_inquiry ,check_51cmd_stop_inq 
+0435 c006fcae beq bt_cmd_start_adv ,check_51cmd_adv 
+0436 c0077cb1 beq bt_cmd_stop_adv ,check_51cmd_stop_adv 
+0437 c007fcb3 beq bt_cmd_start_direct_adv ,check_51cmd_direct_adv 
+0438 c0087cb6 beq bt_cmd_stop_direct_adv ,check_51cmd_stop_direct_adv 
+0439 20207c67 branch check_51cmd_once0 
+
+p_app_updata_le_param:
+043a 20403fa4 call app_lpm_mult_enable 
+043b 700b7d12 jam bt_cmd_le_update_conn ,mem_fifo_temp 
+043c 20207c33 branch ui_ipc_send_cmd 
+
+p_le_prepare_tx_cmd:
+043d 6800c440 fetch 1 ,mem_le_txpayload 
+043e c0078445 beq ll_connection_param_req ,p_le_send_conn_param_req 
+043f c0038441 beq ll_unknown_rsp ,p_le_send_unknown_rsp 
+0440 2020563a branch le_prepare_tx_cmd + 10 
+
+p_le_send_unknown_rsp:
+0441 6800c9e7 fetch 1 ,mem_le_ll_unknow_type 
+0442 e0a08000 istore 1 ,contw 
+0443 18000402 force 2 ,temp 
+0444 20205892 branch le_send_packet 
+
+p_le_send_conn_param_req:
+0445 18a08bff increase -1 ,contw 
+0446 5800000c setarg 0x000c 
+0447 e0a10000 istore 2 ,contw 
+0448 58000005 setarg 0x0005 
+0449 e0a10000 istore 2 ,contw 
+044a 5800b412 setarg 0xb412 
+044b e0a10000 istore 2 ,contw 
+044c 58000008 setarg 0x0008 
+044d e0a10000 istore 2 ,contw 
+044e 680149cf fetch 2 ,mem_conn_min_interv 
+044f e0a10000 istore 2 ,contw 
+0450 680149d1 fetch 2 ,mem_conn_max_interv 
+0451 e0a10000 istore 2 ,contw 
+0452 6800c213 fetch 1 ,mem_lpm_mult 
+0453 e0a10000 istore 2 ,contw 
+0454 680149d4 fetch 2 ,mem_conn_timeout 
+0455 e0a10000 istore 2 ,contw 
+0456 18000202 force 2 ,type 
+0457 2020588a branch le_send_autolen 
+
+p_le_send_adv_ind:
+0458 6800c4db fetch 1 ,mem_le_adv_type 
+0459 c000d4ef beq adv_direct_ind ,le_send_adv_direct_ind 
+045a 6808c4dc fetcht 1 ,mem_le_adv_own_addr_type 
+045b 18520400 lshift4 temp ,temp 
+045c 184b8400 lshift2 temp ,temp 
+045d 9841fe00 ior temp ,pdata 
+045e 202054e5 branch le_send_adv_ind + 7 
+branch le_send_adv_ind + 7 

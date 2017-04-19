@@ -1,0 +1,928 @@
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE YC_SYS
+OBJECT MODULE PLACED IN out/YC_Sys.obj
+COMPILER INVOKED BY: C:\Keil\c51\bin\C51.exe YC_Sys.c OBJECT(out/YC_Sys.obj) OBJECTADVANCED OPTIMIZE(9,SPEED) BROWSE COD
+                    -E SYMBOLS DF(ENABLE_APE) PR(out/YC_Sys.lst) OT(7,SPEED) LARGE
+
+line level    source
+
+   1          #include "YC_Sys.h"
+   2          #include "YC_Define.h"
+   3          #include "hwreg.h"
+   4          
+   5          #define YC_CLK_N (HREADD(CLKN))
+   6          
+   7          YC_UtilTimer_t xdata YC_UtilTimer;
+   8          void YC_UtilTimerInit(void)
+   9          {
+  10   1              u8_t i;
+  11   1              
+  12   1              YC_UtilTimer.timer_flages = 0;
+  13   1              YC_UtilTimer.last_timer = YC_CLK_N;
+  14   1              for(i = 0; i < YC_UTIL_TIMER_NUM; i++){
+  15   2                      YC_UtilTimer.callback[i] = 0;
+  16   2                      YC_UtilTimer.timer_end[i] = 0;
+  17   2              }
+  18   1              return;
+  19   1      }
+  20          #if 0
+              bool YC_UtilTimerStart(u16_t time_in_second, p_TimerCallback callback, pxbyte timer_id)
+              {
+                      u8_t i = 0;
+                      
+                      //do we have enough timers?
+                      if(YC_UtilTimer.timer_flages == 0xff){
+                              return false;
+                      }
+                      while(i < YC_UTIL_TIMER_NUM){
+                              if(!((YC_UtilTimer.timer_flages >> i) & 1)){
+                                      if(timer_id)
+                                              *timer_id = i;
+                                      break;
+                              }
+                              ++i;
+                      }
+                      YC_UtilTimer.timer_flages |= 1 << i;
+                      YC_UtilTimer.callback[i] = callback;
+                      YC_UtilTimer.timer_end[i] =YC_CLK_N + (u32_t)time_in_second * 3200;
+              //      while(1);
+                      return true;
+              }
+              #endif
+  44          bool YC_UtilTimerStartMs(u16_t time_in_ms, p_TimerCallback callback, pxbyte timer_id)
+  45          {
+  46   1              u8_t i = 0;
+  47   1              
+  48   1              //do we have enough timers?
+  49   1              if(YC_UtilTimer.timer_flages == 0xff){
+  50   2                      return false;
+  51   2              }
+  52   1              while(i < YC_UTIL_TIMER_NUM){
+  53   2                      if(!((YC_UtilTimer.timer_flages >> i) & 1)){
+  54   3                              if(timer_id)
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 2   
+
+  55   3                                      *timer_id = i;
+  56   3                              break;
+  57   3                      }
+  58   2                      ++i;
+  59   2              }
+  60   1              YC_UtilTimer.timer_flages |= 1 << i;
+  61   1              YC_UtilTimer.callback[i] = callback;
+  62   1              YC_UtilTimer.timer_end[i] = YC_CLK_N + ((u32_t)time_in_ms << 4)/5;
+  63   1              return true;
+  64   1      }
+  65          
+  66          bool YC_UtilTimerStop( u8_t timer_id) large
+  67          {
+  68   1              if((timer_id > 8) ||!((YC_UtilTimer.timer_flages >> timer_id) & 1))
+  69   1                      return false;
+  70   1              YC_UtilTimer.timer_flages &= ~( 1<< timer_id);
+  71   1              YC_UtilTimer.callback[timer_id] = 0;
+  72   1              YC_UtilTimer.timer_end[timer_id] = 0;
+  73   1              return true;
+  74   1      }
+  75          
+  76          void YC_UtilTimerProcess(void) small
+  77          {
+  78   1              u8_t i;
+  79   1      #if 0
+                      if(YC_UtilTimer.last_timer > (YC_CLK_N + 0x1000)){
+                              for(i = 0; i < YC_UTIL_TIMER_NUM; ++i){
+                                      if((YC_UtilTimer.timer_flages >> i) & 1){
+                                              YC_UtilTimer.timer_end[i] -= YC_UtilTimer.last_timer;
+                                      }
+                              }
+                      }
+                      YC_UtilTimer.last_timer = YC_CLK_N;
+                      for(i = 0; i < YC_UTIL_TIMER_NUM; ++i){
+                              if((YC_UtilTimer.timer_flages >> i) & 1){
+                                      if(YC_UtilTimer.timer_end[i] < YC_CLK_N){
+                                              YC_UtilTimer.timer_flages &=~( 1<< i); // clear the flag
+                                              YC_UtilTimer.callback[i](i);                    
+                                      }
+                              }
+                      }
+              #else
+  97   1              YC_UtilTimer.last_timer = YC_CLK_N;
+  98   1              for(i = 0; i < YC_UTIL_TIMER_NUM; ++i){
+  99   2                      if((YC_UtilTimer.timer_flages >> i) & 1){
+ 100   3                              if((YC_UtilTimer.timer_end[i] < YC_UtilTimer.last_timer) || 
+ 101   3                                 (YC_UtilTimer.timer_end[i]  - YC_UtilTimer.last_timer > 0x1000)){
+ 102   4                                      YC_UtilTimer.timer_flages &=~( 1<< i); // clear the flag
+ 103   4                                      YC_UtilTimer.callback[i](i);                    
+ 104   4                              }
+ 105   3                      }
+ 106   2              }
+ 107   1      #endif
+ 108   1              return;
+ 109   1      }
+ 110          
+ 111          
+ 112          
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 3   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION YC_UtilTimerInit (BEGIN)
+                                           ; SOURCE LINE # 8
+                                           ; SOURCE LINE # 9
+                                           ; SOURCE LINE # 12
+                       CLR     A
+                 R     MOV     DPTR,#YC_UtilTimer
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 13
+                       MOV     DPTR,#08101H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     R0,#08H
+                 E     CALL    ?C?LSHL
+                       MOV     R0,AR4
+                       MOV     R1,AR5
+                       MOV     R2,AR6
+                       MOV     R3,AR7
+                       MOV     DPTR,#08100H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     A,R3
+                       ORL     A,R7
+                       MOV     R7,A
+                       MOV     A,R2
+                       MOV     R6,A
+                       MOV     A,R1
+                       MOV     R5,A
+                       MOV     A,R0
+                       MOV     R4,A
+                       PUSH    AR4
+                       PUSH    AR5
+                       PUSH    AR6
+                       PUSH    AR7
+                       MOV     DPTR,#08102H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     R0,#010H
+                 E     CALL    ?C?LSHL
+                       POP     AR3
+                       POP     AR2
+                       POP     AR1
+                       POP     AR0
+                       MOV     A,R7
+                       ORL     A,R3
+                       MOV     R7,A
+                       MOV     A,R6
+                       ORL     A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       ORL     A,R1
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 4   
+
+                       MOV     R5,A
+                       MOV     A,R4
+                       ORL     A,R0
+                       MOV     R4,A
+                       PUSH    AR4
+                       PUSH    AR5
+                       PUSH    AR6
+                       PUSH    AR7
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     R0,#018H
+                 E     CALL    ?C?LSHL
+                       POP     AR3
+                       POP     AR2
+                       POP     AR1
+                       POP     AR0
+                       MOV     A,R7
+                       ORL     A,R3
+                       MOV     R7,A
+                       MOV     A,R6
+                       ORL     A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       ORL     A,R1
+                       MOV     R5,A
+                       MOV     A,R4
+                       ORL     A,R0
+                       MOV     R4,A
+                 R     MOV     DPTR,#YC_UtilTimer+039H
+                 E     CALL    ?C?LSTXDATA
+                                           ; SOURCE LINE # 14
+                       CLR     A
+                 R     MOV     DPTR,#i
+                       MOVX    @DPTR,A
+             ?C0001:
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     C
+                       SUBB    A,#08H
+                 R     xJGE    ?C0004
+                                           ; SOURCE LINE # 15
+                       MOV     A,R7
+                       MOV     B,#03H
+                       MUL     AB
+                 R     ADD     A,#LOW YC_UtilTimer+01H
+                       MOV     DPL,A
+                       CLR     A
+                 R     ADDC    A,#HIGH YC_UtilTimer+01H
+                       MOV     DPH,A
+                       CLR     A
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 16
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 5   
+
+                       MOV     A,R7
+                       ADD     A,ACC
+                       ADD     A,ACC
+                 R     ADD     A,#LOW YC_UtilTimer+019H
+                       MOV     DPL,A
+                       CLR     A
+                 R     ADDC    A,#HIGH YC_UtilTimer+019H
+                       MOV     DPH,A
+                 E     CALL    ?C?LSTKXDATA
+                       DB      #00H
+                       DB      #00H
+                       DB      #00H
+                       DB      #00H
+                                           ; SOURCE LINE # 17
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                 R     xJMP    ?C0001
+                                           ; SOURCE LINE # 19
+             ?C0004:
+                       RET     
+             ; FUNCTION YC_UtilTimerInit (END)
+
+             ; FUNCTION _YC_UtilTimerStartMs (BEGIN)
+                                           ; SOURCE LINE # 44
+                 R     MOV     DPTR,#time_in_ms
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+;---- Variable 'callback' assigned to Register 'R1/R2/R3' ----
+                                           ; SOURCE LINE # 45
+                                           ; SOURCE LINE # 46
+                       CLR     A
+                 R     MOV     DPTR,#i
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 49
+                 R     MOV     DPTR,#YC_UtilTimer
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#0FFH,?C0007
+                                           ; SOURCE LINE # 50
+                       CLR     C
+                       RET     
+                                           ; SOURCE LINE # 51
+             ?C0007:
+                                           ; SOURCE LINE # 52
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     C
+                       SUBB    A,#08H
+                 R     xJGE    ?C0008
+                                           ; SOURCE LINE # 53
+                 R     MOV     DPTR,#YC_UtilTimer
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       MOV     R0,AR7
+                       INC     R0
+                 R     xJMP    ?C0022
+             ?C0021:
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 6   
+
+                       CLR     C
+                       RRC     A
+             ?C0022:
+                 R     DJNZ    R0,?C0021
+                 R     xJB     ACC.0,?C0009
+                                           ; SOURCE LINE # 54
+                 R     MOV     DPTR,#timer_id
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       ORL     A,R6
+                 R     xJZ     ?C0008
+                                           ; SOURCE LINE # 55
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     DPL,R7
+                       MOV     DPH,R6
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 56
+                 R     xJMP    ?C0008
+                                           ; SOURCE LINE # 57
+             ?C0009:
+                                           ; SOURCE LINE # 58
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 59
+                 R     xJMP    ?C0007
+             ?C0008:
+                                           ; SOURCE LINE # 60
+                 R     MOV     DPTR,#YC_UtilTimer
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       MOV     A,#01H
+                       MOV     R0,AR6
+                       INC     R0
+                 R     xJMP    ?C0024
+             ?C0023:
+                       CLR     C
+                       RLC     A
+             ?C0024:
+                 R     DJNZ    R0,?C0023
+                       ORL     A,R7
+                 R     MOV     DPTR,#YC_UtilTimer
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 61
+                       MOV     A,R6
+                       MOV     B,#03H
+                       MUL     AB
+                 R     ADD     A,#LOW YC_UtilTimer+01H
+                       MOV     DPL,A
+                       CLR     A
+                 R     ADDC    A,#HIGH YC_UtilTimer+01H
+                       MOV     DPH,A
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 7   
+
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 62
+                       MOV     DPTR,#08101H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     R0,#08H
+                 E     CALL    ?C?LSHL
+                       MOV     R0,AR4
+                       MOV     R1,AR5
+                       MOV     R2,AR6
+                       MOV     R3,AR7
+                       MOV     DPTR,#08100H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     A,R3
+                       ORL     A,R7
+                       MOV     R7,A
+                       MOV     A,R2
+                       MOV     R6,A
+                       MOV     A,R1
+                       MOV     R5,A
+                       MOV     A,R0
+                       MOV     R4,A
+                       PUSH    AR4
+                       PUSH    AR5
+                       PUSH    AR6
+                       PUSH    AR7
+                       MOV     DPTR,#08102H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     R0,#010H
+                 E     CALL    ?C?LSHL
+                       POP     AR3
+                       POP     AR2
+                       POP     AR1
+                       POP     AR0
+                       MOV     A,R7
+                       ORL     A,R3
+                       MOV     R7,A
+                       MOV     A,R6
+                       ORL     A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       ORL     A,R1
+                       MOV     R5,A
+                       MOV     A,R4
+                       ORL     A,R0
+                       MOV     R4,A
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 8   
+
+                       PUSH    AR4
+                       PUSH    AR5
+                       PUSH    AR6
+                       PUSH    AR7
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     R0,#018H
+                 E     CALL    ?C?LSHL
+                       POP     AR3
+                       POP     AR2
+                       POP     AR1
+                       POP     AR0
+                       MOV     A,R7
+                       ORL     A,R3
+                       MOV     R7,A
+                       MOV     A,R6
+                       ORL     A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       ORL     A,R1
+                       MOV     R5,A
+                       MOV     A,R4
+                       ORL     A,R0
+                       MOV     R4,A
+                       PUSH    AR4
+                       PUSH    AR5
+                       PUSH    AR6
+                       PUSH    AR7
+                 R     MOV     DPTR,#time_in_ms
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R0,#04H
+                 E     CALL    ?C?LSHL
+                       CLR     A
+                       MOV     R3,#05H
+                       MOV     R2,A
+                       MOV     R1,A
+                       MOV     R0,A
+                 E     CALL    ?C?ULDIV
+                       POP     AR3
+                       POP     AR2
+                       POP     AR1
+                       POP     AR0
+                       MOV     A,R7
+                       ADD     A,R3
+                       MOV     R7,A
+                       MOV     A,R6
+                       ADDC    A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       ADDC    A,R1
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 9   
+
+                       MOV     R5,A
+                       MOV     A,R4
+                       ADDC    A,R0
+                       MOV     R4,A
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       ADD     A,ACC
+                       ADD     A,ACC
+                 R     ADD     A,#LOW YC_UtilTimer+019H
+                       MOV     DPL,A
+                       CLR     A
+                 R     ADDC    A,#HIGH YC_UtilTimer+019H
+                       MOV     DPH,A
+                 E     CALL    ?C?LSTXDATA
+                                           ; SOURCE LINE # 63
+                       SETB    C
+                                           ; SOURCE LINE # 64
+             ?C0006:
+                       RET     
+             ; FUNCTION _YC_UtilTimerStartMs (END)
+
+             ; FUNCTION _YC_UtilTimerStop (BEGIN)
+                                           ; SOURCE LINE # 66
+;---- Variable 'timer_id' assigned to Register 'R4' ----
+                       MOV     R4,AR7
+                                           ; SOURCE LINE # 68
+                       MOV     A,R7
+                       SETB    C
+                       SUBB    A,#08H
+                 R     xJGE    ?C0012
+                 R     MOV     DPTR,#YC_UtilTimer
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       MOV     R0,AR7
+                       INC     R0
+                 R     xJMP    ?C0026
+             ?C0025:
+                       CLR     C
+                       RRC     A
+             ?C0026:
+                 R     DJNZ    R0,?C0025
+                 R     xJB     ACC.0,?C0011
+             ?C0012:
+                                           ; SOURCE LINE # 69
+                       CLR     C
+                       RET     
+             ?C0011:
+                                           ; SOURCE LINE # 70
+                       MOV     R7,AR4
+                       MOV     A,#01H
+                       MOV     R0,AR7
+                       INC     R0
+                 R     xJMP    ?C0028
+             ?C0027:
+                       CLR     C
+                       RLC     A
+             ?C0028:
+                 R     DJNZ    R0,?C0027
+                       CPL     A
+                       ANL     A,R6
+                 R     MOV     DPTR,#YC_UtilTimer
+                       MOVX    @DPTR,A
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 10  
+
+                                           ; SOURCE LINE # 71
+                       MOV     A,R4
+                       MOV     B,#03H
+                       MUL     AB
+                 R     ADD     A,#LOW YC_UtilTimer+01H
+                       MOV     DPL,A
+                       CLR     A
+                 R     ADDC    A,#HIGH YC_UtilTimer+01H
+                       MOV     DPH,A
+                       CLR     A
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 72
+                       MOV     A,R4
+                       ADD     A,ACC
+                       ADD     A,ACC
+                 R     ADD     A,#LOW YC_UtilTimer+019H
+                       MOV     DPL,A
+                       CLR     A
+                 R     ADDC    A,#HIGH YC_UtilTimer+019H
+                       MOV     DPH,A
+                 E     CALL    ?C?LSTKXDATA
+                       DB      #00H
+                       DB      #00H
+                       DB      #00H
+                       DB      #00H
+                                           ; SOURCE LINE # 73
+                       SETB    C
+                                           ; SOURCE LINE # 74
+             ?C0013:
+                       RET     
+             ; FUNCTION _YC_UtilTimerStop (END)
+
+             ; FUNCTION YC_UtilTimerProcess (BEGIN)
+                                           ; SOURCE LINE # 76
+                                           ; SOURCE LINE # 97
+                       MOV     DPTR,#08101H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     R0,#08H
+                 E     CALL    ?C?LSHL
+                       MOV     R0,AR4
+                       MOV     R1,AR5
+                       MOV     R2,AR6
+                       MOV     R3,AR7
+                       MOV     DPTR,#08100H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     A,R3
+                       ORL     A,R7
+                       MOV     R7,A
+                       MOV     A,R2
+                       MOV     R6,A
+                       MOV     A,R1
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 11  
+
+                       MOV     R5,A
+                       MOV     A,R0
+                       MOV     R4,A
+                       PUSH    AR4
+                       PUSH    AR5
+                       PUSH    AR6
+                       PUSH    AR7
+                       MOV     DPTR,#08102H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     R0,#010H
+                 E     CALL    ?C?LSHL
+                       POP     AR3
+                       POP     AR2
+                       POP     AR1
+                       POP     AR0
+                       MOV     A,R7
+                       ORL     A,R3
+                       MOV     R7,A
+                       MOV     A,R6
+                       ORL     A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       ORL     A,R1
+                       MOV     R5,A
+                       MOV     A,R4
+                       ORL     A,R0
+                       MOV     R4,A
+                       PUSH    AR4
+                       PUSH    AR5
+                       PUSH    AR6
+                       PUSH    AR7
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     R0,#018H
+                 E     CALL    ?C?LSHL
+                       POP     AR3
+                       POP     AR2
+                       POP     AR1
+                       POP     AR0
+                       MOV     A,R7
+                       ORL     A,R3
+                       MOV     R7,A
+                       MOV     A,R6
+                       ORL     A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       ORL     A,R1
+                       MOV     R5,A
+                       MOV     A,R4
+                       ORL     A,R0
+                       MOV     R4,A
+                 R     MOV     DPTR,#YC_UtilTimer+039H
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 12  
+
+                 E     CALL    ?C?LSTXDATA
+                                           ; SOURCE LINE # 98
+                       CLR     A
+                 R     MOV     i,A
+             ?C0014:
+                                           ; SOURCE LINE # 99
+                 R     MOV     R7,i
+                 R     MOV     DPTR,#YC_UtilTimer
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       MOV     R0,AR7
+                       INC     R0
+                 R     xJMP    ?C0030
+             ?C0029:
+                       CLR     C
+                       RRC     A
+             ?C0030:
+                 R     DJNZ    R0,?C0029
+                 R     xJNB    ACC.0,?C0016
+                                           ; SOURCE LINE # 100
+                 R     MOV     A,i
+                       ADD     A,ACC
+                       ADD     A,ACC
+                 R     ADD     A,#LOW YC_UtilTimer+019H
+                       MOV     DPL,A
+                       CLR     A
+                 R     ADDC    A,#HIGH YC_UtilTimer+019H
+                       MOV     DPH,A
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#YC_UtilTimer+039H
+                       MOVX    A,@DPTR
+                       MOV     R0,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       SETB    C
+                 E     CALL    ?C?ULCMP
+                 R     xJGE    ?C0019
+                 R     MOV     A,i
+                       ADD     A,ACC
+                       ADD     A,ACC
+                 R     ADD     A,#LOW YC_UtilTimer+019H
+                       MOV     DPL,A
+                       CLR     A
+                 R     ADDC    A,#HIGH YC_UtilTimer+019H
+                       MOV     DPH,A
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 13  
+
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#YC_UtilTimer+039H
+                       MOVX    A,@DPTR
+                       MOV     R0,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       CLR     C
+                       MOV     A,R7
+                       SUBB    A,R3
+                       MOV     R7,A
+                       MOV     A,R6
+                       SUBB    A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       SUBB    A,R1
+                       MOV     R5,A
+                       MOV     A,R4
+                       SUBB    A,R0
+                       MOV     R4,A
+                       CLR     A
+                       MOV     R3,A
+                       MOV     R2,#010H
+                       MOV     R1,A
+                       MOV     R0,A
+                       CLR     C
+                 E     CALL    ?C?ULCMP
+                 R     xJGE    ?C0016
+             ?C0019:
+                                           ; SOURCE LINE # 101
+                                           ; SOURCE LINE # 102
+                 R     MOV     DPTR,#YC_UtilTimer
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     R6,i
+                       MOV     A,#01H
+                       MOV     R0,AR6
+                       INC     R0
+                 R     xJMP    ?C0032
+             ?C0031:
+                       CLR     C
+                       RLC     A
+             ?C0032:
+                 R     DJNZ    R0,?C0031
+                       CPL     A
+                       ANL     A,R7
+                 R     MOV     DPTR,#YC_UtilTimer
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 103
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 14  
+
+                 R     MOV     A,i
+                       MOV     B,#03H
+                       MUL     AB
+                 R     ADD     A,#LOW YC_UtilTimer+01H
+                       MOV     DPL,A
+                       CLR     A
+                 R     ADDC    A,#HIGH YC_UtilTimer+01H
+                       MOV     DPH,A
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     DPL,A
+                       MOV     DPH,R2
+                 R     MOV     R7,i
+                 E     CALL    ?C?ICALL2
+                                           ; SOURCE LINE # 104
+                                           ; SOURCE LINE # 105
+                                           ; SOURCE LINE # 106
+             ?C0016:
+                 R     INC     i
+                 R     MOV     A,i
+                       CLR     C
+                       SUBB    A,#08H
+                 R     xJLT    ?C0014
+                                           ; SOURCE LINE # 109
+             ?C0020:
+                       RET     
+             ; FUNCTION YC_UtilTimerProcess (END)
+
+C51 COMPILER V9.01   YC_SYS                                                                04/18/2017 13:28:31 PAGE 15  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+s8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  CHAR     -----  1
+u8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+pxdbyte. . . . . . . . . . . . . . . .  TYPEDEF  DATA   PTR      -----  2
+YC_UtilTimerProcess. . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  i. . . . . . . . . . . . . . . . . .  AUTO     DATA   U_CHAR   0000H  1
+pdbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  1
+DFIFO0 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0094H  1
+DFIFO1 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0095H  1
+dbyte. . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_CHAR   -----  1
+DFIFO2 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0096H  1
+pxbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  2
+ibyte. . . . . . . . . . . . . . . . .  TYPEDEF  IDATA  U_CHAR   -----  1
+YC_UtilTimer . . . . . . . . . . . . .  PUBLIC   XDATA  STRUCT   0000H  61
+YC_UtilTimer . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
+bool . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+u32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+s16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  INT      -----  2
+xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
+u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
+byte . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+YC_UtilTimerInit . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  i. . . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0000H  1
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+_YC_UtilTimerStop. . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  timer_id . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0004H  1
+p_TimerCallback. . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  3
+_YC_UtilTimerStartMs . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  time_in_ms . . . . . . . . . . . . .  AUTO     XDATA  U_INT    0000H  2
+  callback . . . . . . . . . . . . . .  AUTO     DATA   PTR      0001H  3
+  timer_id . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0005H  2
+  i. . . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0007H  1
+YC_UtilTimer_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    966    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     61       9
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

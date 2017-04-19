@@ -1,0 +1,1386 @@
+
+/* Parse Command:
+TX: take bits from tx fifo, jam it into shift and a destination (rf,bucket)
+RX: take bits from demod,  jam it into shift and a destination (acl,sco,bucket) */
+
+/* Inject Command:
+TX: 0 into shift, send tail of shift into a destination (rf,bucket)
+RX: 0 into shift, send tail of shift into a destination (acl,sco,bucket) */
+
+format
+  ! 15 romdat
+  % d0
+  % d1
+  % d2
+  % d3
+  [8] d0
+  [8] d1
+  [8] d2
+  [8] d3
+end
+
+format
+  ! 15 enable   /* set flag to 1 */
+  % flag
+  [5] opcode
+  [6] 1
+  [6] flag
+  [6] null
+  [9] 0
+end
+ /* High 5 bytes of channel map */
+format
+  ! 15 pulse   /* set flag to 1 */
+  % flag
+  [5] opcode
+  [6] 1
+  [6] flag
+  [6] null
+  [9] 0
+end
+
+format
+  ! 15 disable   /* set flag to 0 */
+  % flag
+  [5] opcode
+  [6] 2
+  [6] flag
+  [6] null
+  [9] 0
+end
+
+format
+  ! 15 set0  /* set selected bit of reg to 0 */
+  % immediate
+  % reg
+  [5] opcode
+  [6] 9
+  [6] never
+  [6] reg
+  [9] immediate
+end
+
+format
+  ! 15 set1  /* set selected bit of reg to 1 */
+  % immediate
+  % reg
+  [5] opcode
+  [6] 9          /* alu op demux */
+  [6] always
+  [6] reg
+  [9] immediate
+end
+
+format
+  ! 15 setflag  /* set selected bit of the reg to the polarity of the flag */
+  % flag
+  % immediate
+  % reg
+  [5] opcode
+  [6] 9
+  [6] flag
+  [6] reg
+  [9] immediate
+end
+
+format
+  ! 15 nsetflag  /* set the selected bit of the reg to the opposite polarity of the flag */
+  % flag
+  % immediate
+  % reg
+  [5] opcode
+  [6] 0x29
+  [6] flag
+  [6] reg
+  [9] immediate
+end
+
+format
+  ! 15 setflip    /* invert the selected bit of the reg */
+  % immediate
+  % reg
+  [5] opcode
+  [6] 10            /* this is alu op */
+  [6] always
+  [6] reg
+  [9] immediate
+end
+
+format
+  ! 0x1f qset1      /* demux the lowest 4 bit of queue and OR it with regr into regw */
+  % reg             /* in short, set the bit in reg indexed by queue to 1 */
+  [5] opcode
+  [6] 9
+  [6] always
+  [6] reg
+  [9] 0
+end
+  
+format
+  ! 0x1f qset0      /* demux the lowest 4 bit of queue and AND it with regr into regw */
+  % reg             /* in short, set the bit in reg indexed by queue to 0 */
+  [5] opcode
+  [6] 9
+  [6] never
+  [6] reg
+  [9] 0
+end
+
+format 
+  ! 0x1f qsetflag   /* set the bit in reg index by queue to same as flag */
+  % flag
+  % reg
+  [5] opcode
+  [6] 9
+  [6] flag
+  [6] reg
+  [9] 0
+end
+
+format 
+  ! 0x1f nqsetflag   /* set the bit in the reg index by queue to opposite of flag */
+  % flag
+  % reg
+  [5] opcode
+  [6] 0x29
+  [6] flag
+  [6] reg
+  [9] 0
+end
+
+format
+  ! 0x1f qsetflip      /* flip the bit in reg index by queue */
+  % reg
+  [5] opcode
+  [6] 10
+  [6] always
+  [6] reg
+  [9] 0
+end
+
+format
+  ! 1 parse       /* take bits out of source (sco_tx,tx_buffer,rx-elas) into pdata and dest (sco_rx,rx_fifo,tx-elas) */
+  % source
+  % dest
+  % immediate
+  [5] opcode
+  [4] source      /* voice, data, demod */
+  [2] 0
+  [6] 0    
+  [2] 0           /* parse or inject */ 
+  [4] dest        /* acl, sco, mod, bucket */
+  [9] immediate   /* number of bits to parse off */
+end
+
+format
+  ! 1 inject      /* shift data from pdata into destination (tx-elas,rx_fifo,sco_rx) */
+  % destination
+  % immediate
+  [5] opcode
+  [4] 0
+  [2] 0
+  [6] 1
+  [2] 0
+  [4] destination /* acl,sco,mod,bucket */
+  [9] immediate   /* number of bits to be injected */
+end
+
+format
+  ! 1 iinject
+  % destination
+  % regr
+  [5] opcode
+  [6] regr       /* contain the number of bits to inject */
+  [6] 3
+  [2] 0
+  [4] destination /* acl,sco,mod,bucket */
+  [9] 0 
+end
+
+format
+  ! 1 stuff  /* automatic parse, stuff_counter decrement on every bit until hits zero */
+  % source
+  % destination
+  [5] opcode
+  [4] source
+  [2] 0
+  [6] 2
+  [2] 0
+  [4] destination
+  [9] 0
+end
+
+format    /* force immediate value into registers */
+  ! 3 force
+  % immediate
+  % regw
+  [5] opcode
+  [6] 0
+  [6] 0    /* alu operation force */
+  [6] regw  /* destination register */
+  [9] immediate
+end
+
+format    /* force whatever is on shift_reg to regsiters */
+  ! 0x13 iforce
+  % regw
+  [5] opcode
+  [6] 0
+  [6] 0    /* alu operation force */
+  [6] regw  /* destination register */
+  [9] 0
+end
+
+format    /* force immediate value into registers */
+  ! 3 increase
+  % immediate
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 1    /* alu operation add */
+  [6] reg
+  [9] immediate
+end
+
+format
+  ! 3 pincrease
+  % immediate
+  [5] opcode
+  [6] -1  /* pdata */
+  [6] 1   /* alu add */
+  [6] -1  /* back to pdata */
+  [9] immediate
+end
+
+format    /* force immediate value into registers */
+  ! 3 and_into
+  % immediate
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 2    /* alu operation and into */
+  [6] reg
+  [9] immediate
+end
+
+format
+  ! 3 and
+  % regr
+  % immediate
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 2    /* alu operation and into */
+  [6] regw
+  [9] immediate
+end
+  
+format
+  ! 0x13 iand    /* pdata & regr -> regw */
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 2    /* alu operation and into */
+  [6] regw
+  [9] 0
+end
+  
+
+format    /* and whatever is in shiftreg with reg */
+  ! 0x13 iand_into
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 2    /* alu operation and into */
+  [6] reg
+  [9] 0
+end
+
+format
+  ! 3 or_into
+  % immediate
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 3    /* alu operation or into */
+  [6] reg
+  [9] immediate
+end
+
+format
+  ! 3 or
+  % regr
+  % immediate
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 3    /* alu operation or into */
+  [6] regw
+  [9] immediate
+end
+
+format
+  ! 0x13 ior
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 3    /* alu operation or into */
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 0x13 ior_into
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 3    /* alu operation or into */
+  [6] reg
+  [9] 0
+end
+
+format
+  ! 3 skip_to   /* jump to location stored in reg */
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 4   /* alu operation copy */
+  [6] rom_addr
+  [9] 0
+end
+
+format
+  ! 3 copy
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 4   /* alu operation copy */
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 deposit   /* copy the register content thru alu to shift register, not prealigned like preload */
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 4   /* alu operation copy */
+  [6] -1  /* pdata */
+  [9] 0
+end
+
+format
+  ! 3 icopy     /* copy the shift register lsb content directly to register, not aligned */
+  % regw
+  [5] opcode
+  [6] -1  /* pdata */
+  [6]  4  /* alu copy */
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 add
+  % regr
+  % immediate
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 1
+  [6] regw
+  [9] immediate
+end
+
+format
+  ! 0x13 iadd       /* regr + pdata -> regw */
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 1
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 sub          /* immediate - regr -> regw */
+  % regr
+  % immediate
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 12
+  [6] regw
+  [9] immediate
+end
+
+format
+  ! 0x13 isub       /* pdata - regr -> regw */
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 12
+  [6] regw
+  [9] 0
+end
+
+
+format
+  ! 3 flip
+  % immediate
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 5
+  [6] reg
+  [9] immediate
+end
+  
+format
+  ! 0x13 iflip  /* use shift register as immediate to do xor */
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 5
+  [6] regw
+  [9] 0
+end
+  
+format
+  ! 3 xor
+  % regr
+  % immediate
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 5
+  [6] regw
+  [9] immediate
+end
+
+format
+  ! 3 xor_into
+  % immediate
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 5
+  [6] reg
+  [9] immediate
+end
+  
+format
+  ! 0x13 ixor  /* pdata xor regr and store result in regw */
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 5
+  [6] regw
+  [9] 0
+end
+  
+format
+  ! 3 invert
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 8
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 pinvert    /* invert pdata into itself */
+  [5] opcode
+  [6] -1
+  [6] 8
+  [6] -1
+  [9] 0
+end
+
+format
+  ! 3 div                 /* regr div immediate div */
+  % reg
+  % immediate
+  [5] opcode
+  [6] reg
+  [6] 13                   /* generate diven pulse to div */
+  [6] null
+  [9] immediate
+end
+
+format
+  ! 0x13 idiv           /* pdata div regr data ready at most after 41 nops */
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 13                   /* generate diven pulse to div */
+  [6] null
+  [9] 0
+end
+
+format
+  ! 3 remainder            /* harvest div remainder */
+  % regw
+  [5] opcode
+  [6] 0
+  [6] 14
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 quotient             /* harvest div quotient */
+  % regw
+  [5] opcode
+  [6] 0
+  [6] 15
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 rshift
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 6
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 rshift2
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 22
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 rshift3
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 18
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 rshift4
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 35
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 rshift8
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 25
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 rshift16
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 34
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 rshift32
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 30
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 lshift
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 7
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 lshift2
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 23
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 lshift8
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 26
+  [6] regw
+  [9] 0
+end
+
+  
+format
+  ! 3 lshift3
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 19
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 lshift4
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 36
+  [6] regw
+  [9] 0
+end
+  
+
+format
+  ! 3 lshift16
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 32
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 random               /* random number into regw */
+  % reg
+  [5] opcode
+  [6] 0
+  [6] 20
+  [6] reg
+  [9] 0
+end
+
+format                     /* bit reverse within a byte */
+  ! 3 reverse
+  % reg
+  % regw
+  [5] opcode
+  [6] reg
+  [6] 27
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 priority    /* priority encode reg into regw, lsb is the top priority, ie, priority(8'b00010000) = 4 */
+  % reg
+  % regw
+  [5] opcode
+  [6] reg
+  [6] 21
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 7 setsect   /* set a section of pdata */
+  % section    /* 0 sets 17:0 of pdata with set_data, 1 sets 35:18, 2 sets 53:36, 3 sets 71:54 */
+  % set_data
+  [5] opcode
+  [7] 0
+  [2] section
+  [18] set_data
+end
+
+format
+  ! 10 preload   /* load stuff into pdata according to fhs format, check us.v */
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 0
+  [6] -1
+  [9] 0
+end
+
+format  /* load register with pdata content, according to fhs format, check us.v */
+  ! 10 ialigned   /* all bits are in position */
+  % regw
+  [5] opcode
+  [6] -1
+  [6] 0
+  [6] regw
+  [9] 0
+end
+
+format  /* load register to another according to fhs format */
+  ! 10 aligned
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 0
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 4 branch
+  % addr
+  % flag
+  [5] opcode
+  [6] 1
+  [6] flag
+  [15] addr
+end
+
+format
+  ! 4 call
+  % addr
+  % flag
+  [5] opcode
+  [6] 2
+  [6] flag
+  [15] addr
+end
+
+format
+  ! 4 rtn
+  % flag
+  [5] opcode
+  [6] 3
+  [6] flag
+  [15] 0
+end
+
+format
+  ! 0x0c store          /* write to memory, data from pdata, address from immediate then mem_ptr */
+  % num_bytes
+  % addr
+  [5] opcode
+  [6] 0               /* memory */
+  [1] 0
+  [1] 0
+  [4] num_bytes
+  [15] addr
+end
+
+format
+  ! 0x0c hstore          /* write to memory, data from pdata, address from immediate then mem_ptr */
+  % num_bytes
+  % addr
+  [5] opcode
+  [6] 0               /* memory */
+  [1] 1
+  [1] 0
+  [4] num_bytes
+  [15] addr
+end
+
+format
+  ! 0x1c istore        /* write to memory, data from pdata, address from regr then mem_ptr */
+  % num_bytes
+  % reg
+  [5] opcode
+  [6] reg            /* hold address */
+  [1] 0
+  [1] 0
+  [4] num_bytes
+  [15] 0
+end
+
+format
+  ! 0x0d fetch          /* read from memory, data into pdata, address from immediate then mem_ptr */
+  % num_bytes
+  % addr
+  [5] opcode
+  [6] 0               /* memory */
+  [1] 0
+  [1] 0
+  [4] num_bytes
+  [15] addr
+end
+
+format
+  ! 0x0d hfetch          /* read from memory, data into pdata, address from immediate then mem_ptr */
+  % num_bytes
+  % addr
+  [5] opcode
+  [6] 0               /* memory */
+  [1] 1
+  [1] 0
+  [4] num_bytes
+  [15] addr
+end
+
+format
+  ! 0x0d crc         /* read from memory, count from loopcnt, put crc result into pdata */
+  % addr
+  [5] opcode
+  [6] 0
+  [1] 0
+  [1] 0
+  [4] 0
+  [15] addr
+end
+
+format
+  ! 0x1d icrc         /* read from memory, address from reg, count from loopcnt, put crc result into pdata */
+  % reg
+  [5] opcode
+  [6] reg             /* hold address */
+  [1] 0
+  [1] 0
+  [4] 0
+  [15] 0
+end
+
+
+format
+  ! 0x1d ifetch         /* read from memory, data into pdata, address from regr then mem_ptr */
+  % num_bytes
+  % reg
+  [5] opcode
+  [6] reg             /* hold address */
+  [1] 0
+  [1] 0
+  [4] num_bytes
+  [15] 0
+end
+
+format
+  ! 0x0c storet          /* write to memory, data from temp, address from immediate won't increment */
+  % num_bytes
+  % addr
+  [5] opcode
+  [6] 0               /* memory */
+  [1] 0
+  [1] 1
+  [4] num_bytes
+  [15] addr
+end
+
+format
+  ! 0x0c hstoret          /* write to corereg, data from temp, address from immediate won't increment */
+  % num_bytes
+  % addr
+  [5] opcode
+  [6] 0               /* memory */
+  [1] 1
+  [1] 1
+  [4] num_bytes
+  [15] addr
+end
+
+format
+  ! 0x1c istoret        /* write to memory, data from temp, address from regr won't increment */
+  % num_bytes
+  % reg
+  [5] opcode
+  [6] reg            /* hold address */
+  [1] 0
+  [1] 1
+  [4] num_bytes
+  [15] 0
+end
+
+format
+  ! 0x0d fetcht          /* read from memory, data into temp, address from immediate won't increment */
+  % num_bytes
+  % addr
+  [5] opcode
+  [6] 0               /* memory */
+  [1] 0
+  [1] 1
+  [4] num_bytes
+  [15] addr
+end
+
+format
+  ! 0x0d hfetcht          /* read from corereg, data into temp, address from immediate won't increment */
+  % num_bytes
+  % addr
+  [5] opcode
+  [6] 0               /* memory */
+  [1] 1
+  [1] 1
+  [4] num_bytes
+  [15] addr
+end
+
+format
+  ! 0x1d ifetcht         /* read from memory, data into temp, address from regr won't increment */
+  % num_bytes
+  % reg
+  [5] opcode
+  [6] reg             /* hold address */
+  [1] 0
+  [1] 1
+  [4] num_bytes
+  [15] 0
+end
+
+format
+  ! 0x0e jam
+  % immediate
+  % addr
+  [5] opcode
+  [3] 0
+  [1] 0   /* msb */
+  [15] addr
+  [8] immediate
+end
+
+format
+  ! 0x0e hjam
+  % immediate
+  % addr
+  [5] opcode
+  [3] 0
+  [1] 1   /* msb */
+  [15] addr
+  [8] immediate
+end
+
+format			/* 0x242... */
+  ! 4 nbranch
+  % addr
+  % flag
+  [5] opcode
+  [1] 1
+  [5] 1
+  [6] flag
+  [15] addr
+end
+
+format
+  ! 4 ncall
+  % addr
+  % flag
+  [5] opcode
+  [1] 1
+  [5] 2
+  [6] flag
+  [15] addr
+end
+
+format
+  ! 4 nrtn
+  % flag
+  [5] opcode
+  [1] 1
+  [5] 3
+  [6] flag
+  [15] 0
+end
+
+format
+  ! 4 nop
+  % addr  /* no-op for addr+2 clocks */
+  [5] opcode
+  [6] 0     
+  [6] 0     /* always */ 
+  [15] addr
+end
+
+format
+  ! 4 clear_stack
+  [5] opcode
+  [6] 4
+  [6] 0    /* always */
+  [15] 0
+end
+
+format
+  ! 6 until
+  % reg
+  % flag
+  [5] opcode
+  [6] reg
+  [6] flag
+  [6] 1
+  [9] 0
+end
+  
+format
+  ! 6 correlate   /* quit if 1. flag is true 2, regr time up 3, found sync,(cond_true) */
+  % reg          /* expire counter to check against */
+  % flag
+  [5] opcode
+  [6] reg
+  [6] flag
+  [6] 2           /* correlate */
+  [9] 0           
+end
+
+format
+  ! 5 compare   /* sets cond flag,  if reg equals immediate */
+  % immediate
+  % reg
+  % mask
+  [5] opcode
+  [6] reg
+  [3] 0
+  [9] mask
+  [9] immediate
+end
+
+format
+  ! 0x15 icompare   /* sets cond flag,  if reg equals pdata */
+  % mask
+  % reg
+  [5] opcode
+  [6] reg
+  [3] 0
+  [9] mask
+  [9] 0
+end
+
+format   /* sets cond. flag, if reg equals LS half of shift reg with MS half of reg being mask */
+  ! 5 iverify
+  % reg
+  [5] opcode
+  [6] reg
+  [3] 2
+  [18] 0
+end
+
+format
+  ! 0x15 qisolate1
+  % reg
+  [5] opcode
+  [6] reg
+  [3] 3
+  [18] -1
+end
+
+format
+  ! 0x15 qisolate0
+  % reg
+  [5] opcode
+  [6] reg
+  [3] 3
+  [18] 0
+end
+
+	/* REVAB bug: cannot access bit above 35 */
+format
+  ! 5 isolate1
+  % addr
+  % reg
+  [5] opcode
+  [6] reg
+  [3] 3
+  [9] -1
+  [9] addr
+end
+
+format
+  ! 5 isolate0
+  % addr
+  % reg
+  [5] opcode
+  [6] reg
+  [3] 3
+  [9] 0
+  [9] addr
+end
+
+format
+  ! 11 setarg
+  % immediate
+  [5] opcode
+  [27] immediate
+end
+
+format
+  ! 0x1b arg
+  % immediate
+  % reg
+  [5] opcode
+  [6] reg
+  [21] immediate
+end
+
+  
+format
+  ! 0 sleep
+  [5] opcode
+  [27] 0
+end
+
+format
+  ! 0 snooze
+  [5] opcode
+  [6] -1
+  [21] 0
+end
+
+format
+  ! 0 revision
+  % rev_num
+  [5] opcode
+  [27] rev_num
+end
+
+format
+  ! 0x18 loop   /* branch when loopcnt is NOT zero, and decrease loopcnt */
+  % addr
+  [5] opcode
+  [4] 4
+  [8] 0
+  [15] addr
+end
+
+format
+  ! 0x18 beq   /* branch when pdata is equal to immediate */
+  % imme
+  % addr
+  [5] opcode
+  [4] 0
+  [8] imme
+  [15] addr
+end
+
+format
+  ! 0x18 bne   /* branch when pdata is NOT equal to immediate */
+  % imme
+  % addr
+  [5] opcode
+  [4] 1
+  [8] imme
+  [15] addr
+end
+
+format
+  ! 0x18 rtneq   /* return when pdata is equal to immediate */
+  % imme
+  [5] opcode
+  [4] 2
+  [8] imme
+  [15] 0
+end
+
+format
+  ! 0x18 rtnne   /* return when pdata is NOT equal to immediate */
+  % imme
+  [5] opcode
+  [4] 3
+  [8] imme
+  [15] 0
+end
+
+format
+  ! 0x18 bbit1   /* branch when pdata's imme bit is 1 */
+  % imme
+  % addr
+  [5] opcode
+  [4] 5
+  [8] imme
+  [15] addr
+end
+
+format
+  ! 0x18 bbit0   /* branch when pdata's imme bit is 0 */
+  % imme
+  % addr
+  [5] opcode
+  [4] 6
+  [8] imme
+  [15] addr
+end
+
+format
+  ! 0x18 rtnbit1   /* return when pdata's imme bit is 0 */
+  % imme
+  [5] opcode
+  [4] 7
+  [8] imme
+  [15] 0
+end
+
+format
+  ! 0x18 rtnbit0   /* return when pdata's imme bit is 0 */
+  % imme
+  [5] opcode
+  [4] 8
+  [8] imme
+  [15] 0
+end
+
+format
+  ! 8	bpatch
+  % imme
+  % addr
+  [5] opcode
+  [4] 9
+  [8] imme
+  [15] addr
+end
+
+format
+  ! 0x18 bmark1   /* branch when mark's imme bit is 1 */
+  % imme
+  % addr
+  [5] opcode
+  [4] 10
+  [8] imme
+  [15] addr
+end
+
+format
+  ! 0x18 bmark0   /* branch when mark's imme bit is 0 */
+  % imme
+  % addr
+  [5] opcode
+  [4] 11
+  [8] imme
+  [15] addr
+end
+
+format
+  ! 0x18 rtnmark1   /* return when mark's imme bit is 0 */
+  % imme
+  [5] opcode
+  [4] 12
+  [8] imme
+  [15] 0
+end
+
+format
+  ! 0x18 rtnmark0   /* return when mark's imme bit is 0 */
+  % imme
+  [5] opcode
+  [4] 13
+  [8] imme
+  [15] 0
+end
+
+
+format
+  ! 3 mult                  /* immediate mult regr */  /* the product will be ready 17 clks later */
+  % immediate                                   /* use "product" instruction to get the result */
+  % reg
+  [5] opcode
+  [6] reg
+  [6] 16                   /* generate diven pulse to div */
+  [6] null
+  [9] immediate
+end
+
+format
+  ! 0x13 imult           /* pdata mult regr */  /* the product will be ready after 15 nops */
+  % reg                                         /* use product opcode to get the result */
+  [5] opcode
+  [6] reg
+  [6] 16                   /* generate mult pulse to multiplier */
+  [6] null
+  [9] 0
+end
+
+format
+  ! 3 mul32                  /* immediate mult regr */ 
+  % regr
+  % immediate                                  
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 31           
+  [6] regw
+  [9] immediate
+end
+
+format
+  ! 0x13 imul32           /* pdata mult regr 32x32=64bit */  
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 31                   
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 product              /* harvest mult product */
+  % regw
+  [5] opcode
+  [6] 0
+  [6] 17
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 byteswap
+  % regr
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 33
+  [6] regw
+  [9] 0
+end
+
+format
+  ! 3 shasx          /* SHA256 Sx operation, immediate is Sx */
+  % regr
+  % immediate
+  % regw
+  [5] opcode
+  [6] regr
+  [6] 28
+  [6] regw
+  [9] immediate
+end
+
+
+format
+  ! 0x13 regexrot 	/* regext[0] <- regext[7], regext[1] <- regext[0], regext[2] <- regext[1] ... */
+  [5] opcode
+  [6] 0
+  [6] 29
+  [6] null
+  [9] 0
+end
+

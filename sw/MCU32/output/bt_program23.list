@@ -1,0 +1,1288 @@
+              include "bt_format "
+              org 0x0000
+0x0000 000010 bmark1 mark_ext_patch ,patch_ext 
+0x0001 000011 beq patch00_6 ,p_connection_incontext 
+0x0002 000012 beq patch1a_1 ,p_hci_init_common 
+0x0003 000013 beq patch16_0 ,p_lpm_sleep 
+0x0004 000014 beq patch12_4 ,p_set_freq_tx 
+0x0005 000015 beq patch12_2 ,p_setfreq_rx 
+0x0006 000016 beq patch12_0 ,p_shutdown_radio 
+0x0007 000017 beq patch15_7 ,p_lpm_hibernate 
+0x0008 000018 branch p_assert 
+:      000020 patch_ext:
+0x0009 000021 beq patch39_5 ,p_module_init 
+0x000a 000022 beq patch39_6 ,p_module_lpm_init 
+0x000b 000023 beq patch2c_5 ,p_le_prepare_att 
+0x000c 000024 beq patch2d_7 ,p_le_parse_att 
+0x000d 000025 beq patch27_5 ,p_debug_test 
+0x000e 000026 beq patch29_3 ,p_le_transmit_receive_sifs 
+0x000f 000027 beq patch27_6 ,p_le_enable 
+0x0010 000028 beq patch29_4 ,p_le_transmit 
+0x0011 000029 beq patch29_6 ,p_le_send_adv_ind 
+0x0012 000030 beq patch30_7 ,p_ui_timer_check 
+0x0013 000031 beq patch31_1 ,p_ui_ipc_send_event 
+0x0014 000032 beq patch31_5 ,p_check_51cmd_once 
+0x0015 000033 beq patch2c_3 ,p_le_prepare_tx_cmd 
+0x0016 000034 beq patch2d_3 ,p_le_parse_ll 
+0x0017 000035 branch p_assert 
+:      000037 p_ui_ipc_send_event:
+0x0018 000038 jam 0x7f ,mem_seqi 
+0x0019 000039 branch ui_ipc_send_event + 2 
+:      000041 p_le_parse_ll:
+0x001a 000042 copy regc ,pdata 
+0x001b 000043 beq ll_connection_update_req ,le_parse_connection_update_req 
+0x001c 000044 beq ll_channel_map_req ,le_parse_channel_map_req 
+0x001d 000045 beq ll_terminate_ind ,p_le_parse_terminate_ind 
+0x001e 000046 beq ll_enc_req ,le_parse_enc_req 
+0x001f 000047 beq ll_enc_rsp ,le_parse_enc_rsp 
+0x0020 000048 beq ll_start_enc_req ,le_parse_start_enc_req 
+0x0021 000049 beq ll_start_enc_rsp ,le_parse_start_enc_rsp 
+0x0022 000050 beq ll_unknown_rsp ,le_parse_unknown_rsp 
+0x0023 000051 beq ll_feature_req ,le_parse_feature_req 
+0x0024 000052 beq ll_feature_rsp ,le_parse_feature_rsp 
+0x0025 000053 beq ll_pause_enc_req ,le_parse_pause_enc_req 
+0x0026 000054 beq ll_pause_enc_rsp ,le_parse_pause_enc_rsp 
+0x0027 000055 beq ll_version_ind ,le_parse_version_ind 
+0x0028 000056 beq ll_reject_ind ,le_parse_reject_ind 
+0x0029 000057 store 1 ,mem_le_ll_unknow_type 
+0x002a 000058 jam xt_ll_unknown_rsp ,mem_fifo_temp 
+0x002b 000059 branch le_xtype_fifo_in 
+:      000061 p_le_parse_terminate_ind:
+0x002c 000062 jam 1 ,mem_le_disc_reson 
+0x002d 000063 branch le_parse_terminate_ind 
+:      000065 p_lpm_hibernate:
+0x002e 000066 call lpm_write_gpio_wakeup 
+0x002f 000067 hfetch 4 ,0x8138 
+0x0030 000068 set0 15 ,pdata 
+0x0031 000069 hstore 4 ,0x804c 
+0x0032 000070 call lpm_write_ctrl 
+0x0033 000073 arg param_hibernate_clks ,temp 
+0x0034 000074 fetch 1 ,mem_le_sleep_flag 
+0x0035 000075 beq 2 ,lpm_hibernate_normal + 1 
+0x0036 000076 branch lpm_sleep 
+:      000079 p_ui_timer_timeout:
+0x0037 000080 setarg 0x10 
+0x0038 000081 arg 3 ,queue 
+0x0039 000082 call lshift8_queue 
+0x003a 000083 iadd regb ,regb 
+0x003b 000084 rtn 
+:      000085 p_ui_timer_check:
+0x003c 000086 arg 0 ,rega 
+0x003d 000087 fetcht 4 ,mem_ui_timer_last_btclk 
+0x003e 000088 copy clkn_bt ,regb 
+0x003f 000089 copy regb ,pdata 
+0x0040 000090 isub temp ,null 
+0x0041 000091 ncall p_ui_timer_timeout ,positive 
+0x0042 000092 branch ui_timer_check_loop 
+:      000095 p_setfreq_rx:
+0x0043 000096 storet 1 ,mem_last_freq 
+0x0044 000097 add temp ,rx_freq_offset ,rega 
+0x0045 000098 branch set_freq_rx + 4 
+:      000100 p_shutdown_radio:
+0x0046 000101 branch shutdown_radio + 2 
+0x0047 000102 branch shutdown_radio + 2 ,33 
+0x0048 000103 fetch 1 ,mem_txdb 
+0x0049 000104 beq 0x0 ,p_shutdown_radio0db 
+0x004a 000105 beq 0x5 ,p_shutdown_radio5db 
+0x004b 000106 beq 0xfb ,p_shutdown_radiof5db 
+0x004c 000107 branch p_shutdown_radio0db 
+:      000108 p_shutdown_radiof5db:
+0x004d 000109 hjam 0xd8 ,0x955 
+0x004e 000110 nop 4 
+0x004f 000111 hjam 0xd7 ,0x955 
+0x0050 000112 nop 4 
+0x0051 000113 hjam 0xd6 ,0x955 
+0x0052 000114 nop 4 
+0x0053 000115 hjam 0xd0 ,0x955 
+0x0054 000116 hjam 0xc0 ,0x956 
+0x0055 000117 branch shutdown_radio + 2 
+:      000118 p_shutdown_radio0db:
+0x0056 000119 hjam 0xd8 ,0x955 
+0x0057 000120 nop 4 
+0x0058 000121 hjam 0xd7 ,0x955 
+0x0059 000122 nop 4 
+0x005a 000123 hjam 0xd6 ,0x955 
+0x005b 000124 nop 4 
+0x005c 000125 hjam 0xd0 ,0x955 
+0x005d 000126 hjam 0xe0 ,0x956 
+0x005e 000127 branch shutdown_radio + 2 
+:      000128 p_shutdown_radio5db:
+0x005f 000129 hjam 0xdf ,0x955 
+0x0060 000130 nop 4 
+0x0061 000131 hjam 0xdd ,0x955 
+0x0062 000132 nop 4 
+0x0063 000133 hjam 0xdb ,0x955 
+0x0064 000134 nop 4 
+0x0065 000135 hjam 0xd0 ,0x955 
+0x0066 000136 hjam 0xe0 ,0x956 
+0x0067 000137 branch shutdown_radio + 2 
+:      000139 p_set_freq_tx:
+0x0068 000140 storet 1 ,mem_last_freq 
+0x0069 000141 add temp ,tx_freq_offset ,rega 
+0x006a 000142 call rf_write_freq 
+0x006b 000143 setarg 0x500 
+0x006c 000144 call sleep 
+:      000145 p_txon:
+0x006d 000146 hjam 0x1 ,0x8906 
+0x006e 000147 hjam 0x3c ,0x8900 
+0x006f 000148 hjam 0xe0 ,0x8901 
+0x0070 000149 hjam 0x12 ,0x96d 
+0x0071 000150 nop 10 
+0x0072 000151 hjam 0x01 ,0x8902 
+0x0073 000152 hjam 0x3d ,0x8902 
+0x0074 000153 nop 10 
+0x0075 000154 hjam 0xb7 ,0x8903 
+0x0076 000155 nop 10 
+0x0077 000156 hjam 0x7d ,0x8902 
+0x0078 000158 fetch 1 ,mem_txdb 
+0x0079 000159 beq 0x0 ,p_txon0db 
+0x007a 000160 beq 0x5 ,p_txon5db 
+0x007b 000161 beq 0xfb ,p_txonf5db 
+0x007c 000162 branch p_txon0db 
+:      000164 p_txonf5db:
+0x007d 000165 hjam 0xcb ,0x956 
+0x007e 000166 nop 4 
+0x007f 000167 hjam 0xd1 ,0x955 
+0x0080 000168 nop 4 
+0x0081 000169 hjam 0xd2 ,0x955 
+0x0082 000170 nop 4 
+0x0083 000171 hjam 0xd3 ,0x955 
+0x0084 000172 nop 4 
+0x0085 000173 hjam 0xd8 ,0x955 
+0x0086 000174 rtn 
+:      000175 p_txon0db:
+0x0087 000176 hjam 0xf0 ,0x956 
+0x0088 000177 nop 4 
+0x0089 000178 hjam 0xd1 ,0x955 
+0x008a 000179 nop 4 
+0x008b 000180 hjam 0xd2 ,0x955 
+0x008c 000181 nop 4 
+0x008d 000182 hjam 0xd3 ,0x955 
+0x008e 000183 nop 4 
+0x008f 000184 hjam 0xd8 ,0x955 
+0x0090 000185 rtn 
+:      000186 p_txon5db:
+0x0091 000187 hjam 0xff ,0x956 
+0x0092 000188 nop 4 
+0x0093 000189 hjam 0xd1 ,0x955 
+0x0094 000190 nop 4 
+0x0095 000191 hjam 0xd2 ,0x955 
+0x0096 000192 nop 4 
+0x0097 000193 hjam 0xd8 ,0x955 
+0x0098 000194 nop 4 
+0x0099 000196 hjam 0xdf ,0x955 
+0x009a 000197 rtn 
+:      000199 p_le_transmit:
+0x009b 000200 call le_prep 
+0x009c 000201 call p_letx_setfreq 
+0x009d 000202 branch le_transmit + 4 
+:      000204 p_letx_setfreq:
+0x009e 000205 branch p_txon ,match 
+0x009f 000206 call le_setfreq 
+0x00a0 000207 branch set_freq_tx 
+:      000210 p_assert:
+0x00a1 000211 branch p_assert 
+:      000213 p_loop:
+0x00a2 000214 branch p_loop 
+:      000217 p_gpio_check_active:
+0x00a3 000218 arg core_gpio_out0 ,contr 
+0x00a4 000219 and temp ,0x07 ,queue 
+0x00a5 000220 rshift3 temp ,pdata 
+0x00a6 000221 and_into 3 ,pdata 
+0x00a7 000222 iadd contr ,contr 
+0x00a8 000223 ifetch 1 ,contr 
+0x00a9 000224 isolate1 7 ,temp 
+0x00aa 000225 branch p_gpio_check_active_1 ,true 
+0x00ab 000226 qisolate0 pdata 
+0x00ac 000227 rtn 
+:      000228 p_gpio_check_active_1:
+0x00ad 000229 qisolate1 pdata 
+0x00ae 000230 rtn 
+:      000232 p_sleep_out_set:
+0x00af 000233 call spid_init_flash 
+0x00b0 000234 rtn 
+:      000236 p_sleep_in_set:
+0x00b1 000237 hjam 1 ,core_docd_ctrl 
+0x00b2 000239 hfetch 1 ,core_gpio_sel1 
+0x00b3 000240 set0 0 ,pdata 
+0x00b4 000241 set0 1 ,pdata 
+0x00b5 000242 hstore 1 ,core_gpio_sel1 
+0x00b6 000244 hfetch 4 ,core_gpio_pu0 
+0x00b7 000245 set0 23 ,pdata 
+0x00b8 000246 set1 24 ,pdata 
+0x00b9 000247 set0 25 ,pdata 
+0x00ba 000248 set0 26 ,pdata 
+0x00bb 000249 hstore 4 ,core_gpio_pu0 
+0x00bc 000251 hfetch 4 ,core_gpio_pd0 
+0x00bd 000252 set1 23 ,pdata 
+0x00be 000253 set0 24 ,pdata 
+0x00bf 000254 set1 25 ,pdata 
+0x00c0 000255 set1 26 ,pdata 
+0x00c1 000256 hstore 4 ,core_gpio_pd0 
+0x00c2 000258 hfetch 4 ,core_gpio_oe0 
+0x00c3 000259 set1 23 ,pdata 
+0x00c4 000260 set1 24 ,pdata 
+0x00c5 000261 set1 25 ,pdata 
+0x00c6 000262 set1 26 ,pdata 
+0x00c7 000263 hstore 4 ,core_gpio_oe0 
+0x00c8 000265 fetch 4 ,core_gpio_out0 
+0x00c9 000266 set0 23 ,pdata 
+0x00ca 000267 set1 24 ,pdata 
+0x00cb 000268 set0 25 ,pdata 
+0x00cc 000269 set0 26 ,pdata 
+0x00cd 000270 hstore 4 ,core_gpio_out0 
+0x00ce 000271 rtn 
+:      000274 p_module_before_lpm:
+0x00cf 000275 branch gpio_set_before_lpm_common 
+:      000277 gpio_set_before_lpm_common:
+0x00d0 000278 arg -1 ,rega 
+0x00d1 000279 hfetch 1 ,core_gpio_sel1 
+0x00d2 000280 isolate1 1 ,pdata 
+0x00d3 000281 call neglact4_from_23_pin ,true 
+0x00d4 000283 and pdata ,0x3 ,regb 
+0x00d5 000284 sub regb ,1 ,null 
+0x00d6 000285 call neglact2_form_25_pin ,zero 
+0x00d7 000287 isolate1 2 ,pdata 
+0x00d8 000288 call neglect2_from_6_pin ,true 
+0x00d9 000290 isolate1 3 ,pdata 
+0x00da 000291 call neglect4_from_9_pin ,true 
+0x00db 000296 hfetch 4 ,core_gpio_pu0 
+0x00dc 000297 hfetcht 4 ,core_gpio_pd0 
+0x00dd 000298 ior temp ,pdata 
+0x00de 000299 invert pdata ,pdata 
+0x00df 000300 iand rega ,pdata 
+0x00e0 000302 hstore 4 ,core_gpio_oe0 
+0x00e1 000304 rtn 
+:      000305 neglect2_from_6_pin:
+0x00e2 000306 arg 6 ,queue 
+0x00e3 000307 branch neglect_2_pin 
+:      000308 neglect4_from_9_pin:
+0x00e4 000309 arg 9 ,queue 
+0x00e5 000310 branch neglact_4_pin 
+:      000311 neglact4_from_23_pin:
+0x00e6 000312 arg 23 ,queue 
+0x00e7 000313 branch neglact_4_pin 
+:      000314 neglact2_form_25_pin:
+0x00e8 000315 arg 23 ,queue 
+0x00e9 000316 branch neglect_2_pin 
+:      000317 neglact_4_pin:
+0x00ea 000318 arg 4 ,loopcnt 
+0x00eb 000319 branch neglect_pin_loop 
+:      000320 neglect_2_pin:
+0x00ec 000321 arg 2 ,loopcnt 
+:      000322 neglect_pin_loop:
+0x00ed 000323 qset0 rega 
+0x00ee 000324 increase 1 ,queue 
+0x00ef 000325 loop neglect_pin_loop 
+0x00f0 000326 rtn 
+:      000330 p_wakeup_c51:
+0x00f1 000331 call p_sleep_out_set 
+0x00f2 000332 hjam 3 ,core_docd_ctrl 
+0x00f3 000333 jam not_enter_lpm ,mem_lpm_lock 
+0x00f4 000334 rtn 
+:      000336 p_module_lpm_wake_init:
+0x00f5 000337 fetch 1 ,mem_le_sleep_flag 
+0x00f6 000338 sub pdata ,1 ,null 
+0x00f7 000339 call p_module_wakeup ,zero 
+0x00f8 000340 fetcht 1 ,mem_ui_button_gpio 
+0x00f9 000341 call gpio_get_bit 
+0x00fa 000342 branch p_wakeup_c51 ,true 
+0x00fb 000343 fetcht 1 ,mem_module_wake_up_gpio 
+0x00fc 000344 call gpio_get_bit 
+0x00fd 000345 branch p_wakeup_c51 ,true 
+0x00fe 000346 rtn 
+:      000349 p_module_init:
+0x00ff 000350 branch p_module_lpm_wake_init ,wake 
+0x0100 000355 copy auxcnt ,pdata 
+0x0101 000356 nbranch p_module_init_poweron_iowake ,blank 
+0x0102 000357 hfetch 1 ,0x813e 
+0x0103 000358 isolate0 ,3 ,pdata 
+0x0104 000359 branch p_module_init_poweron_reset ,true 
+0x0105 000360 branch p_lpm_hibernate 
+:      000362 p_module_init_poweron_iowake:
+0x0106 000363 jam cs_notify_iowake ,mem_poweron_flag 
+0x0107 000364 branch p_module_init_poweron_common 
+:      000365 p_module_init_poweron_reset:
+0x0108 000366 jam cs_notify_poweron ,mem_poweron_flag 
+:      000368 p_module_init_poweron_common:
+0x0109 000369 jam 0 ,mem_module_task 
+0x010a 000370 call p_scale_gpio_init 
+0x010b 000372 setarg scale_process_idle 
+0x010c 000373 store 2 ,mem_cb_idle_process 
+0x010d 000374 setarg scale_process_bb_event 
+0x010e 000375 store 2 ,mem_cb_bb_event_process 
+0x010f 000376 setarg scale_process 
+0x0110 000377 store 2 ,mem_cb_le_process 
+0x0111 000378 setarg p_scale_lpm_lock 
+0x0112 000379 store 2 ,mem_cb_check_wakelock 
+0x0113 000380 setarg p_module_before_lpm 
+0x0114 000381 store 2 ,mem_cb_before_lpm 
+0x0115 000383 setarg mem_event_buf 
+0x0116 000384 store 2 ,mem_event_wptr 
+0x0117 000385 store 2 ,mem_event_rptr 
+0x0118 000386 setarg mem_cmd_buf 
+0x0119 000387 store 2 ,mem_cmd_wptr 
+0x011a 000388 setarg mem_cmd_buf 
+0x011b 000389 store 2 ,mem_cmd_rptr 
+0x011c 000391 call scale_hardware_init 
+0x011d 000393 fetch 1 ,mem_conn_latency 
+0x011e 000394 store 1 ,mem_lpm_mult 
+0x011f 000396 fetch 2 ,mem_lpm_interval 
+0x0120 000397 increase -4 ,pdata 
+0x0121 000398 store 2 ,mem_le_adv_interval_min 
+0x0122 000399 store 2 ,mem_le_adv_interval_max 
+0x0123 000401 call p_le_modified_name 
+0x0124 000402 fetch 6 ,mem_le_lap 
+0x0125 000403 call p_byteswap 
+0x0126 000404 call p_updata_mac 
+0x0127 000405 setarg 0 
+0x0128 000406 store 3 ,mem_att_send_handle 
+0x0129 000407 call p_wakeup_c51 
+0x012a 000408 call p_cs_poweron_notify 
+0x012b 000409 branch check_module_disabled 
+:      000411 p_scale_gpio_init:
+0x012c 000412 fetcht 1 ,mem_ui_button_gpio 
+0x012d 000413 call gpio_config_input 
+0x012e 000414 fetcht 1 ,mem_module_wake_up_gpio 
+0x012f 000415 branch gpio_config_input 
+:      000417 p_scale_lpm_lock:
+0x0130 000418 fetch 1 ,mem_lpm_lock 
+0x0131 000419 beq not_enter_lpm ,app_get_lpm_wake_lock 
+0x0132 000420 fetcht 1 ,mem_ui_button_gpio 
+0x0133 000421 call gpio_get_bit 
+0x0134 000422 branch app_get_lpm_wake_lock ,true 
+0x0135 000423 fetcht 1 ,mem_module_wake_up_gpio 
+0x0136 000424 call gpio_get_bit 
+0x0137 000425 branch app_get_lpm_wake_lock ,true 
+0x0138 000426 hjam 1 ,core_docd_ctrl 
+0x0139 000428 branch app_put_lpm_wake_lock 
+0x013a 000429 rtn 
+:      000435 p_module_lpm_init:
+0x013b 000436 jam 39 ,mem_le_ch_mapped 
+0x013c 000437 jam 0 ,mem_tester_emulate 
+0x013d 000438 jam 0 ,mem_debug_config 
+0x013e 000439 jam 0 ,mem_lch_code 
+0x013f 000440 setarg 0 
+0x0140 000441 store 5 ,mem_sp_state_start 
+0x0141 000442 branch p_module_lpm_uart_init 
+:      000444 p_module_wakeup:
+0x0142 000445 copy auxcnt ,pdata 
+0x0143 000446 branch p_lpm_hibernate ,blank 
+0x0144 000447 jam cs_notify_iowake ,mem_poweron_flag 
+0x0145 000448 jam 0 ,mem_le_sleep_flag 
+0x0146 000450 rtn 
+:      000452 p_module_lpm_uart_init:
+0x0147 000453 call init_filter_ram 
+0x0148 000454 setarg mem_module_rx_buf_custom 
+0x0149 000455 hstore 2 ,core_uart_rsaddr 
+0x014a 000456 setarg mem_module_rx_buf_end_custom 
+0x014b 000457 hstore 2 ,core_uart_readdr 
+0x014c 000458 setarg mem_module_tx_buf 
+0x014d 000459 hstore 2 ,core_uart_tsaddr 
+0x014e 000460 setarg mem_module_tx_buf_end 
+0x014f 000461 hstore 2 ,core_uart_teaddr 
+0x0150 000462 hfetch 1 ,core_gpio_sel1 
+0x0151 000463 set1 0x02 ,pdata 
+0x0152 000464 hstore 1 ,core_gpio_sel1 
+0x0153 000466 jam 0xff ,mem_ucode_id_local 
+0x0154 000467 hjam 0x0 ,core_uart_ctrl 
+0x0155 000468 setarg mem_module_tx_buf 
+0x0156 000469 hstore 2 ,core_uart_twptr 
+0x0157 000470 hstore 2 ,core_uart_trptrp 
+0x0158 000471 setarg mem_module_rx_buf_custom 
+0x0159 000472 hstore 2 ,core_uart_rrptr 
+0x015a 000473 branch hci_init_common 
+:      000479 p_le_send_att_handle_value_indication:
+:      000480 p_le_send_att_handle_value_notification:
+0x015b 000482 fetcht 1 ,mem_scale_tx_length 
+0x015c 000483 branch le_send_packet 
+:      000485 p_le_parse_att_write_request:
+0x015d 000486 fetcht 2 ,mem_le_rxbuf + 7 
+0x015e 000488 call le_att_get_handle_ptr 
+0x015f 000489 add contr ,1 ,regb 
+0x0160 000491 increase -2 ,contr 
+0x0161 000492 ifetch 2 ,contr 
+0x0162 000493 arg client_charactertic_configuration ,temp 
+0x0163 000494 isub temp ,null 
+0x0164 000495 branch p_le_parse_write_req_configuration ,zero 
+0x0165 000497 fetch 1 ,mem_le_rxbuf + 1 
+0x0166 000498 increase -7 ,pdata 
+0x0167 000499 branch le_parse_att_write_request_fail ,blank 
+0x0168 000500 icopy loopcnt 
+0x0169 000501 copy loopcnt ,rega 
+0x016a 000502 copy regb ,contw 
+0x016b 000503 arg mem_le_rxbuf + 9 ,contr 
+0x016c 000504 call memcpy 
+0x016d 000505 copy rega ,loopcnt 
+0x016e 000506 arg mem_le_rxbuf + 9 ,rega 
+0x016f 000507 call p_le_cs_rev_data 
+0x0170 000508 branch le_parse_att_write_request_fail 
+:      000510 p_le_parse_write_req_configuration:
+0x0171 000511 arg 2 ,loopcnt 
+0x0172 000512 copy regb ,contw 
+0x0173 000513 arg mem_le_rxbuf + 9 ,contr 
+0x0174 000514 call memcpy 
+0x0175 000516 fetcht 2 ,mem_le_rxbuf + 7 
+0x0176 000517 call le_att_find_notifyhandle 
+0x0177 000518 nbranch le_parse_att_write_request_fail ,user 
+0x0178 000519 storet 2 ,mem_att_send_handle 
+0x0179 000520 fetch 1 ,mem_le_rxbuf + 9 
+0x017a 000521 store 1 ,mem_att_send_option 
+0x017b 000522 call p_le_open_tx_handle 
+0x017c 000523 branch le_parse_att_write_request_fail 
+:      000525 p_le_open_tx_handle:
+0x017d 000526 arg mem_tmp_buffer ,contw 
+0x017e 000527 setarg cs_prefix_event 
+0x017f 000528 istore 1 ,contw 
+0x0180 000529 setarg 0x04 
+0x0181 000530 istore 1 ,contw 
+0x0182 000531 setarg cs_notify_openhandle 
+0x0183 000532 istore 1 ,contw 
+0x0184 000533 fetch 2 ,mem_att_send_handle 
+0x0185 000534 istore 2 ,contw 
+0x0186 000535 fetch 1 ,mem_att_send_option 
+0x0187 000536 istore 1 ,contw 
+0x0188 000537 branch p_cs_mem_to_event 
+:      000538 p_le_parse_att_write_command:
+0x0189 000539 fetch 1 ,mem_le_rxbuf + 1 
+0x018a 000540 increase -7 ,pdata 
+0x018b 000541 icopy loopcnt 
+0x018c 000542 arg mem_le_rxbuf + 9 ,rega 
+:      000543 p_le_cs_rev_data:
+0x018d 000544 arg mem_tmp_buffer ,contw 
+0x018e 000545 setarg cs_prefix_event 
+0x018f 000546 istore 1 ,contw 
+0x0190 000547 add loopcnt ,3 ,pdata 
+0x0191 000548 istore 1 ,contw 
+0x0192 000549 setarg cs_notify_data 
+0x0193 000550 istore 1 ,contw 
+0x0194 000551 fetch 2 ,mem_le_rxbuf + 7 
+0x0195 000552 istore 2 ,contw 
+0x0196 000553 arg mem_le_rxbuf + 9 ,contr 
+0x0197 000554 call memcpy 
+0x0198 000555 branch p_cs_mem_to_event 
+:      000557 p_le_parse_att_handle_value_confirm:
+0x0199 000558 arg mem_tmp_buffer ,contw 
+0x019a 000559 setarg cs_prefix_event 
+0x019b 000560 istore 1 ,contw 
+0x019c 000561 setarg 1 
+0x019d 000562 istore 1 ,contw 
+0x019e 000563 setarg cs_notify_indicate_confirm 
+0x019f 000564 istore 1 ,contw 
+0x01a0 000565 branch p_cs_mem_to_event 
+:      000567 le_parse_att_read_request:
+0x01a1 000568 fetch 2 ,mem_le_rxbuf + 7 
+0x01a2 000569 store 2 ,mem_le_att_handle 
+0x01a3 000570 store 2 ,mem_le_readhandle 
+0x01a4 000572 copy pdata ,queue 
+0x01a5 000573 sub pdata ,0x3F ,null 
+0x01a6 000574 branch le_parse_att_read_request_2 ,positive 
+:      000575 le_parse_att_read_request_1:
+0x01a7 000576 fetch 8 ,mem_le_readreqhandleflag + 8 
+0x01a8 000577 branch le_parse_att_read_request_2 + 1 
+:      000578 le_parse_att_read_request_2:
+0x01a9 000579 fetch 8 ,mem_le_readreqhandleflag 
+0x01aa 000580 qisolate1 pdata 
+0x01ab 000581 branch p_le_le_att_read_notify ,true 
+:      000582 le_parse_att_read_request_ok:
+0x01ac 000583 jam attop_read_response ,mem_fifo_temp 
+0x01ad 000584 branch le_xtype_fifo_in 
+:      000586 p_le_le_att_read_notify:
+0x01ae 000587 jam 20 ,mem_le_readreq_timeout 
+0x01af 000588 arg mem_tmp_buffer ,contw 
+0x01b0 000589 setarg cs_prefix_event 
+0x01b1 000590 istore 1 ,contw 
+0x01b2 000591 setarg 0x03 
+0x01b3 000592 istore 1 ,contw 
+0x01b4 000593 setarg cs_notify_read_req 
+0x01b5 000594 istore 1 ,contw 
+0x01b6 000595 fetch 2 ,mem_le_readhandle 
+0x01b7 000596 istore 2 ,contw 
+0x01b8 000597 branch p_cs_mem_to_event 
+:      000601 p_debug_test:
+0x01b9 000604 branch le_disconnect0 
+:      000608 p_le_parse_att:
+0x01ba 000609 ifetch 3 ,contr 
+0x01bb 000610 store 3 ,mem_le_att_opcode 
+0x01bc 000611 beq attop_write_request ,p_le_parse_att_write_request 
+0x01bd 000612 beq attop_write_command ,p_le_parse_att_write_command 
+0x01be 000613 beq attop_read_request ,le_parse_att_read_request 
+0x01bf 000614 beq attop_handle_value_confirmation ,p_le_parse_att_handle_value_confirm 
+0x01c0 000615 branch le_parse_att0 
+:      000617 scale_process_bb_event:
+0x01c1 000618 copy regc ,pdata 
+0x01c2 000619 beq bt_evt_le_connected ,scale_process_le_conn 
+0x01c3 000620 beq bt_evt_le_disconnected ,scale_process_le_discon 
+0x01c4 000621 and pdata ,0x0f ,temp 
+0x01c5 000622 and_into bt_evt_timer_mask ,pdata 
+0x01c6 000623 beq bt_evt_timer_init ,p_cs_module_bb_event_timer 
+0x01c7 000624 rtn 
+:      000626 p_cs_module_bb_event_timer:
+0x01c8 000627 call module_bb_event_timer 
+0x01c9 000628 branch p_cs_read_req_timeout 
+:      000630 p_cs_read_req_timeout:
+0x01ca 000631 fetch 1 ,mem_le_readreq_timeout 
+0x01cb 000632 rtn blank 
+0x01cc 000633 increase -1 ,pdata 
+0x01cd 000634 store 1 ,mem_le_readreq_timeout 
+0x01ce 000635 nrtn blank 
+0x01cf 000636 setarg 0x00 
+0x01d0 000637 store 2 ,mem_le_readhandle 
+0x01d1 000638 branch le_parse_att_read_request_ok 
+:      000641 scale_process_le_conn:
+0x01d2 000642 jam 0 ,mem_le_disc_reson 
+0x01d3 000643 call p_cs_conn_notify 
+0x01d4 000644 call p_app_updata_le_param 
+0x01d5 000645 branch module_stop_adv_discovery 
+:      000647 scale_process_le_discon:
+0x01d6 000650 setarg 0x00 
+0x01d7 000651 store 2 ,mem_le_readhandle 
+0x01d8 000652 jam 0 ,mem_le_readreq_timeout 
+0x01d9 000653 fetch 1 ,mem_conn_latency 
+0x01da 000654 store 1 ,mem_lpm_mult 
+0x01db 000655 setarg 0 
+0x01dc 000656 store 2 ,mem_l2cap_rxbuff1_len 
+0x01dd 000657 setarg 0 
+0x01de 000658 store 2 ,mem_l2cap_rxbuff2_len 
+0x01df 000659 setarg 0 
+0x01e0 000660 store 3 ,mem_att_send_handle 
+0x01e1 000661 call le_att_client_clr 
+0x01e2 000662 call module_start_adv_discovery 
+0x01e3 000663 fetch 1 ,mem_le_sleep_flag 
+0x01e4 000664 bne 0 ,p_cs_sleep_enter 
+0x01e5 000665 branch p_cs_dis_notify 
+:      000667 scale_hardware_init:
+0x01e6 000668 rtn wake 
+0x01e7 000669 call spid_init_flash 
+0x01e8 000670 hfetch 1 ,core_uart_clksel 
+0x01e9 000671 set0 0 ,pdata 
+0x01ea 000672 hstore 1 ,core_uart_clksel 
+0x01eb 000675 branch p_module_lpm_uart_init 
+:      000677 scale_process:
+0x01ec 000678 branch scale_normal_dispatch 
+:      000680 scale_process_idle:
+0x01ed 000681 branch scale_normal_dispatch 
+:      000683 scale_debug:
+0x01ee 000685 setarg 1 
+0x01ef 000686 store 2 ,mem_current_packet_length 
+0x01f0 000687 branch at_rev_end 
+:      000689 scale_normal_dispatch_ignore:
+0x01f1 000690 call p_cs_cmd_mem_zero 
+0x01f2 000691 copy contr ,pdata 
+0x01f3 000692 store 2 ,mem_cmd_rptr 
+0x01f4 000693 rtn 
+:      000695 p_cs_cmd_to_mem:
+0x01f5 000696 ifetch 1 ,contr 
+0x01f6 000697 istore 1 ,contw 
+0x01f7 000698 copy pdata ,loopcnt 
+0x01f8 000699 call p_cs_cmd_mem_zero 
+:      000700 p_cs_cmd_to_mem_loop:
+0x01f9 000701 ifetch 1 ,contr 
+0x01fa 000702 istore 1 ,contw 
+0x01fb 000703 call p_cs_cmd_mem_zero 
+0x01fc 000704 loop p_cs_cmd_to_mem_loop 
+0x01fd 000705 copy contr ,pdata 
+0x01fe 000706 store 2 ,mem_cmd_rptr 
+0x01ff 000707 rtn 
+:      000709 scale_normal_dispatch:
+0x0200 000711 fetch 2 ,mem_cmd_rptr 
+0x0201 000712 fetcht 2 ,mem_cmd_wptr 
+0x0202 000713 isub temp ,null 
+0x0203 000714 rtn zero 
+0x0204 000716 copy pdata ,contr 
+0x0205 000717 ifetch 1 ,contr 
+0x0206 000718 bne cs_prefix_cmd ,scale_normal_dispatch_ignore 
+0x0207 000719 call p_cs_cmd_mem_zero 
+0x0208 000720 arg mem_tmp_buffer ,contw 
+0x0209 000721 call p_cs_cmd_to_mem 
+0x020a 000722 fetch 1 ,mem_tmp_buffer + 1 
+0x020b 000723 beq cs_cmd_sleep_req ,p_cs_sleep_req 
+0x020c 000724 beq cs_cmd_adv_interv_set_req ,p_cs_adv_interv_set_req 
+0x020d 000725 beq cs_cmd_conn_interv_set_req ,p_cs_conn_interval_set_req 
+0x020e 000726 beq cs_cmd_txpower_set_req ,p_cs_tx_power_set_req 
+0x020f 000727 beq cs_cmd_le_disc_req ,p_cs_le_dis_req 
+0x0210 000728 beq cs_cmd_le_tx_dat ,p_cs_tx_dat 
+0x0211 000729 beq cs_cmd_le_wr_dat ,p_cs_wr_dat 
+:      000735 p_updata_mac:
+0x0212 000736 fetcht 2 ,mem_adv_lap_ptr 
+0x0213 000737 rtn blank 
+0x0214 000738 istore 6 ,temp 
+0x0215 000739 rtn 
+:      000741 p_byteswap:
+0x0216 000742 store 6 ,mem_swap 
+0x0217 000743 fetch 1 ,mem_swap 
+0x0218 000744 store 1 ,mem_swap + 11 
+0x0219 000745 ifetch 1 ,contr 
+0x021a 000746 store 1 ,mem_swap + 10 
+0x021b 000747 ifetch 1 ,contr 
+0x021c 000748 store 1 ,mem_swap + 9 
+0x021d 000749 ifetch 1 ,contr 
+0x021e 000750 store 1 ,mem_swap + 8 
+0x021f 000751 ifetch 1 ,contr 
+0x0220 000752 store 1 ,mem_swap + 7 
+0x0221 000753 ifetch 1 ,contr 
+0x0222 000754 store 1 ,mem_swap + 6 
+0x0223 000755 fetch 6 ,mem_swap + 6 
+0x0224 000756 rtn 
+:      000758 wait_wakeup_pin_notactive:
+0x0225 000759 fetcht 1 ,mem_module_wake_up_gpio 
+0x0226 000760 call gpio_get_bit 
+0x0227 000761 nrtn true 
+0x0228 000762 nop 10000 
+0x0229 000763 branch wait_wakeup_pin_notactive 
+:      000765 p_cs_sleep_clr:
+0x022a 000766 jam 0 ,mem_le_readreq_timeout 
+0x022b 000767 fetch 1 ,mem_conn_latency 
+0x022c 000768 store 1 ,mem_lpm_mult 
+0x022d 000769 setarg 0 
+0x022e 000770 store 2 ,mem_l2cap_rxbuff1_len 
+0x022f 000771 store 2 ,mem_l2cap_rxbuff2_len 
+0x0230 000772 store 3 ,mem_att_send_handle 
+0x0231 000773 store 2 ,mem_le_readhandle 
+0x0232 000774 jam 0 ,mem_le_disc_reson 
+0x0233 000775 branch le_att_client_clr 
+:      000776 p_cs_sleep_req:
+0x0234 000777 fetch 1 ,mem_tmp_buffer + 2 
+0x0235 000778 beq 1 ,p_cs_sleep_req_hibernate 
+:      000779 p_cs_sleep_req_retation:
+0x0236 000780 jam 0x81 ,mem_le_sleep_flag 
+0x0237 000781 branch p_cs_sleep_req_ok 
+:      000782 p_cs_sleep_req_hibernate:
+0x0238 000783 jam 0x82 ,mem_le_sleep_flag 
+:      000784 p_cs_sleep_req_ok:
+0x0239 000785 fetch 2 ,mem_ui_state_map 
+0x023a 000786 bbit1 ui_state_ble_connected ,app_ble_disconnect 
+:      000787 p_cs_sleep_enter:
+0x023b 000788 call p_cs_sleep_clr 
+0x023c 000789 call wait_uarttx 
+0x023d 000790 call wait_wakeup_pin_notactive 
+0x023e 000791 fetch 1 ,mem_le_sleep_flag 
+0x023f 000792 set0 7 ,pdata 
+0x0240 000793 store 1 ,mem_le_sleep_flag 
+0x0241 000794 call p_sleep_in_set 
+0x0242 000795 branch app_bb_hibernate 
+:      000797 p_cs_adv_interv_set_req:
+0x0243 000798 arg mem_tmp_buffer + 2 ,contr 
+0x0244 000799 ifetch 2 ,contr 
+0x0245 000800 sub pdata ,0x1f ,null 
+0x0246 000801 rtn positive 
+0x0247 000802 store 2 ,mem_lpm_interval 
+0x0248 000803 increase -4 ,pdata 
+0x0249 000804 store 2 ,mem_le_adv_interval_min 
+0x024a 000805 store 2 ,mem_le_adv_interval_max 
+0x024b 000806 rtn 
+:      000808 p_cs_conn_interval_set_req:
+0x024c 000809 arg mem_tmp_buffer + 2 ,contr 
+0x024d 000810 ifetch 2 ,contr 
+0x024e 000811 store 2 ,mem_conn_min_interv 
+0x024f 000812 ifetch 2 ,contr 
+0x0250 000813 store 2 ,mem_conn_max_interv 
+0x0251 000814 ifetch 1 ,contr 
+0x0252 000815 store 1 ,mem_conn_latency 
+0x0253 000816 ifetch 2 ,contr 
+0x0254 000817 store 2 ,mem_conn_timeout 
+0x0255 000819 fetch 2 ,mem_ui_state_map 
+0x0256 000820 isolate1 ui_state_ble_connected ,pdata 
+0x0257 000821 branch p_cs_conn_interval_send ,true 
+0x0258 000822 fetch 1 ,mem_conn_latency 
+0x0259 000823 store 1 ,mem_lpm_mult 
+0x025a 000824 rtn 
+:      000825 p_cs_conn_interval_send:
+0x025b 000826 jam bt_cmd_le_update_conn ,mem_fifo_temp 
+0x025c 000827 branch ui_ipc_send_cmd 
+:      000829 p_cs_tx_power_set_req:
+0x025d 000830 fetch 1 ,mem_tmp_buffer + 2 
+0x025e 000831 store 1 ,mem_txdb 
+0x025f 000832 beq 0x00 ,p_cs_tx_power_set_req0 
+0x0260 000833 beq 0x05 ,p_cs_tx_power_set_req5 
+0x0261 000834 beq 0xfb ,p_cs_tx_power_set_reqfb 
+0x0262 000835 rtn 
+:      000836 p_cs_tx_power_set_req0:
+0x0263 000837 hjam 0x4c ,0x957 
+0x0264 000838 hjam 0x6c ,0x958 
+0x0265 000839 hjam 0x50 ,0x959 
+0x0266 000840 jam 0x4c ,mem_module_uuid_list + 260 
+0x0267 000841 jam 0x6c ,mem_module_uuid_list + 262 
+0x0268 000842 jam 0x50 ,mem_module_uuid_list + 264 
+0x0269 000843 rtn 
+:      000844 p_cs_tx_power_set_req5:
+0x026a 000845 hjam 0x4c ,0x957 
+0x026b 000846 hjam 0x6c ,0x958 
+0x026c 000847 hjam 0x10 ,0x959 
+0x026d 000848 jam 0x4c ,mem_module_uuid_list + 260 
+0x026e 000849 jam 0x6c ,mem_module_uuid_list + 262 
+0x026f 000850 jam 0x10 ,mem_module_uuid_list + 264 
+0x0270 000851 rtn 
+:      000852 p_cs_tx_power_set_reqfb:
+0x0271 000853 hjam 0x4c ,0x957 
+0x0272 000854 hjam 0x6c ,0x958 
+0x0273 000855 hjam 0x50 ,0x959 
+0x0274 000856 jam 0x4c ,mem_module_uuid_list + 260 
+0x0275 000857 jam 0x6c ,mem_module_uuid_list + 262 
+0x0276 000858 jam 0x50 ,mem_module_uuid_list + 264 
+0x0277 000859 rtn 
+:      000861 custom_ble_disconnect:
+0x0278 000862 jam 2 ,mem_le_disc_reson 
+0x0279 000863 jam xt_ll_terminate_ind ,mem_fifo_temp 
+0x027a 000864 branch le_xtype_fifo_in 
+:      000866 p_cs_le_dis_req:
+0x027b 000867 fetch 2 ,mem_ui_state_map 
+0x027c 000868 bbit1 ui_state_ble_connected ,app_ble_disconnect 
+0x027d 000869 rtn 
+:      000871 p_reset_mcu:
+0x027e 000872 hjam 0x1 ,0x8010 
+0x027f 000873 nop 10000 
+:      000876 le_att_find_notifyhandle:
+0x0280 000877 disable user 
+:      000878 le_att_find_notifyhandle_loop:
+0x0281 000879 increase -1 ,temp 
+0x0282 000880 rtn zero 
+0x0283 000881 call le_att_get_handle_ptr 
+0x0284 000882 rtn blank 
+0x0285 000883 nrtn zero 
+0x0286 000884 increase -2 ,contr 
+0x0287 000885 ifetch 2 ,contr 
+0x0288 000886 arg 0x2900 ,rega 
+0x0289 000887 isub rega ,null 
+0x028a 000888 nbranch le_att_find_notifyhandle_ok ,positive 
+0x028b 000889 arg 0x2905 ,rega 
+0x028c 000890 isub rega ,null 
+0x028d 000891 branch le_att_find_notifyhandle_ok ,positive 
+0x028e 000892 branch le_att_find_notifyhandle_loop 
+:      000893 le_att_find_notifyhandle_ok:
+0x028f 000894 enable user 
+0x0290 000895 rtn 
+:      000897 le_att_client_clr:
+0x0291 000898 arg mem_le_att_list ,contr 
+0x0292 000899 arg client_charactertic_configuration ,temp 
+:      000900 le_att_client_clr_loop:
+0x0293 000901 ifetch 2 ,contr 
+0x0294 000902 rtn blank 
+0x0295 000903 ifetch 2 ,contr 
+0x0296 000904 isub temp ,null 
+0x0297 000905 nbranch le_att_client_clr_next ,zero 
+0x0298 000906 setarg 0 
+0x0299 000907 increase 1 ,contr 
+0x029a 000908 istore 2 ,contr 
+0x029b 000909 increase 2 ,contr 
+0x029c 000910 branch le_att_client_clr_loop 
+:      000911 le_att_client_clr_next:
+0x029d 000912 ifetch 1 ,contr 
+0x029e 000913 iadd contr ,contr 
+0x029f 000914 branch le_att_client_clr_loop 
+:      000916 le_att_get_client:
+0x02a0 000917 call le_att_get_handle_ptr 
+0x02a1 000918 ifetch 1 ,contr 
+0x02a2 000919 iadd contr ,contr 
+0x02a3 000920 disable user 
+:      000921 le_att_get_client_loop:
+0x02a4 000922 ifetch 2 ,contr 
+0x02a5 000923 rtn blank 
+0x02a6 000924 ifetch 2 ,contr 
+0x02a7 000925 arg client_charactertic_configuration ,temp 
+0x02a8 000926 isub temp ,null 
+0x02a9 000927 branch le_att_get_client_ok ,zero 
+0x02aa 000928 arg uuid_gatt_primary_service ,temp 
+0x02ab 000929 isub temp ,null 
+0x02ac 000930 rtn zero 
+0x02ad 000931 ifetch 1 ,contr 
+0x02ae 000932 iadd contr ,contr 
+0x02af 000933 branch le_att_get_client_loop 
+:      000934 le_att_get_client_ok:
+0x02b0 000935 enable user 
+0x02b1 000936 rtn 
+:      000938 p_cs_wr_dat:
+0x02b2 000939 disable user 
+0x02b3 000940 branch p_cs_tx_dat_common 
+:      000942 p_cs_tx_dat:
+0x02b4 000943 enable user 
+:      000944 p_cs_tx_dat_common:
+0x02b5 000946 fetcht 2 ,mem_tmp_buffer + 2 
+0x02b6 000947 copy temp ,rega 
+0x02b7 000948 call le_att_get_handle_ptr 
+0x02b8 000949 nrtn ,zero 
+0x02b9 000950 ifetcht 1 ,contr 
+0x02ba 000951 copy contr ,regb 
+0x02bb 000952 fetch 1 ,mem_tmp_buffer 
+0x02bc 000953 arg 4 ,regc 
+0x02bd 000954 isub regc ,pdata 
+0x02be 000955 nrtn positive 
+0x02bf 000956 isub temp ,regc 
+0x02c0 000957 rtn positive 
+0x02c1 000958 increase 1 ,pdata 
+0x02c2 000959 icopy loopcnt 
+0x02c3 000960 copy regb ,contw 
+0x02c4 000961 arg mem_tmp_buffer + 4 ,contr 
+0x02c5 000962 call memcpy 
+0x02c6 000963 sub regc ,-1 ,regc 
+0x02c7 000964 copy regc ,loopcnt 
+0x02c8 000965 call clear_mem 
+0x02c9 000966 nbranch p_cs_wr_dat_end ,user 
+0x02ca 000969 fetch 2 ,mem_ui_state_map 
+0x02cb 000970 isolate1 ui_state_ble_connected ,pdata 
+0x02cc 000971 nrtn ,true 
+0x02cd 000973 copy rega ,temp 
+0x02ce 000974 call le_att_get_client 
+0x02cf 000975 nrtn ,user 
+0x02d0 000976 increase 1 ,contr 
+0x02d1 000977 ifetch 2 ,contr 
+:      000978 p_cs_tx_dat_common_send:
+0x02d2 000979 bbit1 att_bit_notification ,p_cs_le_tx_notification 
+0x02d3 000980 bbit1 att_bit_indication ,p_cs_le_tx_indication 
+0x02d4 000981 rtn 
+:      000983 p_cs_wr_dat_end:
+0x02d5 000984 fetch 2 ,mem_le_readhandle 
+0x02d6 000985 isub rega ,null 
+0x02d7 000986 nrtn zero 
+0x02d8 000987 store 2 ,mem_le_att_handle 
+0x02d9 000988 setarg 0x00 
+0x02da 000989 store 2 ,mem_le_readhandle 
+0x02db 000990 jam 0 ,mem_le_readreq_timeout 
+0x02dc 000991 branch le_parse_att_read_request_ok 
+:      000994 p_cs_le_tx_indication:
+0x02dd 000995 jam attop_handle_value_indication ,mem_fifo_temp 
+0x02de 000996 branch p_cs_le_tx_common 
+:      000997 p_cs_le_tx_notification:
+0x02df 000998 jam attop_handle_value_notification ,mem_fifo_temp 
+:      000999 p_cs_le_tx_common:
+0x02e0 001000 store 1 ,mem_att_send_option 
+0x02e1 001001 copy rega ,pdata 
+0x02e2 001002 store 2 ,mem_att_send_handle 
+0x02e3 001003 fetch 1 ,mem_tmp_buffer 
+0x02e4 001004 arg 3 ,temp 
+0x02e5 001005 isub temp ,pdata 
+0x02e6 001006 copy pdata ,loopcnt 
+0x02e7 001007 increase 7 ,pdata 
+0x02e8 001008 store 1 ,mem_scale_tx_length 
+0x02e9 001009 arg mem_le_l2cap + 1 ,contw 
+0x02ea 001010 fetch 2 ,mem_att_send_handle 
+0x02eb 001011 istore 2 ,contw 
+0x02ec 001012 arg mem_tmp_buffer + 4 ,contr 
+0x02ed 001013 call memcpy 
+0x02ee 001014 call le_xtype_fifo_in 
+0x02ef 001015 rtn 
+:      001017 p_cs_poweron_notify:
+0x02f0 001018 arg mem_tmp_buffer ,contw 
+0x02f1 001019 setarg cs_prefix_event 
+0x02f2 001020 istore 1 ,contw 
+0x02f3 001021 setarg 0x01 
+0x02f4 001022 istore 1 ,contw 
+0x02f5 001023 setarg cs_notify_poweron 
+0x02f6 001024 istore 1 ,contw 
+0x02f7 001025 branch p_cs_mem_to_event 
+:      001026 p_cs_conn_notify:
+0x02f8 001027 arg mem_tmp_buffer ,contw 
+0x02f9 001028 setarg cs_prefix_event 
+0x02fa 001029 istore 1 ,contw 
+0x02fb 001030 setarg 0x01 
+0x02fc 001031 istore 1 ,contw 
+0x02fd 001032 setarg cs_notify_conn 
+0x02fe 001033 istore 1 ,contw 
+0x02ff 001034 branch p_cs_mem_to_event 
+:      001035 p_cs_dis_notify:
+0x0300 001036 arg mem_tmp_buffer ,contw 
+0x0301 001037 setarg cs_prefix_event 
+0x0302 001038 istore 1 ,contw 
+0x0303 001039 setarg 0x02 
+0x0304 001040 istore 1 ,contw 
+0x0305 001041 setarg cs_notify_disc 
+0x0306 001042 istore 1 ,contw 
+0x0307 001043 fetch 1 ,mem_le_disc_reson 
+0x0308 001044 istore 1 ,contw 
+0x0309 001045 branch p_cs_mem_to_event 
+:      001047 p_cs_mem_to_event:
+0x030a 001048 call p_wakeup_c51 
+0x030b 001049 fetch 2 ,mem_event_wptr 
+0x030c 001050 copy pdata ,contw 
+0x030d 001051 fetch 1 ,mem_tmp_buffer 
+0x030e 001052 istore 1 ,contw 
+0x030f 001053 call p_cs_event_mem_zero 
+0x0310 001054 ifetch 1 ,contr 
+0x0311 001055 istore 1 ,contw 
+0x0312 001056 copy pdata ,loopcnt 
+0x0313 001057 call p_cs_event_mem_zero 
+:      001058 p_cs_mem_to_event_loop:
+0x0314 001059 ifetch 1 ,contr 
+0x0315 001060 istore 1 ,contw 
+0x0316 001061 call p_cs_event_mem_zero 
+0x0317 001062 loop p_cs_mem_to_event_loop 
+0x0318 001063 copy contw ,pdata 
+0x0319 001064 store 2 ,mem_event_wptr 
+0x031a 001065 rtn 
+:      001067 p_cs_event_mem_zero:
+0x031b 001068 setarg mem_event_buf_end + 1 
+0x031c 001069 isub contw ,null 
+0x031d 001070 nrtn zero 
+0x031e 001071 arg mem_event_buf ,contw 
+0x031f 001072 rtn 
+:      001074 p_cs_cmd_mem_zero:
+0x0320 001075 setarg mem_cmd_buf_end + 1 
+0x0321 001076 isub contr ,null 
+0x0322 001077 nrtn zero 
+0x0323 001078 arg mem_cmd_buf ,contr 
+0x0324 001079 rtn 
+:      001082 p_le_modified_name:
+0x0325 001083 call le_modified_name_att_list 
+:      001084 p_le_modified_scan_rsp:
+0x0326 001085 fetch 1 ,mem_le_scan_data + 1 
+0x0327 001086 sub pdata ,gap_adtype_local_name_complete ,null 
+0x0328 001087 nrtn zero 
+0x0329 001088 fetch 1 ,mem_le_name_len 
+0x032a 001089 copy pdata ,loopcnt 
+0x032b 001090 increase 1 ,pdata 
+0x032c 001091 store 1 ,mem_le_scan_data 
+0x032d 001092 arg mem_le_scan_data + 2 ,contw 
+0x032e 001093 arg mem_le_name ,contr 
+0x032f 001094 call memcpy 
+0x0330 001095 fetch 1 ,mem_le_scan_data 
+0x0331 001096 increase 1 ,pdata 
+0x0332 001097 store 1 ,mem_le_scan_data_len 
+0x0333 001098 rtn 
+:      001100 p_hci_init_common:
+0x0334 001101 hfetch 2 ,core_clkoff 
+0x0335 001102 set0 0x0f ,pdata 
+0x0336 001103 hstore 2 ,core_clkoff 
+0x0337 001104 call uart_set_baud_by_mem 
+0x0338 001105 hjam 0 ,core_uart_clksel 
+0x0339 001106 hjam uart_ctrl_h4 ,core_uart_ctrl 
+0x033a 001107 branch hci_init_queue_ack 
+:      001110 p_le_prepare_att:
+0x033b 001111 fetch 1 ,mem_le_l2cap 
+0x033c 001112 beq attop_handle_value_notification ,p_le_send_att_handle_value_notification 
+0x033d 001113 beq attop_handle_value_indication ,p_le_send_att_handle_value_indication 
+0x033e 001114 beq attop_read_by_group_type_response ,p_le_send_att_read_by_group_type_response 
+0x033f 001115 beq attop_read_by_type_response ,p_le_send_att_read_by_type_response 
+0x0340 001116 beq attop_write_response ,p_le_send_att_write_response 
+0x0341 001117 branch le_prepare_att0 
+:      001119 p_le_send_att_write_response:
+0x0342 001120 fetcht 2 ,mem_le_att_handle 
+0x0343 001121 call le_att_get_handle_ptr 
+0x0344 001122 branch le_send_att_write_response_go ,blank 
+0x0345 001123 increase -2 ,contr 
+0x0346 001124 ifetcht 2 ,contr 
+0x0347 001125 setarg client_charactertic_configuration 
+0x0348 001126 isub temp ,null 
+0x0349 001127 nbranch le_send_att_write_response_go ,zero 
+0x034a 001128 increase 1 ,contr 
+0x034b 001129 ifetcht 2 ,contr 
+0x034c 001130 setarg 0x0001 
+0x034d 001131 isub temp ,null 
+0x034e 001132 branch le_send_att_write_response_go ,zero 
+0x034f 001133 setarg 0x0000 
+0x0350 001134 isub temp ,null 
+0x0351 001135 nbranch le_send_att_write_response_go ,zero 
+0x0352 001136 branch le_send_att_write_response_go 
+:      001138 p_le_send_att_read_by_type_response:
+0x0353 001139 fetcht 2 ,mem_le_search_att_type 
+0x0354 001140 setarg uuid_gatt_characteristic 
+0x0355 001141 isub temp ,null 
+0x0356 001142 nbranch le_send_att_error_response_notfound ,zero 
+0x0357 001143 fetch 2 ,mem_le_search_handle_start 
+0x0358 001144 store 2 ,mem_temp 
+0x0359 001145 enable user 
+:      001146 p_le_send_att_read_by_type_response_loop:
+0x035a 001147 call p_le_att_handle_inrange 
+0x035b 001148 nbranch p_le_send_att_read_by_type_response_end ,positive 
+0x035c 001149 fetcht 2 ,mem_temp 
+0x035d 001150 call p_le_att_get_handle_info 
+0x035e 001151 beq 1 ,p_le_send_att_read_by_type_response_end 
+0x035f 001152 call p_le_att_same_type 
+0x0360 001153 nbranch p_le_send_att_read_by_type_response_next_handle ,zero 
+0x0361 001154 disable user 
+0x0362 001155 call p_le_send_att_read_by_type_write_properties 
+0x0363 001156 call p_le_att_next_handle 
+0x0364 001157 call p_le_att_get_handle_info 
+0x0365 001158 call p_le_send_att_read_by_type_write_uuid 
+0x0366 001159 branch p_le_send_att_read_by_type_response_end 
+:      001160 p_le_send_att_read_by_type_response_next_handle:
+0x0367 001161 call p_le_att_next_handle 
+0x0368 001162 branch p_le_send_att_read_by_type_response_loop 
+:      001163 p_le_send_att_read_by_type_response_end:
+0x0369 001164 branch le_send_att_error_response_notfound ,user 
+0x036a 001165 branch p_le_send_auto_len_by_mem 
+:      001166 p_le_send_att_read_by_type_write_properties:
+0x036b 001167 fetch 2 ,mem_temp 
+0x036c 001168 store 2 ,mem_le_l2cap_response + 1 
+0x036d 001170 fetch 1 ,mem_le_search_len 
+0x036e 001171 copy pdata ,loopcnt 
+0x036f 001172 call p_get_contr 
+0x0370 001173 arg mem_le_l2cap_response + 3 ,contw 
+0x0371 001174 call memcpy 
+0x0372 001175 branch p_store_contw 
+:      001176 p_le_send_att_read_by_type_write_uuid:
+0x0373 001177 fetcht 2 ,mem_le_cur_att_type 
+0x0374 001178 rshift8 temp ,pdata 
+0x0375 001179 bne 0x03 ,p_le_send_att_read_by_type_write_short_uuid 
+0x0376 001180 call p_get_contw 
+0x0377 001181 fetch 2 ,mem_temp 
+0x0378 001182 istore 2 ,contw 
+0x0379 001183 call p_store_contw 
+0x037a 001184 setarg mem_le_att_list 
+0x037b 001185 iadd temp ,contr 
+0x037c 001186 ifetch 1 ,contr 
+0x037d 001187 copy contr ,temp 
+0x037e 001188 copy pdata ,loopcnt 
+0x037f 001189 increase 5 ,pdata 
+0x0380 001190 store 1 ,mem_le_l2cap_response 
+0x0381 001191 call p_get_contw 
+0x0382 001192 copy temp ,contr 
+0x0383 001193 call memcpy 
+0x0384 001194 branch p_store_contw 
+:      001196 p_le_send_att_read_by_type_write_short_uuid:
+0x0385 001197 call p_get_contw 
+0x0386 001198 fetch 2 ,mem_temp 
+0x0387 001199 istore 2 ,contw 
+0x0388 001200 fetch 2 ,mem_le_cur_att_type 
+0x0389 001201 istore 2 ,contw 
+0x038a 001202 call p_store_contw 
+0x038b 001203 jam 7 ,mem_le_l2cap_response 
+0x038c 001204 rtn 
+:      001212 p_le_send_att_read_by_group_type_response:
+0x038d 001213 arg 3 ,timeup 
+0x038e 001214 fetch 2 ,mem_le_search_handle_start 
+0x038f 001215 store 2 ,mem_temp 
+0x0390 001216 jam 0 ,mem_le_search_res 
+0x0391 001217 enable user 
+:      001218 p_le_send_att_read_by_group_type_response_loop:
+0x0392 001219 call p_le_att_handle_inrange 
+0x0393 001220 nbranch p_le_send_att_read_by_group_type_end0 ,positive 
+0x0394 001221 fetcht 2 ,mem_temp 
+0x0395 001222 call p_le_att_get_handle_info 
+0x0396 001223 beq 1 ,p_le_send_att_read_by_group_type_end1 
+0x0397 001224 call p_le_att_same_type 
+0x0398 001225 nbranch p_le_send_att_read_by_group_type_next_handle ,zero 
+0x0399 001226 fetch 1 ,mem_le_search_res 
+0x039a 001227 beq 1 ,p_le_send_att_read_by_group_type_end1 
+0x039b 001228 nbranch p_le_send_att_read_by_group_type_store_write_record ,user 
+0x039c 001229 disable user 
+0x039d 001230 fetch 1 ,mem_le_search_len 
+0x039e 001231 increase 4 ,pdata 
+0x039f 001232 store 1 ,mem_le_l2cap_response 
+0x03a0 001233 call p_store_contw 
+0x03a1 001234 branch p_le_send_att_read_by_group_type_store_record 
+:      001235 p_le_send_att_read_by_group_type_store_write_record:
+0x03a2 001236 fetch 1 ,mem_le_search_len 
+0x03a3 001237 sub pdata ,0x10 ,null 
+0x03a4 001238 branch p_le_send_att_read_by_group_type_end1 ,zero 
+0x03a5 001239 fetch 1 ,mem_le_l2cap_response 
+0x03a6 001240 sub pdata ,0x10 ,null 
+0x03a7 001241 branch p_le_send_att_read_by_group_type_end1 ,zero 
+0x03a8 001242 fetch 2 ,mem_temp 
+0x03a9 001243 increase -1 ,pdata 
+0x03aa 001244 store 2 ,mem_le_cur_handle_end 
+0x03ab 001245 call p_le_write_att_record 
+:      001246 p_le_send_att_read_by_group_type_store_record:
+0x03ac 001247 fetch 2 ,mem_temp 
+0x03ad 001248 store 2 ,mem_le_cur_handle_start 
+0x03ae 001249 call p_le_store_att_record 
+0x03af 001250 increase -1 ,timeup 
+0x03b0 001251 branch p_le_send_att_read_by_group_type_last_find ,zero 
+:      001252 p_le_send_att_read_by_group_type_next_handle:
+0x03b1 001253 call p_le_att_next_handle 
+0x03b2 001254 branch p_le_send_att_read_by_group_type_response_loop 
+:      001255 p_le_send_att_read_by_group_type_last_find:
+0x03b3 001256 jam 1 ,mem_le_search_res 
+0x03b4 001257 branch p_le_send_att_read_by_group_type_next_handle 
+:      001258 p_le_send_att_read_by_group_type_end0:
+0x03b5 001259 fetch 2 ,mem_temp 
+0x03b6 001260 store 2 ,mem_le_cur_handle_end 
+0x03b7 001261 branch p_le_send_att_read_by_group_type_end_common 
+:      001262 p_le_send_att_read_by_group_type_end1:
+0x03b8 001263 fetch 2 ,mem_temp 
+0x03b9 001264 increase -1 ,pdata 
+0x03ba 001265 store 2 ,mem_le_cur_handle_end 
+0x03bb 001266 branch p_le_send_att_read_by_group_type_end_common 
+:      001267 p_le_send_att_read_by_group_type_end_common:
+0x03bc 001268 branch le_send_att_error_response_notfound ,user 
+0x03bd 001269 call p_le_write_att_record 
+0x03be 001270 branch p_le_send_auto_len_by_mem 
+:      001273 p_le_att_next_handle:
+0x03bf 001274 fetcht 2 ,mem_temp 
+0x03c0 001275 increase 1 ,temp 
+0x03c1 001276 storet 2 ,mem_temp 
+0x03c2 001277 rtn 
+:      001279 p_le_store_att_record:
+0x03c3 001280 fetch 1 ,mem_le_search_len 
+0x03c4 001281 store 1 ,mem_tmp_buffer 
+0x03c5 001282 copy pdata ,loopcnt 
+0x03c6 001283 call p_get_contr 
+0x03c7 001284 branch memcpy 
+:      001286 p_le_write_att_record:
+0x03c8 001287 call p_get_contw 
+0x03c9 001288 fetch 2 ,mem_le_cur_handle_start 
+0x03ca 001289 istore 2 ,contw 
+0x03cb 001290 fetch 2 ,mem_le_cur_handle_end 
+0x03cc 001291 istore 2 ,contw 
+0x03cd 001292 fetch 1 ,mem_tmp_buffer 
+0x03ce 001293 copy pdata ,loopcnt 
+0x03cf 001294 call memcpy 
+0x03d0 001295 branch p_store_contw 
+:      001303 p_le_att_get_handle_info:
+0x03d1 001304 arg mem_le_att_list ,contr 
+0x03d2 001305 copy temp ,rega 
+:      001306 p_le_att_get_handle_loop:
+0x03d3 001307 ifetch 2 ,contr 
+0x03d4 001308 branch p_le_att_unfind_handle ,blank 
+0x03d5 001309 ifetcht 2 ,contr 
+0x03d6 001310 storet 2 ,mem_le_cur_att_type 
+0x03d7 001311 isub rega ,null 
+0x03d8 001312 branch p_le_att_finded_handle ,zero 
+0x03d9 001313 ifetch 1 ,contr 
+0x03da 001314 iadd contr ,contr 
+0x03db 001315 branch p_le_att_get_handle_loop 
+:      001316 p_le_att_unfind_handle:
+0x03dc 001317 setarg 1 
+0x03dd 001318 rtn 
+:      001319 p_le_att_finded_handle:
+0x03de 001320 ifetch 1 ,contr 
+0x03df 001321 store 1 ,mem_le_search_len 
+0x03e0 001322 call p_store_contr 
+0x03e1 001323 setarg 0 
+0x03e2 001324 rtn 
+:      001326 p_le_att_handle_inrange:
+0x03e3 001327 fetcht 2 ,mem_temp 
+0x03e4 001328 fetch 2 ,mem_le_search_handle_end 
+0x03e5 001329 isub temp ,null 
+0x03e6 001330 rtn 
+:      001332 p_le_att_same_type:
+0x03e7 001333 fetch 2 ,mem_le_search_att_type 
+0x03e8 001334 fetcht 2 ,mem_le_cur_att_type 
+0x03e9 001335 isub temp ,null 
+0x03ea 001336 rtn 
+:      001338 p_le_send_auto_len_by_mem:
+0x03eb 001339 call p_get_contw 
+0x03ec 001340 branch le_send_autolen 
+:      001341 p_get_contw:
+0x03ed 001342 fetch 2 ,mem_contw 
+0x03ee 001343 copy pdata ,contw 
+0x03ef 001344 rtn 
+:      001345 p_get_contr:
+0x03f0 001346 fetch 2 ,mem_contr 
+0x03f1 001347 copy pdata ,contr 
+0x03f2 001348 rtn 
+:      001349 p_store_contw:
+0x03f3 001350 copy contw ,pdata 
+0x03f4 001351 store 2 ,mem_contw 
+0x03f5 001352 rtn 
+:      001353 p_store_contr:
+0x03f6 001354 copy contr ,pdata 
+0x03f7 001355 store 2 ,mem_contr 
+0x03f8 001356 rtn 
+:      001358 p_connection_incontext:
+0x03f9 001359 call p_context_search_insniff 
+0x03fa 001360 branch connection_incontext + 3 
+:      001361 p_context_search_insniff:
+0x03fb 001362 arg p_context_search_sniff ,regc 
+0x03fc 001363 branch context_search 
+:      001364 p_context_search_sniff:
+0x03fd 001365 bbit0 1 ,context_search_next 
+:      001366 p_context_search_sniff_loop:
+0x03fe 001367 call context_get_anchor 
+0x03ff 001368 call sign_pdata_temp 
+0x0400 001369 isub temp ,pdata 
+0x0401 001370 increase 1 ,pdata 
+0x0402 001371 branch p_context_search_sniff_miss ,positive 
+0x0403 001372 branch context_search_sniff_cont + 3 
+:      001373 p_context_search_sniff_miss:
+0x0404 001374 iforce regb 
+0x0405 001375 add rega ,2 ,contr 
+0x0406 001376 ifetch 2 ,contr 
+0x0407 001377 branch context_search_meet ,blank 
+0x0408 001378 call context_next_anchor 
+0x0409 001379 branch p_context_search_sniff_loop 
+:      001381 sign_pdata_temp:
+0x040a 001382 rshift16 pdata ,timeup 
+0x040b 001383 rshift8 timeup ,timeup 
+0x040c 001384 branch sign_pdata_temp_p0 ,zero 
+0x040d 001385 compare 0xf ,timeup ,0xf 
+0x040e 001386 nrtn true 
+0x040f 001387 rshift16 temp ,timeup 
+0x0410 001388 rshift8 timeup ,timeup 
+0x0411 001389 nrtn zero 
+0x0412 001390 set1 28 ,temp 
+0x0413 001391 rtn 
+:      001392 sign_pdata_temp_p0:
+0x0414 001393 rshift16 temp ,timeup 
+0x0415 001394 rshift8 timeup ,timeup 
+0x0416 001395 compare 0xf ,timeup ,0xf 
+0x0417 001396 nrtn true 
+0x0418 001397 set1 28 ,pdata 
+0x0419 001398 rtn 
+:      001400 p_le_transmit_receive_sifs:
+0x041a 001401 call le_transmit 
+0x041b 001402 fetcht 1 ,mem_last_freq 
+0x041c 001403 call set_freq_rx 
+0x041d 001404 call rf_rx_enable 
+0x041e 001405 enable swfine 
+0x041f 001406 arg 5500 ,timeup 
+0x0420 001408 branch le_receive_rxon 
+:      001410 p_le_enable:
+0x0421 001411 hjam 0x36 ,0x90f 
+0x0422 001412 hjam 0x5f ,0x90b 
+0x0423 001413 branch 0x53d4 
+:      001415 p_lpm_sleep:
+0x0424 001416 call xtal_fast_wake 
+0x0425 001417 branch lpm_sleep + 2 
+:      001419 p_check_51cmd_once:
+0x0426 001420 call ui_ipc_get_lock 
+0x0427 001421 arg mem_ipc_fifo_c512bt ,rega 
+0x0428 001422 call fifo_out 
+0x0429 001423 copy pdata ,temp 
+0x042a 001424 call ui_ipc_put_lock 
+0x042b 001425 copy temp ,pdata 
+0x042c 001426 rtn blank 
+0x042d 001427 beq bt_cmd_start_discovery ,check_51cmd_start_discovery 
+0x042e 001428 beq bt_cmd_stop_discovery ,check_51cmd_stop_discovery 
+0x042f 001429 beq bt_cmd_reconnect ,check_51cmd_reconnect 
+0x0430 001430 beq bt_cmd_enter_sniff_subrating ,check_51cmd_enter_sniff_subrating 
+0x0431 001431 beq bt_cmd_exit_sniff_subrating ,check_51cmd_exit_sniff_subrating 
+0x0432 001432 beq bt_cmd_sniff_test ,check_51cmd_sniff_test 
+0x0433 001433 beq bt_cmd_start_inquiry ,check_51cmd_inq 
+0x0434 001434 beq bt_cmd_stop_inquiry ,check_51cmd_stop_inq 
+0x0435 001435 beq bt_cmd_start_adv ,check_51cmd_adv 
+0x0436 001436 beq bt_cmd_stop_adv ,check_51cmd_stop_adv 
+0x0437 001437 beq bt_cmd_start_direct_adv ,check_51cmd_direct_adv 
+0x0438 001438 beq bt_cmd_stop_direct_adv ,check_51cmd_stop_direct_adv 
+0x0439 001439 branch check_51cmd_once0 
+:      001441 p_app_updata_le_param:
+0x043a 001442 call app_lpm_mult_enable 
+0x043b 001443 jam bt_cmd_le_update_conn ,mem_fifo_temp 
+0x043c 001444 branch ui_ipc_send_cmd 
+:      001446 p_le_prepare_tx_cmd:
+0x043d 001447 fetch 1 ,mem_le_txpayload 
+0x043e 001448 beq ll_connection_param_req ,p_le_send_conn_param_req 
+0x043f 001449 beq ll_unknown_rsp ,p_le_send_unknown_rsp 
+0x0440 001450 branch le_prepare_tx_cmd + 10 
+:      001452 p_le_send_unknown_rsp:
+0x0441 001453 fetch 1 ,mem_le_ll_unknow_type 
+0x0442 001454 istore 1 ,contw 
+0x0443 001455 force 2 ,temp 
+0x0444 001456 branch le_send_packet 
+:      001457 p_le_send_conn_param_req:
+0x0445 001458 increase -1 ,contw 
+0x0446 001459 setarg 0x000c 
+0x0447 001460 istore 2 ,contw 
+0x0448 001461 setarg 0x0005 
+0x0449 001462 istore 2 ,contw 
+0x044a 001463 setarg 0xb412 
+0x044b 001464 istore 2 ,contw 
+0x044c 001465 setarg 0x0008 
+0x044d 001466 istore 2 ,contw 
+0x044e 001467 fetch 2 ,mem_conn_min_interv 
+0x044f 001468 istore 2 ,contw 
+0x0450 001469 fetch 2 ,mem_conn_max_interv 
+0x0451 001470 istore 2 ,contw 
+0x0452 001471 fetch 1 ,mem_lpm_mult 
+0x0453 001472 istore 2 ,contw 
+0x0454 001473 fetch 2 ,mem_conn_timeout 
+0x0455 001474 istore 2 ,contw 
+0x0456 001475 force 2 ,type 
+0x0457 001476 branch le_send_autolen 
+:      001478 p_le_send_adv_ind:
+0x0458 001479 fetch 1 ,mem_le_adv_type 
+0x0459 001480 beq adv_direct_ind ,le_send_adv_direct_ind 
+0x045a 001481 fetcht 1 ,mem_le_adv_own_addr_type 
+0x045b 001482 lshift4 temp ,temp 
+0x045c 001483 lshift2 temp ,temp 
+0x045d 001484 ior temp ,pdata 
+0x045e 001485 branch le_send_adv_ind + 7 

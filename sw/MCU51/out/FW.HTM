@@ -1,0 +1,1262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>LX51 Static Call Analysis</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<style type="text/css">
+<!--
+p            { font-family: Verdana; font-size: 8pt; margin-top: 2; margin-bottom: 2 }
+.LI2         { margin-top: 2; margin-bottom: 2 }
+.Release     { background-color: #CCCCCC; font-weight: bold; padding: 6 }
+.ToolT       { font-size: 8pt; color: #808080 }
+.TinyT       { font-size: 8pt; text-align: Center }
+ul           { font-family: Verdana; font-size: 8pt; list-style-type: square;  margin-top: 2; margin-bottom: 2 }
+ol           { font-family: Verdana; font-size: 8pt }
+h1           { font-family: Verdana; font-size: 14pt; color: #000080; font-weight: bold; text-align: Center; margin-right: 3 }
+h2           { font-family: Verdana; font-size: 8pt; color: #000080; font-weight: bold; margin-top: 12; margin-bottom: 3; background-color: #CCCCCC; padding: 6 }
+h3           { font-family: Verdana; font-size: 8pt; font-weight: bold; margin-top: 12; margin-bottom: 3; background-color: #CCCCCC; padding: 6 }
+pre          { font-family: Courier New; font-size: 8pt; background-color: #CCFFCC; margin-left: 24; margin-right: 24 }
+li           { margin-top: 3; margin-bottom: 0 }
+-->
+</style>
+</head>
+<body>
+<h1>Static Call Analysis for<br>OUT\FW (MAIN)</h1>
+
+<p class="TinyT">
+Created from: <b>LX51 LINKER/LOCATER V4.41</b><br>
+Creation time: <b>04/18/2017  15:00:14</b><p>
+
+<hr>
+
+
+<h2><a name="S2"></a>?PR?MAIN?MAIN (C:0004C2H - C:0004E4H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=42 Bytes (<a href="#S5">?PR?SYSTEMINIT?SYSTEM</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S8">?PR?BTCONTROLPROCESS?SYSTEM</a></li>
+<li><a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a></li>
+<li><a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a></li>
+<li><a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a></li>
+<li><a href="#S10">?PR?SYSSTATUSPROCESS?SYSTEM</a></li>
+<li><a href="#S5">?PR?SYSTEMINIT?SYSTEM</a></li>
+<li><a href="#S16">?PR?YC_UTILTIMERPROCESS?YC_SYS</a></li>
+</ul>
+
+<h2><a name="S3"></a>?PR?SOFTTIMER_10MSCALLBACK?SYSTEM (C:0008F3H - C:000936H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=28 Bytes (<a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S81">?PR?_CS_MEMORYWEIGHTCLEAR_TIMER?CS_SCALE_PROC</a></li>
+<li><a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S87">?PR?_CS_SOFTTIMER?CS_SCALE_PROC</a></li>
+<li><a href="#S13">?PR?_YC_UTILTIMERSTARTMS?YC_SYS</a></li>
+</ul>
+
+<h2><a name="S15"></a>?PR?_YC_UTILTIMERSTOP?YC_SYS (C:002060H - C:0020B8H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<h2><a name="S20"></a>?PR?_YC_UARTSENDDATA?YC_PERIPHERAL (C:001C2EH - C:001D2BH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=4 Bytes (<a href="#S48">?PR?_XMEMCPY?YC_UTILITIES</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S48">?PR?_XMEMCPY?YC_UTILITIES</a></li>
+</ul>
+
+<h2><a name="S42"></a>?PR?BT_CMDFIFOEMPTY?BT_IPC (C:002940H - C:002948H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S40">?PR?BT_GETCMDFIFODEPTH?BT_IPC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S40">?PR?BT_GETCMDFIFODEPTH?BT_IPC</a></li>
+</ul>
+
+<h2><a name="S43"></a>?PR?_BT_CMDFIFOFULL?BT_IPC (C:002949H - C:00297DH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S40">?PR?BT_GETCMDFIFODEPTH?BT_IPC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S40">?PR?BT_GETCMDFIFODEPTH?BT_IPC</a></li>
+</ul>
+
+<h2><a name="S52"></a>?PR?_CMEMCPY?YC_UTILITIES (C:002AB6H - C:002AECH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<h2><a name="S54"></a>?PR?_YC_MEMCHECKEMPTY?YC_UTILITIES (C:002AEDH - C:002B42H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<h2><a name="S110"></a>?PR?CS_SCALEDISPLAY_DEBUG?CS_SCALEDISPLAY (C:003922H - C:003972H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a></li>
+<li><a href="#S116">?PR?_CS_SCALEDISPLAY_HEXTOBCD?CS_SCALEDISPLAY</a></li>
+<li><a href="#S118">?PR?_CS_SCALEDISPLAY_LOOKUPTABLE?CS_SCALEDISPLAY</a></li>
+<li><a href="#S115">?PR?CS_SCALEDISPLAY_LCDBUF_RSHIFT4?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<h2><a name="S125"></a>?PR?CS_KEYSCAN?CS_SCALEKEY (C:000937H - C:000A07H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=38 Bytes (<a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S19">?PR?_YC_GPIOGETINPUTSTATUS?YC_PERIPHERAL</a></li>
+<li><a href="#S69">?PR?CS_SCALE_CHANGEUNIT?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S5"></a>?PR?SYSTEMINIT?SYSTEM (C:000FFAH - C:001090H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=40 Bytes (<a href="#S60">?PR?CS_SCALE_POWERON?CS_SCALE_PROC</a>) Top=2 Bytes (<a href="#S2">?PR?MAIN?MAIN</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a></li>
+<li><a href="#S46">?PR?_XMEMSET?YC_UTILITIES</a></li>
+<li><a href="#S19">?PR?_YC_GPIOGETINPUTSTATUS?YC_PERIPHERAL</a></li>
+<li><a href="#S13">?PR?_YC_UTILTIMERSTARTMS?YC_SYS</a></li>
+<li><a href="#S60">?PR?CS_SCALE_POWERON?CS_SCALE_PROC</a></li>
+<li><a href="#S158">?PR?QUEUEINIT?LXPROTOCOL</a></li>
+<li><a href="#S11">?PR?YC_UTILTIMERINIT?YC_SYS</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S2">?PR?MAIN?MAIN</a></li>
+</ul>
+
+<h2><a name="S6"></a>?PR?_GENERATECHECKSUM?SYSTEM (C:00184FH - C:001879H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=6 Bytes (<a href="#S94">?PR?CS_1186COM_READMACADRESS_PROC?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S94">?PR?CS_1186COM_READMACADRESS_PROC?CS_COMMTO1186</a></li>
+</ul>
+
+<h2><a name="S8"></a>?PR?BTCONTROLPROCESS?SYSTEM (C:001FDAH - C:00205FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=8 Bytes (<a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a>) Top=2 Bytes (<a href="#S2">?PR?MAIN?MAIN</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S38">?PR?_BT_EVENTFIFOOUT?BT_IPC</a></li>
+<li><a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S2">?PR?MAIN?MAIN</a></li>
+</ul>
+
+<h2><a name="S10"></a>?PR?SYSSTATUSPROCESS?SYSTEM (C:0005A2H - C:0005E1H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S22">?PR?YC_UARTWAITSENDDATA?YC_PERIPHERAL</a>) Top=2 Bytes (<a href="#S2">?PR?MAIN?MAIN</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S36">?PR?_BT_CMDFIFOIN?BT_IPC</a></li>
+<li><a href="#S25">?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL</a></li>
+<li><a href="#S22">?PR?YC_UARTWAITSENDDATA?YC_PERIPHERAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S2">?PR?MAIN?MAIN</a></li>
+</ul>
+
+<h2><a name="S11"></a>?PR?YC_UTILTIMERINIT?YC_SYS (C:0010C6H - C:001188H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=4 Bytes (<a href="#S5">?PR?SYSTEMINIT?SYSTEM</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S5">?PR?SYSTEMINIT?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S13"></a>?PR?_YC_UTILTIMERSTARTMS?YC_SYS (C:001189H - C:0012C7H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=4 Bytes (<a href="#S5">?PR?SYSTEMINIT?SYSTEM</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S3">?PR?SOFTTIMER_10MSCALLBACK?SYSTEM</a></li>
+<li><a href="#S5">?PR?SYSTEMINIT?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S16"></a>?PR?YC_UTILTIMERPROCESS?YC_SYS (C:0020B9H - C:0021FBH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=2 Bytes (<a href="#S2">?PR?MAIN?MAIN</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S2">?PR?MAIN?MAIN</a></li>
+</ul>
+
+<h2><a name="S19"></a>?PR?_YC_GPIOGETINPUTSTATUS?YC_PERIPHERAL (C:001091H - C:0010C5H)</h2>
+<p><br><b>Maximum Stack:</b> Top=4 Bytes (<a href="#S5">?PR?SYSTEMINIT?SYSTEM</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S125">?PR?CS_KEYSCAN?CS_SCALEKEY</a></li>
+<li><a href="#S5">?PR?SYSTEMINIT?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S22"></a>?PR?YC_UARTWAITSENDDATA?YC_PERIPHERAL (C:00065BH - C:00066CH)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S99">?PR?CS_1186COM_SETSLEEPMODE_PROC?CS_COMMTO1186</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S99">?PR?CS_1186COM_SETSLEEPMODE_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S10">?PR?SYSSTATUSPROCESS?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S23"></a>?PR?_YC_UARTRECIVEDATAEXPECTED?YC_PERIPHERAL (C:0007A8H - C:0008F2H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=3 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=6 Bytes (<a href="#S94">?PR?CS_1186COM_READMACADRESS_PROC?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S96">?PR?CS_1186COM_READADC_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S101">?PR?CS_1186COM_READADZERO_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S94">?PR?CS_1186COM_READMACADRESS_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S98">?PR?CS_1186COM_READTIME_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S97">?PR?CS_1186COM_SETLCD_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S100">?PR?CS_1186COM_SETOPENWEIGHT_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S99">?PR?CS_1186COM_SETSLEEPMODE_PROC?CS_COMMTO1186</a></li>
+</ul>
+
+<h2><a name="S25"></a>?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL (C:000592H - C:0005A1H)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S102">?PR?CS_1186COM_RESET_PROC?CS_COMMTO1186</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S96">?PR?CS_1186COM_READADC_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S101">?PR?CS_1186COM_READADZERO_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S94">?PR?CS_1186COM_READMACADRESS_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S98">?PR?CS_1186COM_READTIME_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S102">?PR?CS_1186COM_RESET_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S97">?PR?CS_1186COM_SETLCD_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S100">?PR?CS_1186COM_SETOPENWEIGHT_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S99">?PR?CS_1186COM_SETSLEEPMODE_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a></li>
+<li><a href="#S10">?PR?SYSSTATUSPROCESS?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S26"></a>?PR?SPIFLASHREADSR?SPIFLASH (C:0021FCH - C:002245H)</h2>
+<p><br><b>Maximum Stack:</b> Top=14 Bytes (<a href="#S29">?PR?SPIFLASHWAITBUSY?SPIFLASH</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S29">?PR?SPIFLASHWAITBUSY?SPIFLASH</a></li>
+</ul>
+
+<h2><a name="S28"></a>?PR?SPIFLASHWRITEENABLE?SPIFLASH (C:00238FH - C:0023BAH)</h2>
+<p><br><b>Maximum Stack:</b> Top=14 Bytes (<a href="#S29">?PR?SPIFLASHWAITBUSY?SPIFLASH</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S29">?PR?SPIFLASHWAITBUSY?SPIFLASH</a></li>
+</ul>
+
+<h2><a name="S29"></a>?PR?SPIFLASHWAITBUSY?SPIFLASH (C:002246H - C:002257H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=12 Bytes (<a href="#S30">?PR?_SPIFLASHERASESECTOR?SPIFLASH</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S56">?PR?_YC_DELAY1MS?YC_UTILITIES</a></li>
+<li><a href="#S26">?PR?SPIFLASHREADSR?SPIFLASH</a></li>
+<li><a href="#S28">?PR?SPIFLASHWRITEENABLE?SPIFLASH</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S30">?PR?_SPIFLASHERASESECTOR?SPIFLASH</a></li>
+<li><a href="#S32">?PR?_SPIFLASHWRITE?SPIFLASH</a></li>
+</ul>
+
+<h2><a name="S30"></a>?PR?_SPIFLASHERASESECTOR?SPIFLASH (C:002258H - C:0022CDH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=4 Bytes (<a href="#S29">?PR?SPIFLASHWAITBUSY?SPIFLASH</a>) Top=10 Bytes (<a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S29">?PR?SPIFLASHWAITBUSY?SPIFLASH</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S32"></a>?PR?_SPIFLASHWRITE?SPIFLASH (C:0022CEH - C:00238EH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=4 Bytes (<a href="#S29">?PR?SPIFLASHWAITBUSY?SPIFLASH</a>) Top=10 Bytes (<a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S29">?PR?SPIFLASHWAITBUSY?SPIFLASH</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S34"></a>?PR?_SPIFLASHREAD?SPIFLASH (C:0023D3H - C:00246DH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=8 Bytes (<a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S163">?PR?_CAL_CRC32_MULTIPLE?CRC32</a></li>
+<li><a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S36"></a>?PR?_BT_CMDFIFOIN?BT_IPC (C:0027F2H - C:002911H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=18 Bytes (<a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S40">?PR?BT_GETCMDFIFODEPTH?BT_IPC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S145">?PR?_LXSENDRECVDATAACK?LXPROTOCOL</a></li>
+<li><a href="#S151">?PR?_LXSETTINGDEVICERESPONE?LXPROTOCOL</a></li>
+<li><a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a></li>
+<li><a href="#S153">?PR?SENDHISTORYDATA?LXPROTOCOL</a></li>
+<li><a href="#S10">?PR?SYSSTATUSPROCESS?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S38"></a>?PR?_BT_EVENTFIFOOUT?BT_IPC (C:00297EH - C:002A80H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S41">?PR?BT_GETEVTFIFODEPTH?BT_IPC</a>) Top=4 Bytes (<a href="#S8">?PR?BTCONTROLPROCESS?SYSTEM</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S41">?PR?BT_GETEVTFIFODEPTH?BT_IPC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S8">?PR?BTCONTROLPROCESS?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S40"></a>?PR?BT_GETCMDFIFODEPTH?BT_IPC (C:002912H - C:00293FH)</h2>
+<p><br><b>Maximum Stack:</b> Top=20 Bytes (<a href="#S36">?PR?_BT_CMDFIFOIN?BT_IPC</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S43">?PR?_BT_CMDFIFOFULL?BT_IPC</a></li>
+<li><a href="#S36">?PR?_BT_CMDFIFOIN?BT_IPC</a></li>
+<li><a href="#S42">?PR?BT_CMDFIFOEMPTY?BT_IPC</a></li>
+</ul>
+
+<h2><a name="S41"></a>?PR?BT_GETEVTFIFODEPTH?BT_IPC (C:002A81H - C:002AAEH)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S38">?PR?_BT_EVENTFIFOOUT?BT_IPC</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S38">?PR?_BT_EVENTFIFOOUT?BT_IPC</a></li>
+</ul>
+
+<h2><a name="S46"></a>?PR?_XMEMSET?YC_UTILITIES (C:001F9CH - C:001FB9H)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S152">?PR?DELUSERDATA?LXPROTOCOL</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a></li>
+<li><a href="#S152">?PR?DELUSERDATA?LXPROTOCOL</a></li>
+<li><a href="#S153">?PR?SENDHISTORYDATA?LXPROTOCOL</a></li>
+<li><a href="#S5">?PR?SYSTEMINIT?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S48"></a>?PR?_XMEMCPY?YC_UTILITIES (C:001D86H - C:001DBCH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=4 Bytes (<a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a></li>
+<li><a href="#S20">?PR?_YC_UARTSENDDATA?YC_PERIPHERAL</a></li>
+</ul>
+
+<h2><a name="S50"></a>?PR?_DMEMCPY?YC_UTILITIES (C:0027BEH - C:0027F1H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=16 Bytes (<a href="#S161">?PR?_QUEUEPUSH?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S161">?PR?_QUEUEPUSH?LXPROTOCOL</a></li>
+<li><a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a></li>
+<li><a href="#S153">?PR?SENDHISTORYDATA?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S56"></a>?PR?_YC_DELAY1MS?YC_UTILITIES (C:0023BBH - C:0023D2H)</h2>
+<p><br><b>Maximum Stack:</b> Top=14 Bytes (<a href="#S29">?PR?SPIFLASHWAITBUSY?SPIFLASH</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S29">?PR?SPIFLASHWAITBUSY?SPIFLASH</a></li>
+</ul>
+
+<h2><a name="S57"></a>?PR?_YC_DELAY10MS?YC_UTILITIES (C:001F84H - C:001F9BH)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S145">?PR?_LXSENDRECVDATAACK?LXPROTOCOL</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S145">?PR?_LXSENDRECVDATAACK?LXPROTOCOL</a></li>
+<li><a href="#S151">?PR?_LXSETTINGDEVICERESPONE?LXPROTOCOL</a></li>
+<li><a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a></li>
+<li><a href="#S153">?PR?SENDHISTORYDATA?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S59"></a>?PR?CS_SCALE_PROC?CS_SCALE_PROC (C:000F9CH - C:000FF9H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=38 Bytes (<a href="#S61">?PR?CS_SCALE_WEIGHTPROC?CS_SCALE_PROC</a>) Top=2 Bytes (<a href="#S2">?PR?MAIN?MAIN</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S85">?PR?CS_SCALE_POWERONPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S61">?PR?CS_SCALE_WEIGHTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S109">?PR?CS_SCALEDISPLAY?CS_SCALEDISPLAY</a></li>
+<li><a href="#S124">?PR?CS_SCALEDISPLAY_STEADYFLASH?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S2">?PR?MAIN?MAIN</a></li>
+</ul>
+
+<h2><a name="S60"></a>?PR?CS_SCALE_POWERON?CS_SCALE_PROC (C:0012C8H - C:0012FAH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=38 Bytes (<a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a>) Top=4 Bytes (<a href="#S5">?PR?SYSTEMINIT?SYSTEM</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S85">?PR?CS_SCALE_POWERONPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S5">?PR?SYSTEMINIT?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S61"></a>?PR?CS_SCALE_WEIGHTPROC?CS_SCALE_PROC (C:002B69H - C:002B8FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=36 Bytes (<a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a>) Top=4 Bytes (<a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S65">?PR?_CS_SCALE_ADCFILTER?CS_SCALE_PROC</a></li>
+<li><a href="#S62">?PR?_CS_SCALE_GETDELTAAD?CS_SCALE_PROC</a></li>
+<li><a href="#S67">?PR?_CS_SCALE_GETWEIGHT?CS_SCALE_PROC</a></li>
+<li><a href="#S73">?PR?_CS_SCALE_JUDGELOWBAT?CS_SCALE_PROC</a></li>
+<li><a href="#S74">?PR?_CS_SCALE_JUDGEOVERLOAD?CS_SCALE_PROC</a></li>
+<li><a href="#S72">?PR?_CS_SCALE_LOCKPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S62"></a>?PR?_CS_SCALE_GETDELTAAD?CS_SCALE_PROC (C:0017EFH - C:00184EH)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=22 Bytes (<a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a>) Top=14 Bytes (<a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S61">?PR?CS_SCALE_WEIGHTPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S65"></a>?PR?_CS_SCALE_ADCFILTER?CS_SCALE_PROC (C:002FDBH - C:00338AH)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=14 Bytes (<a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S61">?PR?CS_SCALE_WEIGHTPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S67"></a>?PR?_CS_SCALE_GETWEIGHT?CS_SCALE_PROC (C:00338BH - C:0034DBH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=24 Bytes (<a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a>) Top=14 Bytes (<a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S61">?PR?CS_SCALE_WEIGHTPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S69"></a>?PR?CS_SCALE_CHANGEUNIT?CS_SCALE_PROC (C:0036C3H - C:0036F4H)</h2>
+<p><br><b>Maximum Stack:</b> Top=2 Bytes (<a href="#S125">?PR?CS_KEYSCAN?CS_SCALEKEY</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S125">?PR?CS_KEYSCAN?CS_SCALEKEY</a></li>
+</ul>
+
+<h2><a name="S70"></a>?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC (C:0012FBH - C:001542H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=34 Bytes (<a href="#S75">?PR?_CS_SCALE_JUDGESTEADY?CS_SCALE_PROC</a>) Top=18 Bytes (<a href="#S72">?PR?_CS_SCALE_LOCKPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S65">?PR?_CS_SCALE_ADCFILTER?CS_SCALE_PROC</a></li>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S62">?PR?_CS_SCALE_GETDELTAAD?CS_SCALE_PROC</a></li>
+<li><a href="#S75">?PR?_CS_SCALE_JUDGESTEADY?CS_SCALE_PROC</a></li>
+<li><a href="#S72">?PR?_CS_SCALE_LOCKPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S62">?PR?_CS_SCALE_GETDELTAAD?CS_SCALE_PROC</a></li>
+<li><a href="#S72">?PR?_CS_SCALE_LOCKPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S101">?PR?CS_1186COM_READADZERO_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S99">?PR?CS_1186COM_SETSLEEPMODE_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S60">?PR?CS_SCALE_POWERON?CS_SCALE_PROC</a></li>
+<li><a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a></li>
+<li><a href="#S61">?PR?CS_SCALE_WEIGHTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S109">?PR?CS_SCALEDISPLAY?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<h2><a name="S72"></a>?PR?_CS_SCALE_LOCKPROC?CS_SCALE_PROC (C:0036F5H - C:003762H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=26 Bytes (<a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a>) Top=16 Bytes (<a href="#S79">?PR?CS_SCALE_RETURNLOCK?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S75">?PR?_CS_SCALE_JUDGESTEADY?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S79">?PR?CS_SCALE_RETURNLOCK?CS_SCALE_PROC</a></li>
+<li><a href="#S61">?PR?CS_SCALE_WEIGHTPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S73"></a>?PR?_CS_SCALE_JUDGELOWBAT?CS_SCALE_PROC (C:002F61H - C:002F72H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Top=16 Bytes (<a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S61">?PR?CS_SCALE_WEIGHTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S109">?PR?CS_SCALEDISPLAY?CS_SCALEDISPLAY</a></li>
+<li><a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S74"></a>?PR?_CS_SCALE_JUDGEOVERLOAD?CS_SCALE_PROC (C:002F16H - C:002F60H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Top=18 Bytes (<a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S61">?PR?CS_SCALE_WEIGHTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S109">?PR?CS_SCALEDISPLAY?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<h2><a name="S75"></a>?PR?_CS_SCALE_JUDGESTEADY?CS_SCALE_PROC (C:002B90H - C:002C71H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=32 Bytes (<a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a>) Top=14 Bytes (<a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S72">?PR?_CS_SCALE_LOCKPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S87">?PR?_CS_SOFTTIMER?CS_SCALE_PROC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S77"></a>?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC (C:0034DCH - C:00360AH)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=30 Bytes (<a href="#S79">?PR?CS_SCALE_RETURNLOCK?CS_SCALE_PROC</a>) Top=12 Bytes (<a href="#S75">?PR?_CS_SCALE_JUDGESTEADY?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S91">?PR?_CS_SCALE_1186COMSEND?CS_COMMTO1186</a></li>
+<li><a href="#S65">?PR?_CS_SCALE_ADCFILTER?CS_SCALE_PROC</a></li>
+<li><a href="#S62">?PR?_CS_SCALE_GETDELTAAD?CS_SCALE_PROC</a></li>
+<li><a href="#S67">?PR?_CS_SCALE_GETWEIGHT?CS_SCALE_PROC</a></li>
+<li><a href="#S75">?PR?_CS_SCALE_JUDGESTEADY?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S87">?PR?_CS_SOFTTIMER?CS_SCALE_PROC</a></li>
+<li><a href="#S161">?PR?_QUEUEPUSH?LXPROTOCOL</a></li>
+<li><a href="#S92">?PR?CS_IF1186COMSUCESS?CS_COMMTO1186</a></li>
+<li><a href="#S79">?PR?CS_SCALE_RETURNLOCK?CS_SCALE_PROC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S75">?PR?_CS_SCALE_JUDGESTEADY?CS_SCALE_PROC</a></li>
+<li><a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S79"></a>?PR?CS_SCALE_RETURNLOCK?CS_SCALE_PROC (C:002F73H - C:002FDAH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=28 Bytes (<a href="#S72">?PR?_CS_SCALE_LOCKPROC?CS_SCALE_PROC</a>) Top=14 Bytes (<a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S72">?PR?_CS_SCALE_LOCKPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S81"></a>?PR?_CS_MEMORYWEIGHTCLEAR_TIMER?CS_SCALE_PROC (C:003763H - C:003798H)</h2>
+<p><br><b>Maximum Stack:</b> Top=2 Bytes (<a href="#S3">?PR?SOFTTIMER_10MSCALLBACK?SYSTEM</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S3">?PR?SOFTTIMER_10MSCALLBACK?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S82"></a>?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC (C:000A08H - C:000EE4H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=36 Bytes (<a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a>) Top=16 Bytes (<a href="#S67">?PR?_CS_SCALE_GETWEIGHT?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S65">?PR?_CS_SCALE_ADCFILTER?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S112">?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY</a></li>
+<li><a href="#S87">?PR?_CS_SOFTTIMER?CS_SCALE_PROC</a></li>
+<li><a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S67">?PR?_CS_SCALE_GETWEIGHT?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S100">?PR?CS_1186COM_SETOPENWEIGHT_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S125">?PR?CS_KEYSCAN?CS_SCALEKEY</a></li>
+<li><a href="#S60">?PR?CS_SCALE_POWERON?CS_SCALE_PROC</a></li>
+<li><a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S84"></a>?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC (C:002D8FH - C:002E21H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=24 Bytes (<a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a>) Top=16 Bytes (<a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S36">?PR?_BT_CMDFIFOIN?BT_IPC</a></li>
+<li><a href="#S91">?PR?_CS_SCALE_1186COMSEND?CS_COMMTO1186</a></li>
+<li><a href="#S74">?PR?_CS_SCALE_JUDGEOVERLOAD?CS_SCALE_PROC</a></li>
+<li><a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S92">?PR?CS_IF1186COMSUCESS?CS_COMMTO1186</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S88">?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S85"></a>?PR?CS_SCALE_POWERONPROC?CS_SCALE_PROC (C:002E2DH - C:002F0FH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S112">?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY</a>) Top=6 Bytes (<a href="#S60">?PR?CS_SCALE_POWERON?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S91">?PR?_CS_SCALE_1186COMSEND?CS_COMMTO1186</a></li>
+<li><a href="#S112">?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY</a></li>
+<li><a href="#S87">?PR?_CS_SOFTTIMER?CS_SCALE_PROC</a></li>
+<li><a href="#S92">?PR?CS_IF1186COMSUCESS?CS_COMMTO1186</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S60">?PR?CS_SCALE_POWERON?CS_SCALE_PROC</a></li>
+<li><a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S87"></a>?PR?_CS_SOFTTIMER?CS_SCALE_PROC (C:000EE5H - C:000F22H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Top=14 Bytes (<a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S75">?PR?_CS_SCALE_JUDGESTEADY?CS_SCALE_PROC</a></li>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S85">?PR?CS_SCALE_POWERONPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S124">?PR?CS_SCALEDISPLAY_STEADYFLASH?CS_SCALEDISPLAY</a></li>
+<li><a href="#S3">?PR?SOFTTIMER_10MSCALLBACK?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S88"></a>?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC (C:002C72H - C:002D8EH)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=26 Bytes (<a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a>) Top=18 Bytes (<a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S73">?PR?_CS_SCALE_JUDGELOWBAT?CS_SCALE_PROC</a></li>
+<li><a href="#S74">?PR?_CS_SCALE_JUDGEOVERLOAD?CS_SCALE_PROC</a></li>
+<li><a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S75">?PR?_CS_SCALE_JUDGESTEADY?CS_SCALE_PROC</a></li>
+<li><a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S60">?PR?CS_SCALE_POWERON?CS_SCALE_PROC</a></li>
+<li><a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a></li>
+<li><a href="#S79">?PR?CS_SCALE_RETURNLOCK?CS_SCALE_PROC</a></li>
+<li><a href="#S3">?PR?SOFTTIMER_10MSCALLBACK?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S91"></a>?PR?_CS_SCALE_1186COMSEND?CS_COMMTO1186 (C:002E22H - C:002E2CH)</h2>
+<p><br><b>Maximum Stack:</b> Top=18 Bytes (<a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S85">?PR?CS_SCALE_POWERONPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S92"></a>?PR?CS_IF1186COMSUCESS?CS_COMMTO1186 (C:002F10H - C:002F15H)</h2>
+<p><br><b>Maximum Stack:</b> Top=18 Bytes (<a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S84">?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S85">?PR?CS_SCALE_POWERONPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S93"></a>?PR?CS_SCALE_1186COM?CS_COMMTO1186 (C:0004E5H - C:00052CH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=40 Bytes (<a href="#S100">?PR?CS_1186COM_SETOPENWEIGHT_PROC?CS_COMMTO1186</a>) Top=2 Bytes (<a href="#S2">?PR?MAIN?MAIN</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S96">?PR?CS_1186COM_READADC_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S101">?PR?CS_1186COM_READADZERO_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S94">?PR?CS_1186COM_READMACADRESS_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S98">?PR?CS_1186COM_READTIME_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S102">?PR?CS_1186COM_RESET_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S97">?PR?CS_1186COM_SETLCD_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S100">?PR?CS_1186COM_SETOPENWEIGHT_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S99">?PR?CS_1186COM_SETSLEEPMODE_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S25">?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S2">?PR?MAIN?MAIN</a></li>
+</ul>
+
+<h2><a name="S94"></a>?PR?CS_1186COM_READMACADRESS_PROC?CS_COMMTO1186 (C:00187AH - C:00192BH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=8 Bytes (<a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a>) Top=4 Bytes (<a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a></li>
+<li><a href="#S6">?PR?_GENERATECHECKSUM?SYSTEM</a></li>
+<li><a href="#S23">?PR?_YC_UARTRECIVEDATAEXPECTED?YC_PERIPHERAL</a></li>
+<li><a href="#S25">?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a></li>
+</ul>
+
+<h2><a name="S96"></a>?PR?CS_1186COM_READADC_PROC?CS_COMMTO1186 (C:003799H - C:003870H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=8 Bytes (<a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a>) Top=4 Bytes (<a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a></li>
+<li><a href="#S23">?PR?_YC_UARTRECIVEDATAEXPECTED?YC_PERIPHERAL</a></li>
+<li><a href="#S25">?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a></li>
+</ul>
+
+<h2><a name="S97"></a>?PR?CS_1186COM_SETLCD_PROC?CS_COMMTO1186 (C:00052DH - C:000591H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=8 Bytes (<a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a>) Top=2 Bytes (<a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a></li>
+<li><a href="#S23">?PR?_YC_UARTRECIVEDATAEXPECTED?YC_PERIPHERAL</a></li>
+<li><a href="#S25">?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a></li>
+</ul>
+
+<h2><a name="S98"></a>?PR?CS_1186COM_READTIME_PROC?CS_COMMTO1186 (C:0005E2H - C:00065AH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=8 Bytes (<a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a>) Top=4 Bytes (<a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a></li>
+<li><a href="#S23">?PR?_YC_UARTRECIVEDATAEXPECTED?YC_PERIPHERAL</a></li>
+<li><a href="#S25">?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a></li>
+</ul>
+
+<h2><a name="S99"></a>?PR?CS_1186COM_SETSLEEPMODE_PROC?CS_COMMTO1186 (C:00066DH - C:000700H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=36 Bytes (<a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a>) Top=4 Bytes (<a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S23">?PR?_YC_UARTRECIVEDATAEXPECTED?YC_PERIPHERAL</a></li>
+<li><a href="#S25">?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL</a></li>
+<li><a href="#S22">?PR?YC_UARTWAITSENDDATA?YC_PERIPHERAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a></li>
+</ul>
+
+<h2><a name="S100"></a>?PR?CS_1186COM_SETOPENWEIGHT_PROC?CS_COMMTO1186 (C:00071BH - C:0007A7H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=38 Bytes (<a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a>) Top=4 Bytes (<a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a></li>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S23">?PR?_YC_UARTRECIVEDATAEXPECTED?YC_PERIPHERAL</a></li>
+<li><a href="#S25">?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a></li>
+</ul>
+
+<h2><a name="S101"></a>?PR?CS_1186COM_READADZERO_PROC?CS_COMMTO1186 (C:003871H - C:003921H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=36 Bytes (<a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a>) Top=4 Bytes (<a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S23">?PR?_YC_UARTRECIVEDATAEXPECTED?YC_PERIPHERAL</a></li>
+<li><a href="#S25">?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a></li>
+</ul>
+
+<h2><a name="S102"></a>?PR?CS_1186COM_RESET_PROC?CS_COMMTO1186 (C:000701H - C:00071AH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=8 Bytes (<a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a>) Top=4 Bytes (<a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a></li>
+<li><a href="#S25">?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S93">?PR?CS_SCALE_1186COM?CS_COMMTO1186</a></li>
+</ul>
+
+<h2><a name="S103"></a>?PR?_CS_COMMTO1186_XOR?CS_COMMTO1186 (C:001D2CH - C:001D85H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=4 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=8 Bytes (<a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a></li>
+</ul>
+
+<h2><a name="S105"></a>?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186 (C:00192CH - C:001C2DH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S103">?PR?_CS_COMMTO1186_XOR?CS_COMMTO1186</a>) Top=6 Bytes (<a href="#S102">?PR?CS_1186COM_RESET_PROC?CS_COMMTO1186</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S103">?PR?_CS_COMMTO1186_XOR?CS_COMMTO1186</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S96">?PR?CS_1186COM_READADC_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S101">?PR?CS_1186COM_READADZERO_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S94">?PR?CS_1186COM_READMACADRESS_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S98">?PR?CS_1186COM_READTIME_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S102">?PR?CS_1186COM_RESET_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S97">?PR?CS_1186COM_SETLCD_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S100">?PR?CS_1186COM_SETOPENWEIGHT_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S99">?PR?CS_1186COM_SETSLEEPMODE_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S110">?PR?CS_SCALEDISPLAY_DEBUG?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<h2><a name="S109"></a>?PR?CS_SCALEDISPLAY?CS_SCALEDISPLAY (C:001543H - C:001602H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=36 Bytes (<a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a>) Top=4 Bytes (<a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S73">?PR?_CS_SCALE_JUDGELOWBAT?CS_SCALE_PROC</a></li>
+<li><a href="#S74">?PR?_CS_SCALE_JUDGEOVERLOAD?CS_SCALE_PROC</a></li>
+<li><a href="#S70">?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S112">?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S112"></a>?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY (C:001603H - C:0017D4H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=4 Bytes (<a href="#S116">?PR?_CS_SCALEDISPLAY_HEXTOBCD?CS_SCALEDISPLAY</a>) Top=8 Bytes (<a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S116">?PR?_CS_SCALEDISPLAY_HEXTOBCD?CS_SCALEDISPLAY</a></li>
+<li><a href="#S118">?PR?_CS_SCALEDISPLAY_LOOKUPTABLE?CS_SCALEDISPLAY</a></li>
+<li><a href="#S115">?PR?CS_SCALEDISPLAY_LCDBUF_RSHIFT4?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S85">?PR?CS_SCALE_POWERONPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S109">?PR?CS_SCALEDISPLAY?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<h2><a name="S115"></a>?PR?CS_SCALEDISPLAY_LCDBUF_RSHIFT4?CS_SCALEDISPLAY (C:0039DEH - C:003A74H)</h2>
+<p><br><b>Maximum Stack:</b> Top=10 Bytes (<a href="#S112">?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S112">?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY</a></li>
+<li><a href="#S110">?PR?CS_SCALEDISPLAY_DEBUG?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<h2><a name="S116"></a>?PR?_CS_SCALEDISPLAY_HEXTOBCD?CS_SCALEDISPLAY (C:003973H - C:0039DDH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=10 Bytes (<a href="#S112">?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S112">?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY</a></li>
+<li><a href="#S110">?PR?CS_SCALEDISPLAY_DEBUG?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<h2><a name="S118"></a>?PR?_CS_SCALEDISPLAY_LOOKUPTABLE?CS_SCALEDISPLAY (C:0017D5H - C:0017E4H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=10 Bytes (<a href="#S112">?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S112">?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY</a></li>
+<li><a href="#S110">?PR?CS_SCALEDISPLAY_DEBUG?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<h2><a name="S120"></a>?PR?CS_SCALEDISPLAY_LCDSHOWNODIGIT?CS_SCALEDISPLAY (C:000F58H - C:000F72H)</h2>
+<p><br><b>Maximum Stack:</b> Top=4 Bytes (<a href="#S124">?PR?CS_SCALEDISPLAY_STEADYFLASH?CS_SCALEDISPLAY</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S124">?PR?CS_SCALEDISPLAY_STEADYFLASH?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<h2><a name="S122"></a>?PR?CS_SCALEDISPLAY_LCDBACKUP?CS_SCALEDISPLAY (C:003A92H - C:003ABAH)</h2>
+<p><br><b>Maximum Stack:</b> Top=4 Bytes (<a href="#S124">?PR?CS_SCALEDISPLAY_STEADYFLASH?CS_SCALEDISPLAY</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S124">?PR?CS_SCALEDISPLAY_STEADYFLASH?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<h2><a name="S123"></a>?PR?CS_SCALEDISPLAY_LCDRESTORE?CS_SCALEDISPLAY (C:000F73H - C:000F9BH)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S124">?PR?CS_SCALEDISPLAY_STEADYFLASH?CS_SCALEDISPLAY</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S124">?PR?CS_SCALEDISPLAY_STEADYFLASH?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<h2><a name="S124"></a>?PR?CS_SCALEDISPLAY_STEADYFLASH?CS_SCALEDISPLAY (C:000F23H - C:000F57H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S87">?PR?_CS_SOFTTIMER?CS_SCALE_PROC</a>) Top=4 Bytes (<a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S87">?PR?_CS_SOFTTIMER?CS_SCALE_PROC</a></li>
+<li><a href="#S122">?PR?CS_SCALEDISPLAY_LCDBACKUP?CS_SCALEDISPLAY</a></li>
+<li><a href="#S123">?PR?CS_SCALEDISPLAY_LCDRESTORE?CS_SCALEDISPLAY</a></li>
+<li><a href="#S120">?PR?CS_SCALEDISPLAY_LCDSHOWNODIGIT?CS_SCALEDISPLAY</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S59">?PR?CS_SCALE_PROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S143"></a>?PR?_BIGLITTLEENDIANSWAP?LXPROTOCOL (C:003ABBH - C:003B75H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=6 Bytes (<a href="#S151">?PR?_LXSETTINGDEVICERESPONE?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a></li>
+<li><a href="#S151">?PR?_LXSETTINGDEVICERESPONE?LXPROTOCOL</a></li>
+<li><a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a></li>
+<li><a href="#S153">?PR?SENDHISTORYDATA?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S145"></a>?PR?_LXSENDRECVDATAACK?LXPROTOCOL (C:001F08H - C:001F3AH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=4 Bytes (<a href="#S36">?PR?_BT_CMDFIFOIN?BT_IPC</a>) Top=4 Bytes (<a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S36">?PR?_BT_CMDFIFOIN?BT_IPC</a></li>
+<li><a href="#S57">?PR?_YC_DELAY10MS?YC_UTILITIES</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S146"></a>?PR?_LXRECVDATAFROMAPP?LXPROTOCOL (C:001DBDH - C:001EFEH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=8 Bytes (<a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a>) Top=2 Bytes (<a href="#S8">?PR?BTCONTROLPROCESS?SYSTEM</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S143">?PR?_BIGLITTLEENDIANSWAP?LXPROTOCOL</a></li>
+<li><a href="#S148">?PR?_CHANGELXOPTSTATUS?LXPROTOCOL</a></li>
+<li><a href="#S145">?PR?_LXSENDRECVDATAACK?LXPROTOCOL</a></li>
+<li><a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a></li>
+<li><a href="#S48">?PR?_XMEMCPY?YC_UTILITIES</a></li>
+<li><a href="#S46">?PR?_XMEMSET?YC_UTILITIES</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S8">?PR?BTCONTROLPROCESS?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S148"></a>?PR?_CHANGELXOPTSTATUS?LXPROTOCOL (C:001EFFH - C:001F07H)</h2>
+<p><br><b>Maximum Stack:</b> Top=2 Bytes (<a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S149"></a>?PR?LXOPTPROCESS?LXPROTOCOL (C:003B76H - C:003E7BH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=8 Bytes (<a href="#S152">?PR?DELUSERDATA?LXPROTOCOL</a>) Top=2 Bytes (<a href="#S2">?PR?MAIN?MAIN</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S143">?PR?_BIGLITTLEENDIANSWAP?LXPROTOCOL</a></li>
+<li><a href="#S36">?PR?_BT_CMDFIFOIN?BT_IPC</a></li>
+<li><a href="#S73">?PR?_CS_SCALE_JUDGELOWBAT?CS_SCALE_PROC</a></li>
+<li><a href="#S50">?PR?_DMEMCPY?YC_UTILITIES</a></li>
+<li><a href="#S151">?PR?_LXSETTINGDEVICERESPONE?LXPROTOCOL</a></li>
+<li><a href="#S57">?PR?_YC_DELAY10MS?YC_UTILITIES</a></li>
+<li><a href="#S152">?PR?DELUSERDATA?LXPROTOCOL</a></li>
+<li><a href="#S153">?PR?SENDHISTORYDATA?LXPROTOCOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S2">?PR?MAIN?MAIN</a></li>
+</ul>
+
+<h2><a name="S151"></a>?PR?_LXSETTINGDEVICERESPONE?LXPROTOCOL (C:003E7CH - C:003EC2H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=4 Bytes (<a href="#S143">?PR?_BIGLITTLEENDIANSWAP?LXPROTOCOL</a>) Top=4 Bytes (<a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S143">?PR?_BIGLITTLEENDIANSWAP?LXPROTOCOL</a></li>
+<li><a href="#S36">?PR?_BT_CMDFIFOIN?BT_IPC</a></li>
+<li><a href="#S57">?PR?_YC_DELAY10MS?YC_UTILITIES</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S152"></a>?PR?DELUSERDATA?LXPROTOCOL (C:001FBAH - C:001FD9H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a>) Top=4 Bytes (<a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S156">?PR?_SPIFLASHOPERATOR?LXPROTOCOL</a></li>
+<li><a href="#S46">?PR?_XMEMSET?YC_UTILITIES</a></li>
+<li><a href="#S158">?PR?QUEUEINIT?LXPROTOCOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S153"></a>?PR?SENDHISTORYDATA?LXPROTOCOL (C:002569H - C:0027BDH)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S163">?PR?_CAL_CRC32_MULTIPLE?CRC32</a>) Top=4 Bytes (<a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S143">?PR?_BIGLITTLEENDIANSWAP?LXPROTOCOL</a></li>
+<li><a href="#S36">?PR?_BT_CMDFIFOIN?BT_IPC</a></li>
+<li><a href="#S163">?PR?_CAL_CRC32_MULTIPLE?CRC32</a></li>
+<li><a href="#S50">?PR?_DMEMCPY?YC_UTILITIES</a></li>
+<li><a href="#S46">?PR?_XMEMSET?YC_UTILITIES</a></li>
+<li><a href="#S57">?PR?_YC_DELAY10MS?YC_UTILITIES</a></li>
+<li><a href="#S159">?PR?QUEUEPOP?LXPROTOCOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S156"></a>?PR?_SPIFLASHOPERATOR?LXPROTOCOL (C:001F3BH - C:001F83H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Bottom=6 Bytes (<a href="#S30">?PR?_SPIFLASHERASESECTOR?SPIFLASH</a>) Top=8 Bytes (<a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S30">?PR?_SPIFLASHERASESECTOR?SPIFLASH</a></li>
+<li><a href="#S34">?PR?_SPIFLASHREAD?SPIFLASH</a></li>
+<li><a href="#S32">?PR?_SPIFLASHWRITE?SPIFLASH</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a></li>
+<li><a href="#S152">?PR?DELUSERDATA?LXPROTOCOL</a></li>
+<li><a href="#S5">?PR?SYSTEMINIT?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S158"></a>?PR?QUEUEINIT?LXPROTOCOL (C:0017E5H - C:0017EEH)</h2>
+<p><br><b>Maximum Stack:</b> Top=6 Bytes (<a href="#S152">?PR?DELUSERDATA?LXPROTOCOL</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S152">?PR?DELUSERDATA?LXPROTOCOL</a></li>
+<li><a href="#S5">?PR?SYSTEMINIT?SYSTEM</a></li>
+</ul>
+
+<h2><a name="S159"></a>?PR?QUEUEPOP?LXPROTOCOL (C:003669H - C:0036C2H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=2 Bytes (<a href="#S168">?C?LIB_CODE</a>) Top=16 Bytes (<a href="#S161">?PR?_QUEUEPUSH?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S161">?PR?_QUEUEPUSH?LXPROTOCOL</a></li>
+<li><a href="#S153">?PR?SENDHISTORYDATA?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S161"></a>?PR?_QUEUEPUSH?LXPROTOCOL (C:00360BH - C:003668H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=4 Bytes (<a href="#S159">?PR?QUEUEPOP?LXPROTOCOL</a>) Top=14 Bytes (<a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S50">?PR?_DMEMCPY?YC_UTILITIES</a></li>
+<li><a href="#S159">?PR?QUEUEPOP?LXPROTOCOL</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S77">?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC</a></li>
+</ul>
+
+<h2><a name="S163"></a>?PR?_CAL_CRC32_MULTIPLE?CRC32 (C:00246EH - C:002568H)</h2>
+<p><br><b>Maximum Stack:</b> Bottom=4 Bytes (<a href="#S34">?PR?_SPIFLASHREAD?SPIFLASH</a>) Top=6 Bytes (<a href="#S153">?PR?SENDHISTORYDATA?LXPROTOCOL</a>)<p>
+<p><br><b>Calls to:</b></p>
+<ul>
+<li><a href="#S168">?C?LIB_CODE</a></li>
+<li><a href="#S34">?PR?_SPIFLASHREAD?SPIFLASH</a></li>
+</ul>
+
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S153">?PR?SENDHISTORYDATA?LXPROTOCOL</a></li>
+</ul>
+
+<h2><a name="S168"></a>?C?LIB_CODE (C:000003H - C:0003F4H)</h2><p><b>*** CONTAINS A POTENTIAL RECURSION</b></p>
+<p><br><b>Maximum Stack:</b> Top=20 Bytes (<a href="#S36">?PR?_BT_CMDFIFOIN?BT_IPC</a>)<p>
+<p><br><b>Called from:</b></p>
+<ul>
+<li><a href="#S143">?PR?_BIGLITTLEENDIANSWAP?LXPROTOCOL</a></li>
+<li><a href="#S43">?PR?_BT_CMDFIFOFULL?BT_IPC</a></li>
+<li><a href="#S36">?PR?_BT_CMDFIFOIN?BT_IPC</a></li>
+<li><a href="#S38">?PR?_BT_EVENTFIFOOUT?BT_IPC</a></li>
+<li><a href="#S163">?PR?_CAL_CRC32_MULTIPLE?CRC32</a></li>
+<li><a href="#S52">?PR?_CMEMCPY?YC_UTILITIES</a></li>
+<li><a href="#S105">?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186</a></li>
+<li><a href="#S103">?PR?_CS_COMMTO1186_XOR?CS_COMMTO1186</a></li>
+<li><a href="#S65">?PR?_CS_SCALE_ADCFILTER?CS_SCALE_PROC</a></li>
+<li><a href="#S82">?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC</a></li>
+<li><a href="#S67">?PR?_CS_SCALE_GETWEIGHT?CS_SCALE_PROC</a></li>
+<li><a href="#S116">?PR?_CS_SCALEDISPLAY_HEXTOBCD?CS_SCALEDISPLAY</a></li>
+<li><a href="#S118">?PR?_CS_SCALEDISPLAY_LOOKUPTABLE?CS_SCALEDISPLAY</a></li>
+<li><a href="#S50">?PR?_DMEMCPY?YC_UTILITIES</a></li>
+<li><a href="#S6">?PR?_GENERATECHECKSUM?SYSTEM</a></li>
+<li><a href="#S146">?PR?_LXRECVDATAFROMAPP?LXPROTOCOL</a></li>
+<li><a href="#S161">?PR?_QUEUEPUSH?LXPROTOCOL</a></li>
+<li><a href="#S30">?PR?_SPIFLASHERASESECTOR?SPIFLASH</a></li>
+<li><a href="#S34">?PR?_SPIFLASHREAD?SPIFLASH</a></li>
+<li><a href="#S32">?PR?_SPIFLASHWRITE?SPIFLASH</a></li>
+<li><a href="#S48">?PR?_XMEMCPY?YC_UTILITIES</a></li>
+<li><a href="#S54">?PR?_YC_MEMCHECKEMPTY?YC_UTILITIES</a></li>
+<li><a href="#S23">?PR?_YC_UARTRECIVEDATAEXPECTED?YC_PERIPHERAL</a></li>
+<li><a href="#S20">?PR?_YC_UARTSENDDATA?YC_PERIPHERAL</a></li>
+<li><a href="#S13">?PR?_YC_UTILTIMERSTARTMS?YC_SYS</a></li>
+<li><a href="#S15">?PR?_YC_UTILTIMERSTOP?YC_SYS</a></li>
+<li><a href="#S96">?PR?CS_1186COM_READADC_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S101">?PR?CS_1186COM_READADZERO_PROC?CS_COMMTO1186</a></li>
+<li><a href="#S109">?PR?CS_SCALEDISPLAY?CS_SCALEDISPLAY</a></li>
+<li><a href="#S152">?PR?DELUSERDATA?LXPROTOCOL</a></li>
+<li><a href="#S149">?PR?LXOPTPROCESS?LXPROTOCOL</a></li>
+<li><a href="#S159">?PR?QUEUEPOP?LXPROTOCOL</a></li>
+<li><a href="#S153">?PR?SENDHISTORYDATA?LXPROTOCOL</a></li>
+<li><a href="#S29">?PR?SPIFLASHWAITBUSY?SPIFLASH</a></li>
+<li><a href="#S11">?PR?YC_UTILTIMERINIT?YC_SYS</a></li>
+<li><a href="#S16">?PR?YC_UTILTIMERPROCESS?YC_SYS</a></li>
+</ul>
+
+</body>
+</html>

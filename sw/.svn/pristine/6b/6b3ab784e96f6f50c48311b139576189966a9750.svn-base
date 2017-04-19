@@ -1,0 +1,120 @@
+
+mem_patch00:
+40   #mem_patch00
+00   #mem_patch01
+00   #mem_patch02
+00   #mem_patch03
+00   #mem_patch04
+00   #mem_patch05
+00   #mem_patch06
+00   #mem_patch07
+00   #mem_patch08
+00   #mem_patch09
+00   #mem_patch0A
+00   #mem_patch0B
+00   #mem_patch0C
+00   #mem_patch0D
+00   #mem_patch0E
+00   #mem_patch0F
+00   #mem_patch10
+00   #mem_patch11
+15   #mem_patch12	#15
+00   #mem_patch13
+00   #mem_patch14
+80   #mem_patch15
+01   #mem_patch16
+00   #mem_patch17
+00   #mem_patch18
+00   #mem_patch19
+02   #mem_patch1A
+00   #mem_patch1B
+00   #mem_patch1C
+00   #mem_patch1D
+00   #mem_patch1E
+00   #mem_patch1F
+00   #mem_patch20
+00   #mem_patch21
+00   #mem_patch22
+00   #mem_patch23
+00   #mem_patch24
+00   #mem_patch25
+00   #mem_patch26
+60   #mem_patch27
+00   #mem_patch28
+58   #mem_patch29	#18
+00   #mem_patch2A
+00   #mem_patch2B
+28   #mem_patch2C
+88   #mem_patch2D
+00   #mem_patch2E
+00   #mem_patch2F
+80   #mem_patch30
+22   #mem_patch31
+00   #mem_patch32
+00   #mem_patch33
+00   #mem_patch34
+00   #mem_patch35
+00   #mem_patch36
+00   #mem_patch37
+00   #mem_patch38
+60   #mem_patch39
+00   #mem_patch3A
+00   #mem_patch3B
+00   #mem_patch3C
+00   #mem_patch3D
+00   #mem_patch3E
+00   #mem_patch3F
+
+mem_le_scan_type:01
+mem_le_scan_own_addr_type:00
+mem_le_scan_filter_policy:00
+mem_le_scan_interval:28
+mem_le_scan_window:0c 00
+
+mem_ui_profile_supported:40
+mem_lpm_mult:02
+mem_lpm_mult_timeout:02
+mem_lpm_overhead:06
+mem_led_light_time:90 01
+mem_led_dark_time:90 01
+mem_ui_button_gpio:05
+mem_module_wake_up_gpio:1b		#GPIO27
+mem_module_connect_state_gpio:84
+mem_module_state:02
+
+mem_module_version:
+56 
+31 
+2e 
+30 
+30 
+31
+
+mem_device_option:0a
+
+
+mem_app_connection_options:13
+
+mem_at_using_flag:ff
+
+
+memui_uuid_table:mem_module_uuid_list
+
+# mem_le_adv_interval_min:fc 00 	
+# mem_le_adv_interval_max:fc  00 
+
+mem_le_adv_own_addr_type:00
+
+mem_le_adv_channel_map:07 
+mem_le_adv_filter_policy:00
+mem_le_transmit_window:50
+
+mem_fcomp_mul:02
+mem_fcomp_div:24
+
+mem_le_notify_handle:14
+mem_le_sleep_flag:00
+
+
+
+

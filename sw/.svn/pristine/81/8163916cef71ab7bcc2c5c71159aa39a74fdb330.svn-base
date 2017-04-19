@@ -1,0 +1,65 @@
+check_module_disabled:		//label: 0x3e2b
+	fetch 2,mem_chip_functions
+	bbit1 module_disable,assert
+	rtn
+	
+	
+le_att_get_handle_ptr:
+	arg mem_le_att_list,contr
+le_att_get_handle_loop:
+	ifetch 2,contr
+	rtn blank
+	increase 2,contr
+	isub temp,null
+	rtn zero
+	ifetch 1,contr			/* length */
+	iadd contr,contr
+	branch le_att_get_handle_loop
+
+le_send_scan_request:	//label:0x5507
+	set1 mark_ext_patch,mark
+	bpatch patch2a_0,mem_patch2a
+	fetch 1,mem_le_scan_type
+	rtnne LE_SCAN_TYPE_ACTIVE,pdata
+	fetch 1,mem_le_adv_transmit
+	increase 1,pdata
+	store 1,mem_le_adv_transmit
+	arg 0x0c03,temp// length + SCAN_REQ PDU
+	fetch 1,mem_le_scan_own_addr_type
+	nsetflag blank,LE_SENDER_ADDR_BIT,temp
+	copy regA,pdata
+	nsetflag blank,LE_RECEIVER_ADDR_BIT,temp	
+	storet 2,mem_le_txheader
+	fetch 6,mem_le_lap
+	istore 6,contw
+	fetch 6,mem_le_plap
+	istore 6,contw
+	branch le_transmit_receive_sifs
+
+
+le_send_scan_response:	//label:0x5519
+	set1 mark_ext_patch,mark
+	bpatch patch2a_1,mem_patch2a
+	arg SCAN_RSP,temp
+	fetch 1,mem_le_adv_own_addr_type
+	nsetflag blank,LE_SENDER_ADDR_BIT,temp
+	storet 1,mem_le_txheader
+	fetcht 1,mem_le_scan_data_len
+	add temp,6,pdata
+	store 1,mem_le_txlen
+	fetch 6,mem_le_lap
+	store 6,mem_le_txpayload
+	arg mem_le_scan_data,contr
+	copy temp,loopcnt
+	call memcpy
+	branch le_transmit_norx
+	
+clear_mem:			//label:0x7e3f
+	deposit loopcnt
+	rtn blank
+	setarg 0
+clear_mem_loop:		//label:0x7e42
+	istore 1,contw
+	loop clear_mem_loop
+	rtn
+

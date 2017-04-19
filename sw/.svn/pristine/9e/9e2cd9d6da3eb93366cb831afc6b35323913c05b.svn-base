@@ -1,0 +1,525 @@
+app_init:
+	set1 mark_ext_patch,mark
+	bpatch patch39_5,mem_patch39
+	fetch 1,mem_device_option
+	branch app_init,blank				/* wait ram to be initialized */
+	beq dvc_op_ukey,le_ukey_init
+	beq dvc_op_ir,le_ir_init
+	beq dvc_op_dongle,le_dongle_init
+	beq dvc_op_kb,kb_init
+	beq dvc_op_hci,hci_init
+	beq dvc_op_shutter,shutter_init
+	beq dvc_op_module,module_init
+	beq dvc_op_ble_kb,le_kb_init
+	beq dvc_op_ble_prcp,prcp_init
+	beq dvc_op_test,test_init
+	bbit1 dvc_op_mouse,mouse_init
+	rtn
+	
+app_lpm_init:
+	set1 mark_ext_patch,mark
+	bpatch patch39_6,mem_patch39
+	jam 0,mem_tester_emulate
+	jam 0,mem_debug_config
+	jam 0, mem_lch_code
+	setarg 0
+	store 5,mem_sp_state_start
+	fetch 1,mem_device_option
+	branch app_lpm_init,blank				/* wait ram to be initialized */
+	beq dvc_op_module,module_lpm_init
+app_lpm_init0:
+	rtn
+
+	
+app_process_idle:
+	call ui_dispatch
+	call check_51cmd
+	call app_process_bb_event
+	fetch 2,mem_cb_idle_process
+	branch callback_func
+	
+app_process_bt:
+	fetch 2,mem_cb_bt_process
+	branch callback_func
+	
+app_process_ble:
+	fetch 2,mem_cb_le_process
+	branch callback_func
+
+app_process_bb_event:
+	set1 mark_ext_patch,mark
+	bpatch patch39_7,mem_patch39
+	//return if c51 need to process bb event
+	arg mem_ipc_fifo_bt2c51,rega
+	call fifo_out
+	rtn blank
+	//reaching here mains c51 cannot get bb event.
+	copy pdata,regc
+	call app_event_normal_process
+	branch app_process_bb_event_priority
+	
+app_discard_event:
+	arg 0,regc
+	rtn
+
+//************************************************//
+//*APP BB EVENT NORMAL PROCESS**//
+//************************************************//
+app_event_normal_process:
+	beq BT_EVT_BB_CONNECTED,app_evt_bt_conn
+	beq BT_EVT_BUTTON_LONG_PRESSED,app_evt_button_long_pressed
+	beq BT_EVT_SETUP_COMPLETE,app_evt_setup_complete
+	beq BT_EVT_HID_HANDSHAKE,app_evt_hid_handshake
+	beq BT_EVT_HID_CONNECTED,app_bb_event_hid_connected
+	beq BT_EVT_RECONN_FAILED,app_bb_event_reconn_failed
+	beq BT_EVT_BB_DISCONNECTED,app_bb_event_bb_disconn
+	beq BT_EVT_RECONN_PAGE_TIMEOUT,app_bb_event_reconn_failed	
+	beq BT_EVT_LE_CONNECTED,app_le_event_bb_connected
+	beq BT_EVT_LE_DISCONNECTED,app_le_event_bb_disconn
+	beq BT_EVT_RECONN_STARTED,app_event_reconn_start
+	beq BT_EVT_ENTER_SNIFF,app_event_enter_sniff
+	beq BT_EVT_EXIT_SNIFF,app_event_exit_sniff
+	
+	beq BT_EVT_ML2CAP_CONN_REFUSED,app_event_ml2cap_conn_refused
+	beq BT_EVT_LINKKEY_GENERATE,app_event_linkkey_generate
+	beq BT_EVT_SWITCH_FAIL_MASTER,app_event_switch_fail_master
+	beq BT_EVT_SWITCH_SUCCESS_MASTER,app_event_switch_success
+	
+	and pdata,0x0f,temp
+	and_into BT_EVT_TIMER_MASK,pdata
+	beq BT_EVT_TIMER_INIT,app_evt_timer
+	rtn
+
+app_evt_bt_conn:
+	fetch 2,mem_ui_state_map
+	set1 UI_STATE_BT_CONNECTED,pdata
+	store 2,mem_ui_state_map
+	fetch APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	set0 APP_DISC_BY_BUTTON ,pdata
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	rtn
+app_event_switch_success:
+	jam 0,mem_switch_fail_master_count
+	rtn	
+
+app_event_switch_fail_master:
+	fetch 1,mem_switch_fail_master_count
+	increase 1,pdata
+	store 1,mem_switch_fail_master_count
+	sub pdata,1,null
+	branch app_bt_role_switch,positive
+	jam 0,mem_switch_fail_master_count
+	fetch APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	set1 APP_DISC_SWITCH_FAIL,pdata
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	branch app_bt_disconnect
+	
+app_process_bb_event_priority:
+	fetch 2,mem_cb_bb_event_process
+	branch callback_func
+
+app_check_wake_lock:
+	fetch 2,mem_cb_check_wakelock
+	branch callback_func
+	
+app_will_enter_lpm:
+	fetch 2,mem_cb_before_lpm
+	branch callback_func
+
+app_event_linkkey_generate:
+	fetch APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	set1 APP_DISC_AFTER_PAIRING ,pdata
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	branch app_bt_store_reconn_info
+	
+app_event_reconn_start:
+	fetch 2,mem_ui_state_map
+	set1 UI_STATE_BT_RECONNECT,pdata
+	store 2,mem_ui_state_map
+	fetch APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	set1 APP_DISC_AFTER_RECONN,pdata
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	rtn
+
+app_evt_setup_complete:
+	fetch 2,mem_ui_state_map
+	set1 UI_STATE_BT_SETUP_COMPLETE,pdata
+	store 2,mem_ui_state_map
+	fetch APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	set1 APP_DISC_AFTER_SETUP_DONE,pdata
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	rtn
+
+app_evt_hid_handshake:
+	fetch 2,mem_ui_state_map
+	set1 UI_STATE_BT_HID_HANDSHAKE,pdata
+	store 2,mem_ui_state_map
+	rtn
+	
+app_event_enter_sniff:
+	fetch 2,mem_ui_state_map
+	set1 UI_STATE_BT_SNIFF,pdata
+	store 2,mem_ui_state_map
+	fetch APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	set1 APP_DISC_AFTER_SNIFF,pdata
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	rtn
+	
+app_event_exit_sniff:
+	fetch 2,mem_ui_state_map
+	set0 UI_STATE_BT_SNIFF,pdata
+	store 2,mem_ui_state_map
+	rtn
+
+app_le_event_bb_connected:
+	fetch 2,mem_ui_state_map
+	set1 UI_STATE_BLE_CONNECTED,pdata
+	store 2,mem_ui_state_map
+	rtn
+	
+app_le_event_bb_disconn:
+	fetch 2,mem_ui_state_map
+	set0 UI_STATE_BLE_CONNECTED,pdata
+	store 2,mem_ui_state_map
+	jam 0,mem_le_switch_send_data
+	branch app_lpm_mult_disable
+	
+app_bb_event_hid_connected:
+	fetch 2,mem_ui_state_map
+	set1 UI_STATE_BT_HID_CONN,pdata
+	store 2,mem_ui_state_map
+	rtn
+
+app_evt_button_long_pressed:
+	fetch APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	set1 APP_DISC_BY_BUTTON,pdata
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	rtn
+	
+app_event_ml2cap_conn_refused:
+	fetch APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	set1 APP_DISC_L2CAP_REFUSED,pdata
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	branch  app_bt_disconnect
+
+
+app_evt_timer:
+	set1 mark_ext_patch,mark
+	bpatch patch3a_0,mem_patch3a
+	storet 1,mem_app_evt_timer_count
+app_evt_100ms_loop:
+	fetch 1,mem_app_evt_timer_count
+	rtn blank
+	increase -1,pdata
+	store 1,mem_app_evt_timer_count
+	call ui_button_polling
+	call app_lpm_wake_auto_lock_timer
+	call app_unsniff_delay_timer
+	call app_discovery_timer
+	branch app_evt_100ms_loop
+	
+app_unsniff_delay_timer:
+	fetch 1,mem_unsniff2sniff_timer_count
+	rtn blank
+	increase -1,pdata
+	store 1,mem_unsniff2sniff_timer_count
+	nrtn blank
+	call context_check_idle
+	branch app_bt_enter_sniff,zero
+	rtn
+app_discovery_timer:
+	fetch 2,mem_discovery_timeout_timer_count
+	rtn blank
+	increase -1,pdata
+	store 2,mem_discovery_timeout_timer_count
+	nrtn blank
+	call app_bt_stop_discovery
+	call app_led_off
+	fetch 2,mem_cb_discovry_timeout
+	branch callback_func 
+	
+app_bb_event_reconn_failed:
+	call app_disconn_reason_flag_clear
+	fetch 2,mem_ui_state_map
+	set0 UI_STATE_BT_RECONNECT,pdata
+	store 2,mem_ui_state_map
+	rtn
+
+app_bb_event_bb_disconn:
+	jam 0,mem_unsniff2sniff_timer_count
+	fetch 2,mem_ui_state_map
+	bbit1 UI_STATE_BT_RECONNECT,app_bb_event_bb_reconn_disconn
+	isolate0 UI_STATE_BT_SETUP_COMPLETE,pdata
+ 	call app_discard_event,true
+app_bb_event_bb_reconn_disconn:
+	fetch 2,mem_ui_state_map
+	set0 UI_STATE_BT_CONNECTED,pdata
+	set0 UI_STATE_BT_SETUP_COMPLETE,pdata
+	set0 UI_STATE_BT_HID_CONN,pdata
+	set0 UI_STATE_BT_HID_HANDSHAKE,pdata
+	set0 UI_STATE_BT_SPP_CONN,pdata
+	store 2,mem_ui_state_map
+	branch app_lpm_mult_disable
+	
+app_bb_hibernate:
+	call app_disconn_reason_clear
+	branch app_enter_hibernate
+
+	
+app_event_do_nothing:
+app_disconn_reason_clear:
+	setarg 0
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason
+	rtn
+app_disconn_reason_flag_clear:
+	setarg 0
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	rtn
+
+	
+app_disconn_reason_collect_bt:
+	fetch APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason
+	setarg 0
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	rtn
+	
+app_disconn_reason_collect_ble:
+	fetch APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	set1 APP_DISC_BLE,pdata
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason
+	setarg 0
+	store APP_DISC_RSN_SIZE,mem_app_disconn_reason_flag
+	rtn
+
+	
+//************************************************//
+//********APP SHARED FUNCSIONS*******//
+//************************************************//
+app_check_reconn_target:
+	call eeprom_load_reconn_info
+	fetch 6,mem_hci_plap
+	rtn
+	
+app_le_check_reconn_target:
+	fetch 1,mem_ltk_exists
+	branch app_le_check_reconn_target_none,blank
+	call app_led_on
+	branch app_ble_start_direct_adv
+app_le_check_reconn_target_none:
+	call app_led_start_blink
+	branch app_ble_start_adv
+
+app_check_plap:
+	set1 mark_ext_patch,mark
+	bpatch patch3a_1,mem_patch3a
+	arg mem_check_plap_temp,regb
+	arg app_check_one_plap,regc
+	branch context_search
+	
+app_check_one_plap:
+	arg 0,temp
+	bbit0 state_inconn,app_check_one_plap_next
+	add rega,coffset_plap,contr
+	ifetcht 6,contr
+app_check_one_plap_next:
+	copy temp,pdata
+	ncall app_check_one_plap_device_exist,blank
+	istoret 6,regb
+	increase 6,regb
+	branch context_search_next
+app_check_one_plap_device_exist:
+	fetch 1,mem_device_nums
+	increase 1,pdata
+	store 1,mem_device_nums
+	rtn
+	
+app_check_conn_device_nums_addr:
+	jam 0,mem_device_nums
+	branch app_check_plap
+
+app_check_sniff:
+	fetch 1,mem_ui_state_map
+	isolate1 UI_STATE_BT_SNIFF,pdata
+	rtn
+
+//*****************************************//
+//*****************API********************//
+//*****************************************//
+app_clearflag_store:
+	setarg 0
+	branch app_flag_store
+app_initflag_store:
+	setarg EEPROM_INIT_FLAG
+app_flag_store:
+	store 2,mem_timeup
+	set1 mark_ext_patch,mark
+	bpatch patch3a_2,mem_patch3a
+	arg 2,temp
+	arg mem_timeup,rega
+	arg eeprom_module_init_flag,regb
+	branch iicd_write_eep_data
+
+//initflag is in eeprom to sure is eeprom nead to init
+app_initflag_check:
+	set1 mark_ext_patch,mark
+	bpatch patch3a_3,mem_patch3a
+	arg 2,temp
+	arg mem_pdatatemp,rega
+	arg eeprom_module_init_flag,regb
+	call iicd_read_eep_data
+	fetch 2,mem_pdatatemp
+	arg EEPROM_INIT_FLAG,temp
+	isub  temp,null
+	rtn
+
+
+app_start_auto_sniff:
+	fetch 1,mem_unsniff2sniff_timer
+	store 1,mem_unsniff2sniff_timer_count
+	rtn	
+	
+app_get_lpm_wake_lock:
+	arg wake_lock_app,queue
+	branch lpm_get_wake_lock
+
+app_put_lpm_wake_lock:
+	arg wake_lock_app,queue
+	branch lpm_put_wake_lock
+	
+app_lpm_wake_auto_lock:
+	jam  LPM_WAKE_UP_DELAY_TIMER,mem_wake_up_delay_timer
+	branch app_get_lpm_wake_lock
+app_lpm_wake_auto_lock_timer:
+	fetch 1,mem_wake_up_delay_timer
+	rtn blank
+	increase -1,pdata
+	store 1,mem_wake_up_delay_timer
+	nrtn blank
+	branch app_put_lpm_wake_lock
+
+app_l2cap_flow_control_enable:
+	jam L2CAP_FLOW_CTRL_ENABLE,mem_l2cap_flow_ctrl_flag
+	rtn
+
+app_l2cap_flow_control_disable:
+	jam L2CAP_FLOW_CTRL_DISABLE,mem_l2cap_flow_ctrl_flag
+	rtn
+	
+app_bt_set_pincode:
+	jam BT_CMD_SET_PIN_CODE,mem_fifo_temp
+	branch ui_ipc_send_cmd
+
+app_bt_role_switch:
+	jam BT_CMD_ROLE_SWITCH,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_bt_start_reconnect:
+	set1 mark_ext_patch,mark
+	bpatch patch3a_4,mem_patch3a
+	fetch 1,mem_app_connection_options
+	store 1,mem_connection_options
+	jam APP_FLAG_RECONNECT,mem_reconnect_flag
+	jam BT_CMD_RECONNECT,mem_fifo_temp
+	branch ui_ipc_send_cmd	
+	
+app_bt_reconnect_cancel:
+	jam BT_CMD_BB_RECONN_CANCEL,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_bt_disconnect:
+	jam BT_CMD_DISCONNECT,mem_fifo_temp
+	branch ui_ipc_send_cmd	
+
+app_bt_start_discovery_short:
+	fetch 2,mem_discovery_timeout
+	store 2,mem_discovery_timeout_timer_count
+app_bt_start_discovery_led_blink:
+	call app_led_start_blink
+app_bt_start_discovery:
+	jam BT_CMD_START_DISCOVERY,mem_fifo_temp
+	branch ui_ipc_send_cmd
+
+app_bt_stop_discovery:
+	setarg 0
+	store 2,mem_discovery_timeout_timer_count
+	jam BT_CMD_STOP_DISCOVERY,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_ble_start_direct_adv:
+	jam BT_CMD_START_DIRECT_ADV,mem_fifo_temp
+	branch ui_ipc_send_cmd
+
+app_ble_stop_direct_adv:
+	jam BT_CMD_STOP_DIRECT_ADV,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_ble_stop_adv:
+	jam BT_CMD_STOP_ADV,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_ble_start_adv:	
+	jam BT_CMD_START_ADV,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_ble_start_scan:
+	jam BT_CMD_LE_START_SCAN,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_ble_stop_scan:
+	jam BT_CMD_LE_STOP_SCAN,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_ble_start_conn:
+	jam BT_CMD_LE_START_CONN,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_ble_disconnect:
+	jam BT_CMD_LE_DISCONNECT,mem_fifo_temp
+	branch ui_ipc_send_cmd
+
+app_ble_start_write:
+	jam BT_CMD_LE_START_WRITE,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_led_start_blink:	
+	jam BT_CMD_LED_BLINK,mem_fifo_temp
+	branch ui_ipc_send_cmd
+
+app_led_on:
+	jam BT_CMD_LED_ON,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_led_stop_blink:
+app_led_off:
+	jam BT_CMD_LED_OFF,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_enter_hibernate:
+	jam BT_CMD_ENTER_HIBERNATE,mem_fifo_temp 
+	branch ui_ipc_send_cmd
+	
+app_bt_sniff_exit:
+	jam BT_CMD_EXIT_SNIFF,mem_fifo_temp
+	branch  ui_ipc_send_cmd
+	
+app_bt_enter_sniff:
+	jam BT_CMD_ENTER_SNIFF,mem_fifo_temp
+	branch ui_ipc_send_cmd
+
+app_ble_store_reconn_info:
+	jam BT_CMD_STORE_RECONN_INFO_LE,mem_fifo_temp
+	branch ui_ipc_send_cmd
+
+app_bt_store_reconn_info:
+	jam BT_CMD_STORE_RECONN_INFO_BT,mem_fifo_temp
+	branch ui_ipc_send_cmd
+	
+app_lpm_mult_enable:
+	set1 mark_lpm_mult_enable,mark
+	rtn
+
+app_lpm_mult_disable:
+	set0 mark_lpm_mult_enable,mark
+	rtn
+	

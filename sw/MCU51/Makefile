@@ -1,0 +1,110 @@
+	comma:= ,
+empty:=
+space:= $(empty) $(empty)
+bracketl:= (
+bracketl0:= \(
+bracketr:= )
+bracketr0:= \)
+
+
+OUTDIR = out
+ROOT_PATH =C:\Keil
+
+UTIL_PATH =util
+
+C51BIN = $(ROOT_PATH)\c51\bin
+C51   = $(C51BIN)\c51
+A51   = $(C51BIN)\ax51
+BL51  = $(C51BIN)\lx51
+OH51  = $(C51BIN)\Ohx51
+OC51  = $(C51BIN)\oc51
+LIB51 = $(C51BIN)\lib51
+
+TARGET = $(OUTDIR)\fw
+TARGETHEX = $(TARGET).hex
+
+
+RAMTARGET = $(OUTDIR)\fwram
+
+RAMTARGETHEX = $(addsuffix .hex, $(RAMTARGET))
+
+############################## IMPORTANT ####################################
+#   opt level greater than 7 cannot be used, or the ram code and the rom code will be different
+##############################################################################
+OPT_LEVEL=7
+
+LIST_FILE_CTL=PR($(@:obj=lst))
+
+C_OPTS = object($@) OBJECTADVANCED  OPTIMIZE(9,SPEED) browse code symbols DF(ENABLE_APE) $(LIST_FILE_CTL) \
+OT($(OPT_LEVEL),SPEED) large
+
+#ASM_OPTS =  $(LIST_FILE_CTL) object($@)
+ASM_OPTS = SET (large) DEBUG EP $(LIST_FILE_CTL) object($@)
+
+LINK_OPTS = \
+	CLASSES (XDATA (X:0x4c80-X:0x4eFF), \
+	CODE(C:0-C:0xffff), DATA(D:0x10-0x7f), IDATA(I:0x80-0xcf)) \
+	SEGMENTS($(DATA_MAP)) \
+	NOOVERLAY \
+	PAGELENGTH(60000) \
+	CODE
+
+DATA_MAP = ?STACK(D:0xD0)
+CODE_MAP = ?PR?RAMENTRY?JUMPTABLE(C:0x0), ?PR?*, ?C*
+
+LINK_OBJ_RAM = main system YC_Sys YC_Peripheral spiflash BT_IPC YC_Utilities CS_Scale_Proc \
+                CS_CommTo1186 CS_ScaleDisplay CS_ScaleKey retation_variable lxProtocol Crc32
+
+LINK_OBJ_TMP_RAM = $(addsuffix .obj,$(LINK_OBJ_RAM))
+LINK_OBJ_DEPENDENCIES_RAM = $(addprefix $(OUTDIR)/, $(LINK_OBJ_TMP_RAM))
+LINK_OBJ_FILES_RAM = $(subst $(space),$(comma),$(LINK_OBJ_DEPENDENCIES_RAM))
+
+LINK_OBJ_TMP_ROM = $(addsuffix .obj,$(LINK_OBJ_ROM))
+LINK_OBJ_DEPENDENCIES_ROM = $(addprefix $(OUTDIR)/, $(LINK_OBJ_TMP_ROM))
+LINK_OBJ_FILES_ROM = $(subst $(space),$(comma),$(LINK_OBJ_DEPENDENCIES_ROM))
+
+
+.SUFFIXES: .a51
+RAM_BIN = $(RAMTARGET).rom
+
+
+PROG_FILE = ..\rom\program\c51.prog
+RAM_FILES = $(RAM_MIF) $(RAM_BIN) $(EEPROM_FILE) $(PROG_FILE)
+
+$(OUTDIR)/%.obj : %.c hwreg.h
+	$(C51) $< "$(C_OPTS)"
+
+$(OUTDIR)/%.obj : %.a51
+	$(A51) $< "$(ASM_OPTS)"
+
+all : $(RAM_FILES) 
+
+
+$(TARGET) : $(LINK_OBJ_DEPENDENCIES_RAM)
+	$(BL51) $(LINK_OBJ_FILES_RAM) TO $@ "$(LINK_OPTS)"
+
+$(TARGETHEX) : $(TARGET)
+	$(OH51) $(TARGET)
+
+
+$(RAM_BIN) : $(TARGETHEX)
+	perl $(UTIL_PATH)\hex2mif.pl < $< ram > $@
+	copy $@ ..\MCU32\output
+	copy $@ .\output 
+	genbin
+	
+
+
+$(RAM_MIF) : $(TARGETHEX)
+	perl $(UTIL_PATH)\hex2mif.pl < $< rammif > $@
+
+
+$(EEPROM_FILE) : $(RAM_BIN)
+	cd ..\rom\output; ..\util\geneep.exe; cp eeprom.dat ..\..\sim 
+
+$(PROG_FILE) : $(RAM_BIN)
+#	perl $(UTIL_PATH)\setarg.pl $< c51 > $@
+
+clean:  
+	del /q $(OUTDIR)\*.*
+

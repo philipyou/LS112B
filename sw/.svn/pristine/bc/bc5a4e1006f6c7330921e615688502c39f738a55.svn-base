@@ -1,0 +1,549 @@
+
+ifdef COMPILE_MODULE
+
+
+
+
+module_init:
+	rtn wake
+	jam 0,mem_module_task
+	call module_gpio_init
+	call module_init_static_string
+	setarg module_process_idle
+	store 2,mem_cb_idle_process
+	setarg module_conn_process
+	store 2,mem_cb_bt_process
+	setarg module_process_bb_event
+	store 2,mem_cb_bb_event_process
+	setarg module_le_rx
+	store 2,mem_cb_att_write
+	setarg module_conn_process
+	store 2,mem_cb_le_process
+	set1 mark_ext_patch,mark
+	bpatch patch30_0,mem_patch30
+	setarg module_lpm_lock
+	store 2,mem_cb_check_wakelock
+	setarg module_le_tx_update_data
+	store 2,mem_cb_update_notify_value
+	setarg 0
+	store 4,mem_last_uart_clock
+	store 2,mem_module_prepare_tx_len
+	call module_hardware_init
+	call init_module_environment
+	call check_module_disabled
+	branch eeprom_load_reconn_info
+
+module_hardware_init:
+	rtn wake
+	setarg uart_baud_115200
+	store uart_baud_len,mem_baud
+module_lpm_uart_init:
+	call init_filter_ram
+	setarg mem_module_rx_buf
+	hstore 2,core_uart_rsaddr
+	setarg mem_module_rx_buf_end
+	hstore 2,core_uart_readdr
+	setarg mem_module_tx_buf
+	hstore 2,core_uart_tsaddr
+	setarg mem_module_tx_buf_end
+	hstore 2,core_uart_teaddr
+	hjam 0x4,core_gpio_sel1
+	jam 0xff,mem_ucode_id_local
+	hjam 0x0,core_uart_ctrl
+ 	setarg mem_module_tx_buf
+	hstore 2,core_uart_twptr
+	hstore 2,core_uart_trptrp
+	setarg mem_module_rx_buf
+	hstore 2,core_uart_rrptr
+	branch hci_init_common 
+
+
+module_lpm_init:
+	call module_lpm_uart_init
+	branch module_gpio_init
+	
+module_gpio_init:
+	//module state pin
+	call ui_led_init	
+	call app_led_start_blink
+	//module conn state pin
+	fetcht 1,mem_module_connect_state_gpio
+	call gpio_config_output
+	call module_set_conn_pin_low
+	
+	fetcht 1,mem_module_wake_up_gpio
+	call gpio_config_input
+	fetcht 1,mem_at_gpio
+	branch gpio_config_input_without_wake
+
+module_lpm_lock:
+	fetcht 1,mem_module_wake_up_gpio
+	call gpio_get_bit
+	nbranch app_put_lpm_wake_lock,true
+	branch app_get_lpm_wake_lock
+
+	
+/*************at dispatch*******************/
+module_process_idle:
+	branch module_app_dispatch
+module_conn_process:
+	branch module_app_dispatch
+module_app_dispatch:
+	set1 mark_ext_patch,mark
+	bpatch patch30_1,mem_patch30
+	call module_control_air_flow
+	call module_uart_set
+	call l2cap_malloc_is_fifo_full
+	nrtn blank
+	branch module_process
+module_process_bb_event:
+	copy regc,pdata
+	beq BT_EVT_PINCODE_REQ,module_process_evt_pincode_req
+	beq BT_EVT_RECONN_FAILED,module_reconn_fail
+	beq BT_EVT_RECONN_PAGE_TIMEOUT,module_page_time_out
+	beq BT_EVT_BB_DISCONNECTED,module_process_bb_event_disconned
+	beq BT_EVT_SWITCH_NOT_ACCEPT,module_process_switch_not_accept
+	beq BT_EVT_SWITCH_ACCEPT,module_process_switch_accept
+	beq BT_EVT_SNIFF_ACCEPT,module_process_sniff_accept
+	beq BT_EVT_SNIFF_NOT_ACCEPT,module_process_sniff_not_accept
+	beq BT_EVT_UNSNIFF_ACCEPT,module_process_unsniff_accept
+	beq BT_EVT_UNSNIFF_NOT_ACCEPT,module_process_unsniff_not_accept
+	beq BT_EVT_LE_CONNECTED,module_process_le_conn
+	beq BT_EVT_BB_CONNECTED,module_process_bb_conn
+	beq BT_EVT_LE_DISCONNECTED,module_process_bb_even_le_disconn
+	beq BT_EVT_SETUP_COMPLETE,module_process_setup_complete
+	beq BT_EVT_ENTER_SNIFF,module_sniff_param_check
+	beq BT_EVT_EXIT_SNIFF,app_lpm_mult_disable
+	and pdata,0x0f,temp
+	and_into BT_EVT_TIMER_MASK,pdata
+	beq BT_EVT_TIMER_INIT,module_bb_event_timer
+	rtn
+
+module_process_bb_event_disconned:
+	call module_disconn_start
+	fetch APP_DISC_RSN_SIZE,mem_app_disconn_reason
+	rtnbit0 APP_DISC_AFTER_SETUP_DONE
+	arg 3,loopcnt
+	arg mem_prarm_dis,contr
+	branch send_mem_to_uart
+	
+module_sniff_param_check:
+	//fetch 1,mem_context
+	//rtnbit0 state_insniff
+	fetch 2,mem_context+coffset_tsniff
+	rshift pdata,pdata
+	fetcht 2,mem_sniff_param_interval
+	isub temp,null
+	nbranch module_sniff_param_check_unsniff,zero
+	branch app_lpm_mult_enable
+module_sniff_param_check_unsniff:
+	fetch 1,mem_module_task
+	rtnbit1 AT_TASK_UNSINFF
+	hfetch 2,core_uart_rxitems    //*
+	ncall at_set_unsniff_task_flag,blank    //*加这两句话
+	branch app_bt_sniff_exit
+ 	
+module_process_setup_complete:
+	call module_conn_start
+	call module_check_cmode
+	branch module_uart_send_conn,zero
+	branch  app_bt_disconnect
+module_uart_send_conn:
+	arg 4,loopcnt
+	arg mem_prarm_conn,contr
+	branch send_mem_to_uart
+	
+module_process_bb_even_le_disconn:
+	call module_disconn_start
+	arg 5,loopcnt
+	arg mem_prarm_bledis,contr
+	branch send_mem_to_uart
+
+module_process_evt_pincode_req:
+	call at_restore_pin_code
+	branch  app_bt_set_pincode
+module_process_switch_not_accept:
+	fetch 1,mem_module_task
+	rtnbit0 AT_TASK_SWITCH
+	set0 AT_TASK_SWITCH,pdata
+	store 1,mem_module_task
+	branch at_error_rev_end
+	
+module_process_switch_accept:
+	fetch 1,mem_module_task
+	rtnbit0 AT_TASK_SWITCH
+	set0 AT_TASK_SWITCH,pdata
+	store 1,mem_module_task
+	branch at_nomal_rev_end
+
+module_process_sniff_accept:
+	rtn
+
+module_process_sniff_not_accept:
+	rtn
+	
+module_process_unsniff_accept:
+	fetch 1,mem_module_task
+	bbit0 AT_TASK_UNSINFF,app_bt_enter_sniff
+	branch at_clear_unsniff_task_flag
+	
+module_process_unsniff_not_accept:
+	rtn
+	
+module_process_le_conn:
+	call module_conn_start
+	arg mem_le_plap,regb
+	call module_check_cmode
+	branch module_uart_send_leconn,zero
+	branch  app_ble_disconnect
+module_uart_send_leconn:
+	arg 6,loopcnt
+	arg mem_prarm_bleconn,contr
+	branch  send_mem_to_uart
+
+module_process_bb_conn:
+	rtn
+
+
+module_reconn_fail:
+	arg 7,loopcnt
+	arg mem_prarm_recfail,contr
+	call send_mem_to_uart
+	branch module_disconn_start
+module_page_time_out:
+	arg 7,loopcnt
+	arg mem_prarm_pageout,contr
+	call send_mem_to_uart
+module_disconn_start:
+	call module_start_adv_discovery
+	branch module_set_conn_pin_high
+
+module_start_adv_discovery:
+	fetch 1,mem_module_state
+	isolate1 AT_STATE_SET30,pdata
+	call app_bt_start_discovery,true
+	fetch 1,mem_module_state
+	isolate1 AT_STATE_SET40,pdata
+	call app_ble_start_adv,true
+	rtn
+module_set_conn_pin_high:
+	fetcht 1,mem_module_connect_state_gpio
+	branch gpio_out_active
+
+module_conn_start:
+	call module_stop_adv_discovery
+	branch module_set_conn_pin_low
+	
+module_stop_adv_discovery:
+	fetch 1,mem_module_state
+	isolate1 AT_STATE_SET30,pdata
+	call app_bt_stop_discovery,true
+	fetch 1,mem_module_state
+	isolate1 AT_STATE_SET40,pdata
+	call app_ble_stop_adv,true
+	rtn
+module_set_conn_pin_low:
+	fetcht 1,mem_module_connect_state_gpio
+	branch gpio_out_inactive
+
+
+	
+
+module_process:
+	fetch 1,mem_device_option
+	rtnne dvc_op_module
+	hfetch 2,core_uart_rxitems
+	rtn blank
+	store 2,mem_current_packet_length
+
+	call spp_mode
+	branch at_process,true
+	call at_ckeck_send_buff
+	branch module_tx_packet
+
+
+spp_mode:    //true=1透传\true=0 不透传
+	fetcht 1,mem_at_gpio
+	branch gpio_get_bit
+
+
+module_exit_sniff:
+	fetch 1,mem_module_task
+	rtnbit1 AT_TASK_UNSINFF
+	call at_set_unsniff_task_flag	
+	branch app_bt_sniff_exit
+
+module_tx_packet:
+	fetch 1,mem_context
+	bbit0 state_inconn,spp_send_end
+	fetch 1,mem_context+coffset_mode
+	bbit1 mode_le,modle_le_tx
+	call app_check_sniff
+	branch module_exit_sniff,true
+	branch spp_tx_rfcomm_packet
+
+module_le_rx:
+	call le_att_get_handle_ptr
+	ifetch 1,contr
+	copy contr,rega
+	call get_uart_twptr
+	copy regb,loopcnt
+	copy rega,contr
+	call uart_copy_tx_bytes
+	branch uartd_send
+
+
+module_le_tx_update_data:
+	//get tx len
+	fetch 2,mem_module_prepare_tx_len
+	rtn blank
+	arg DM_LE_BUFF_LEN,temp
+	call not_greater_than
+	store 2,mem_module_temp_len
+	//reduced mem_module_prepare_tx_len
+	copy pdata,temp
+	fetch 2,mem_module_prepare_tx_len
+	isub temp,pdata
+	store 2,mem_module_prepare_tx_len
+	nbranch assert,positive
+	//get destination for copy
+	arg PRCP_TX_LE,temp
+	storet 2,mem_le_notify_handle
+	call le_att_get_handle_ptr
+	branch assert,blank
+	add contr,1,contw
+	//copy len
+	fetch 2,mem_module_temp_len
+	copy pdata,loopcnt
+	//get source for copy
+	call get_uart_rrptr
+	//copy
+	call uart_copy_rx_bytes
+	//release and clean
+	fetch 2,mem_module_temp_len
+	store 2,mem_current_packet_length
+	store 2,mem_le_notify_len
+	branch spp_send_end 
+
+
+modle_le_tx:
+	rtnmark0 mark_context
+	call modle_le_tx_once // 3 times
+	call modle_le_tx_once
+modle_le_tx_once:
+	call le_xtype_fifo_is_near_full
+	nrtn blank
+	hfetch 2,core_uart_rxitems
+	rtn blank
+	fetcht 2,mem_module_prepare_tx_len
+	isub temp,pdata    //uart_rx_len - data_in_ble_tx_fifo
+	nbranch assert,positive
+	store 2,mem_current_packet_length
+	rtn blank
+	call at_ckeck_send_buff_le
+	fetch 2,mem_module_prepare_tx_len
+	fetcht 2,mem_current_packet_length
+	iadd temp,pdata
+	store 2,mem_module_prepare_tx_len
+	fetcht 2,mem_module_prepare_tx_len
+	hfetch 2,core_uart_rxitems
+	isub temp,rega
+	nbranch assert,positive
+	jam ATTOP_HANDLE_VALUE_NOTIFICATION,mem_fifo_temp
+	branch le_xtype_fifo_in
+
+module_bb_event_timer:
+	storet 1,mem_app_evt_timer_count
+module_bb_event_100ms_loop:
+	fetch 1,mem_app_evt_timer_count
+	rtn blank
+	increase -1,pdata
+	store 1,mem_app_evt_timer_count
+	call module_bb_event_hud_ms
+	branch module_bb_event_100ms_loop
+	
+module_bb_event_hud_ms:
+	fetch 2,mem_at_scan_time
+	rtn blank
+	increase -1,pdata
+	store 2,mem_at_scan_time
+	nrtn blank
+	fetch 1,mem_at_using_flag
+	jam 0,mem_at_using_flag
+	bbit1 AT_FLAG_LEINQ,modue_le_inq
+	bbit1 AT_FLAG_INQ,module_inq
+	branch assert
+modue_le_inq:
+	branch app_ble_stop_scan
+module_inq:
+	jam hci_cmd_inquiry_cancel,mem_hci_cmd
+	rtn
+
+at_ckeck_send_buff:
+	fetch 1,mem_context+coffset_mode
+	bbit1 mode_le,at_ckeck_send_buff_le
+	fetch 2,mem_current_packet_length
+	arg DM_REFCOM_BUFF_LEN,temp
+	/*long packet*/
+	call not_greater_than
+	store 2,mem_current_packet_length
+	rtn
+at_ckeck_send_buff_le:
+	fetch 2,mem_current_packet_length
+	arg DM_LE_BUFF_LEN,temp
+	call not_greater_than
+	store 2,mem_current_packet_length
+	rtn
+
+at_set_unsniff_task_flag:
+	fetch 1,mem_module_task
+	set1 AT_TASK_UNSINFF,pdata
+	store 1,mem_module_task
+	rtn
+
+at_clear_unsniff_task_flag:
+	fetch 1,mem_module_task
+	set0 AT_TASK_UNSINFF,pdata
+	store 1,mem_module_task
+	rtn
+
+at_set_cmd_task_flag:
+	fetch 1,mem_module_task
+	set1 AT_TASK_CMD_FLAG,pdata
+	store 1,mem_module_task
+	rtn
+
+at_clear_cmd_task_flag:
+	fetch 1,mem_module_task
+	set0 AT_TASK_CMD_FLAG,pdata
+	store 1,mem_module_task
+	rtn
+
+module_control_air_flow:
+	set1 mark_ext_patch,mark
+	bpatch patch30_2,mem_patch30
+	call check_uart_tx_buff
+	branch app_l2cap_flow_control_enable,positive
+	branch app_l2cap_flow_control_disable
+
+module_uart_set:
+	call spp_mode
+	branch module_set_baud_115200,true
+	hfetcht uart_baud_len,core_uart_baud
+	fetch 2,mem_baud
+	isub temp,null
+	rtn zero
+	branch uart_set_baud_by_mem
+
+
+module_set_baud_115200:
+	hfetcht uart_baud_len,core_uart_baud
+	setarg AT_baud_115200
+	isub temp,null
+	rtn zero
+	hstore uart_baud_len,core_uart_baud
+	rtn
+
+module_check_cmode:
+	set1 mark_ext_patch,mark
+	bpatch patch30_3,mem_patch30
+	fetch 1,mem_module_state
+	isolate0 AT_STATE_CMODE,pdata
+	branch module_check_cmode_close,true
+	arg mem_cmode_addr,rega
+	arg 6,loopcnt
+	branch string_compare
+module_check_cmode_close:
+	force 0,null
+	rtn
+
+module_init_static_string:
+	set1 mark_ext_patch,mark
+	bpatch patch30_4,mem_patch30
+	arg mem_prarm_pswd,contw
+	setsect 0,0x35350
+	setsect 1,0x15115
+	setsect 2,0x12415
+	setsect 3,0x10951
+	istore 9,contw
+	setsect 0,0x2454c
+	setsect 1,0x35053
+	setsect 2,0x2454
+	setsect 3,0x11531
+	istore 9,contw
+	setsect 0,0x34441
+	setsect 1,0x194d4
+	setsect 2,0x12455
+	setsect 3,0x10d4d
+	istore 9,contw
+	setsect 0,0x3414c
+	setsect 1,0xd4d4
+	setsect 2,0x124c4
+	setsect 3,0x13119
+	istore 9,contw
+	setsect 0,0x15247
+	setsect 1,0x3d0d1
+	setsect 2,0xe4e4
+	setsect 3,0x11531
+	istore 9,contw
+	setsect 0,0x34944
+	setsect 1,0x114d4
+	setsect 2,0xe535
+	setsect 3,0x15105
+	istore 9,contw
+	setsect 0,0x14c2b
+	setsect 1,0x114d2
+	setsect 2,0xf525
+	setsect 3,0x11531
+	istore 9,contw
+	setsect 0,0x14e53
+	setsect 1,0x19192
+	setsect 2,0x44c4
+	setsect 3,0x15915
+	istore 9,contw
+	setsect 0,0x35352
+	setsect 1,0xd254
+	setsect 2,0x5444
+	setsect 3,0x10959
+	istore 9,contw
+	setsect 0,0x1454c
+	setsect 1,0x5392
+	setsect 2,0x3525
+	setsect 3,0x13d35
+	istore 9,contw
+	setsect 0,0x14544
+	setsect 1,0x113d3
+	setsect 2,0x4454
+	setsect 3,0x14d35
+	istore 9,contw
+	setsect 0,0x4154
+	setsect 1,0x11155
+	setsect 2,0x13494
+	setsect 3,0x13d0d
+	istore 9,contw
+	setsect 0,0x4f56
+	setsect 1,0x31055
+	setsect 2,0x3454
+	setsect 3,0x1393d
+	istore 9,contw
+	setsect 0,0x1504e
+	setsect 1,0x151d0
+	setsect 2,0x154f4
+	setsect 3,0x14951
+	istore 9,contw
+	setsect 0,0x24345
+	setsect 1,0x25051
+	setsect 2,0x4c4
+	istore 6,contw
+	rtn
+/*************at end*******************/
+		
+else
+module_init:
+module_process_idle:
+module_conn_process:
+module_process_bb_event:
+module_lpm_init:
+module_init_static_string:
+	branch assert
+endif

@@ -1,0 +1,893 @@
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE BT_IPC
+OBJECT MODULE PLACED IN out/BT_IPC.obj
+COMPILER INVOKED BY: C:\Keil51\c51\bin\C51.exe BT_IPC.c OBJECT(out/BT_IPC.obj) OBJECTADVANCED OPTIMIZE(9,SPEED) BROWSE C
+                    -ODE SYMBOLS DF(ENABLE_APE) PR(out/BT_IPC.lst) OT(7,SPEED) LARGE
+
+line level    source
+
+   1          #include "BT_IPC.h"
+   2          #include "YC_Utilities.h"
+   3          #include "hwreg.h"
+   4          #include "btreg.h"
+   5          #include "retation_variable.h"
+   6          
+   7          bool BT_CmdFifoIn(BT_CMDFIFO_t *pFIFO)
+   8          {
+   9   1              u16_t new_wprt,new_cmd_len,i;
+  10   1              if( pFIFO->len ==0 )
+  11   1                      return false;
+  12   1              new_cmd_len = BT_GetCmdFifoDepth()+pFIFO->len+2;
+  13   1              if(new_cmd_len<=BT_CMD_BUF_LEN)
+  14   1              {
+  15   2                      new_wprt = ESWAP(BT_CmdWptr);
+  16   2                      HWRITE(new_wprt++,CS_PREFIX_CMD);
+  17   2                      if(new_wprt == (mem_cmd_buf_end + 1))
+  18   2                      {
+  19   3                              new_wprt = mem_cmd_buf;
+  20   3                      }
+  21   2                      HWRITE(new_wprt++,pFIFO->len);
+  22   2                      if(new_wprt == (mem_cmd_buf_end + 1))
+  23   2                      {
+  24   3                              new_wprt = mem_cmd_buf;
+  25   3                      }
+  26   2                      for(i=0;i<pFIFO->len;i++)
+  27   2                      {
+  28   3                              HWRITE(new_wprt++,pFIFO->DATA[i]);
+  29   3                              if(new_wprt == (mem_cmd_buf_end + 1))
+  30   3                              {
+  31   4                                      new_wprt = mem_cmd_buf;
+  32   4                              }
+  33   3                      }
+  34   2                      BT_CmdWptr = ESWAP(new_wprt);
+  35   2                      return true;
+  36   2              }
+  37   1              else
+  38   1              {
+  39   2                      return false;
+  40   2              }
+  41   1      }
+  42          
+  43          void BT_EventFifoOut(BT_EVENTFIFO_t * event)
+  44          {
+  45   1              u16_t new_rprt,i;
+  46   1              u8_t event_prefix;
+  47   1              if(BT_GetEvtFifoDepth()>2)
+  48   1              {//event is not empty
+  49   2                      new_rprt = ESWAP(BT_EventRptr);
+  50   2                      event_prefix = HREAD(new_rprt++);
+  51   2                      if(event_prefix == CS_PREFIX_EVENT) {
+  52   3                              event->len = HREAD(new_rprt++);
+  53   3                              if( new_rprt == (mem_event_buf_end+1) )
+  54   3                              {
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 2   
+
+  55   4                                      new_rprt = mem_event_buf;
+  56   4                              }
+  57   3                              for(i=0;i<event->len;i++)
+  58   3                              {
+  59   4                                      event->DATA[i] = HREAD(new_rprt++);
+  60   4                                      if( new_rprt == (mem_event_buf_end+1) )
+  61   4                                      {
+  62   5                                              new_rprt = mem_event_buf;
+  63   5                                      }
+  64   4                              }
+  65   3                      }
+  66   2                      else {
+  67   3                              event->len = 0;
+  68   3                      }
+  69   2                      BT_EventRptr = ESWAP(new_rprt);
+  70   2              }
+  71   1              else
+  72   1              {
+  73   2                      event->len = 0;
+  74   2              }
+  75   1      }
+  76          
+  77          
+  78          u8_t BT_GetCmdFifoDepth(void)
+  79          {
+  80   1              u16_t wptr,rptr,len;
+  81   1              wptr = ESWAP(BT_CmdWptr);
+  82   1              rptr = ESWAP(BT_CmdRptr);
+  83   1              len = (wptr + BT_CMD_BUF_LEN - rptr)&(BT_CMD_BUF_LEN-1);
+  84   1              return len&0xff;
+  85   1      }
+  86          
+  87          u8_t BT_GetEvtFifoDepth(void)
+  88          {
+  89   1              u16_t wptr,rptr,len;
+  90   1              wptr = ESWAP(BT_EventWptr);
+  91   1              rptr = ESWAP(BT_EventRptr);
+  92   1              len = (wptr + BT_EVT_BUF_LEN - rptr)&(BT_EVT_BUF_LEN-1);
+  93   1              return len&0xff;
+  94   1      }
+  95          
+  96          bool BT_CmdFifoEmpty(void)
+  97          {
+  98   1              if(BT_GetCmdFifoDepth()==0)
+  99   1              {
+ 100   2                      return true;
+ 101   2              }
+ 102   1              return false;
+ 103   1      }
+ 104          
+ 105          bool BT_CmdFifoFull(BT_CMDFIFO_t *pFIFO)
+ 106          {
+ 107   1              if((BT_GetCmdFifoDepth()+pFIFO->len+1) > BT_CMD_BUF_LEN)
+ 108   1                      return true;
+ 109   1              return false;
+ 110   1      }
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 3   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION _BT_CmdFifoIn (BEGIN)
+                                           ; SOURCE LINE # 7
+                 R     MOV     DPTR,#pFIFO
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 8
+                                           ; SOURCE LINE # 10
+                 E     CALL    ?C?CLDPTR
+                 R     xJNZ    ?C0001
+                                           ; SOURCE LINE # 11
+                       CLR     C
+                       RET     
+             ?C0001:
+                                           ; SOURCE LINE # 12
+                 R     CALL    BT_GetCmdFifoDepth
+                 R     MOV     DPTR,#pFIFO
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                 E     CALL    ?C?CLDPTR
+                       MOV     R5,A
+                       ADD     A,R7
+                       MOV     R7,A
+                       CLR     A
+                       RLC     A
+                       XCH     A,R7
+                       ADD     A,#02H
+                       XCH     A,R7
+                       ADDC    A,#00H
+                       MOV     R6,A
+;---- Variable 'new_cmd_len' assigned to Register 'R6/R7' ----
+                                           ; SOURCE LINE # 13
+                       SETB    C
+                       MOV     A,R7
+                       SUBB    A,#080H
+                       MOV     A,R6
+                       SUBB    A,#00H
+                 R     xJGE    ?C0003
+                                           ; SOURCE LINE # 14
+                                           ; SOURCE LINE # 15
+                 E     MOV     DPTR,#BT_CmdWptr+01H
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                 E     MOV     DPTR,#BT_CmdWptr
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     A,R2
+                       MOV     R6,A
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 4   
+
+                       MOV     A,R7
+                 R     MOV     DPTR,#new_wprt
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 16
+                 R     MOV     DPTR,#new_wprt
+                       CLR     A
+                       MOV     B,#01H
+                 E     CALL    ?C?ILDIX
+                       MOV     DPL,B
+                       MOV     DPH,A
+                       MOV     A,#0C5H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 17
+                 R     MOV     DPTR,#new_wprt
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#04FH,?C0004
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#080H,?C0004
+                                           ; SOURCE LINE # 18
+                                           ; SOURCE LINE # 19
+                 R     MOV     DPTR,#new_wprt
+                       MOV     A,#04FH
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 20
+             ?C0004:
+                                           ; SOURCE LINE # 21
+                 R     MOV     DPTR,#new_wprt
+                       CLR     A
+                       MOV     B,#01H
+                 E     CALL    ?C?ILDIX
+                       MOV     DPL,B
+                       MOV     DPH,A
+                       MOV     A,R5
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 22
+                 R     MOV     DPTR,#new_wprt
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#04FH,?C0005
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#080H,?C0005
+                                           ; SOURCE LINE # 23
+                                           ; SOURCE LINE # 24
+                 R     MOV     DPTR,#new_wprt
+                       MOV     A,#04FH
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 25
+             ?C0005:
+                                           ; SOURCE LINE # 26
+                       CLR     A
+                 R     MOV     DPTR,#i
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 5   
+
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+             ?C0006:
+                 R     MOV     DPTR,#pFIFO
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                 E     CALL    ?C?CLDPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       CLR     C
+                       SUBB    A,R7
+                       MOV     A,R4
+                       SUBB    A,#00H
+                 R     xJGE    ?C0007
+                                           ; SOURCE LINE # 27
+                                           ; SOURCE LINE # 28
+                       MOV     A,R1
+                       ADD     A,#01H
+                       MOV     R1,A
+                       CLR     A
+                       ADDC    A,R2
+                       MOV     R2,A
+                       MOV     A,R1
+                       ADD     A,R5
+                       MOV     R1,A
+                       MOV     A,R2
+                       ADDC    A,R4
+                       MOV     R2,A
+                 E     CALL    ?C?CLDPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#new_wprt
+                       CLR     A
+                       MOV     B,#01H
+                 E     CALL    ?C?ILDIX
+                       MOV     DPL,B
+                       MOV     DPH,A
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 29
+                 R     MOV     DPTR,#new_wprt
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#04FH,?C0008
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#080H,?C0008
+                                           ; SOURCE LINE # 30
+                                           ; SOURCE LINE # 31
+                 R     MOV     DPTR,#new_wprt
+                       MOV     A,#04FH
+                       MOVX    @DPTR,A
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 6   
+
+                       INC     DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 32
+                                           ; SOURCE LINE # 33
+             ?C0008:
+                 R     MOV     DPTR,#i+01H
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                 R     JNZ     ?C0030
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+             ?C0030:
+                 R     xJMP    ?C0006
+             ?C0007:
+                                           ; SOURCE LINE # 34
+                 R     MOV     DPTR,#new_wprt
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       MOV     A,R4
+                       MOV     R7,A
+                       MOV     A,R2
+                       MOV     R6,A
+                       MOV     A,R7
+                 E     MOV     DPTR,#BT_CmdWptr
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 35
+                       SETB    C
+                       RET     
+                                           ; SOURCE LINE # 36
+             ?C0003:
+                                           ; SOURCE LINE # 38
+                                           ; SOURCE LINE # 39
+                       CLR     C
+                                           ; SOURCE LINE # 40
+                                           ; SOURCE LINE # 41
+             ?C0002:
+                       RET     
+             ; FUNCTION _BT_CmdFifoIn (END)
+
+             ; FUNCTION _BT_EventFifoOut (BEGIN)
+                                           ; SOURCE LINE # 43
+                 R     MOV     DPTR,#event
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 44
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 7   
+
+                                           ; SOURCE LINE # 47
+                 R     CALL    BT_GetEvtFifoDepth
+                       MOV     A,R7
+                       SETB    C
+                       SUBB    A,#02H
+                 R     xJLT    ?C0011
+                                           ; SOURCE LINE # 48
+                                           ; SOURCE LINE # 49
+                 E     MOV     DPTR,#BT_EventRptr+01H
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                 E     MOV     DPTR,#BT_EventRptr
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     A,R4
+                       MOV     R6,A
+                       MOV     A,R7
+                 R     MOV     DPTR,#new_rprt
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 50
+                 R     MOV     DPTR,#new_rprt
+                       CLR     A
+                       MOV     B,#01H
+                 E     CALL    ?C?ILDIX
+                       MOV     DPL,B
+                       MOV     DPH,A
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+;---- Variable 'event_prefix' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 51
+                       XRL     A,#0C6H
+                 R     xJNZ    ?C0012
+                                           ; SOURCE LINE # 52
+                 R     MOV     DPTR,#new_rprt
+                       MOV     B,#01H
+                 E     CALL    ?C?ILDIX
+                       MOV     DPL,B
+                       MOV     DPH,A
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#event
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     A,R7
+                 E     CALL    ?C?CSTPTR
+                                           ; SOURCE LINE # 53
+                 R     MOV     DPTR,#new_rprt
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#050H,?C0013
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#00H,?C0013
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 8   
+
+                                           ; SOURCE LINE # 54
+                                           ; SOURCE LINE # 55
+                 R     MOV     DPTR,#new_rprt
+                       MOV     A,#04FH
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,#080H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 56
+             ?C0013:
+                                           ; SOURCE LINE # 57
+;---- Variable 'i' assigned to Register 'R6/R7' ----
+                       CLR     A
+                       MOV     R7,A
+                       MOV     R6,A
+             ?C0014:
+                 R     MOV     DPTR,#event
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                 E     CALL    ?C?CLDPTR
+                       MOV     R5,A
+                       CLR     C
+                       MOV     A,R7
+                       SUBB    A,R5
+                       MOV     A,R6
+                       SUBB    A,#00H
+                 R     xJGE    ?C0018
+                                           ; SOURCE LINE # 58
+                                           ; SOURCE LINE # 59
+                 R     MOV     DPTR,#new_rprt
+                       CLR     A
+                       MOV     B,#01H
+                 E     CALL    ?C?ILDIX
+                       MOV     DPL,B
+                       MOV     DPH,A
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       MOV     A,R1
+                       ADD     A,#01H
+                       MOV     R1,A
+                       CLR     A
+                       ADDC    A,R2
+                       MOV     R2,A
+                       MOV     A,R1
+                       ADD     A,R7
+                       MOV     R1,A
+                       MOV     A,R2
+                       ADDC    A,R6
+                       MOV     R2,A
+                       MOV     A,R5
+                 E     CALL    ?C?CSTPTR
+                                           ; SOURCE LINE # 60
+                 R     MOV     DPTR,#new_rprt
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#050H,?C0016
+                       INC     DPTR
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 9   
+
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#00H,?C0016
+                                           ; SOURCE LINE # 61
+                                           ; SOURCE LINE # 62
+                 R     MOV     DPTR,#new_rprt
+                       MOV     A,#04FH
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,#080H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 63
+                                           ; SOURCE LINE # 64
+             ?C0016:
+                       INC     R7
+                 R     CJNE    R7,#00H,?C0033
+                       INC     R6
+             ?C0033:
+                 R     xJMP    ?C0014
+                                           ; SOURCE LINE # 65
+             ?C0012:
+                                           ; SOURCE LINE # 66
+                                           ; SOURCE LINE # 67
+                 R     MOV     DPTR,#event
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       CLR     A
+                 E     CALL    ?C?CSTPTR
+                                           ; SOURCE LINE # 68
+             ?C0018:
+                                           ; SOURCE LINE # 69
+                 R     MOV     DPTR,#new_rprt
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       MOV     A,R4
+                       MOV     R7,A
+                       MOV     A,R2
+                       MOV     R6,A
+                       MOV     A,R7
+                 E     MOV     DPTR,#BT_EventRptr
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 70
+                       RET     
+             ?C0011:
+                                           ; SOURCE LINE # 72
+                                           ; SOURCE LINE # 73
+                 R     MOV     DPTR,#event
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 10  
+
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       CLR     A
+                 E     CALL    ?C?CSTPTR
+                                           ; SOURCE LINE # 74
+                                           ; SOURCE LINE # 75
+             ?C0020:
+                       RET     
+             ; FUNCTION _BT_EventFifoOut (END)
+
+             ; FUNCTION BT_GetCmdFifoDepth (BEGIN)
+                                           ; SOURCE LINE # 78
+                                           ; SOURCE LINE # 79
+                                           ; SOURCE LINE # 81
+                 E     MOV     DPTR,#BT_CmdWptr+01H
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                 E     MOV     DPTR,#BT_CmdWptr
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     A,R4
+                       MOV     A,R7
+;---- Variable 'wptr' assigned to Register 'R4/R5' ----
+                       MOV     R5,A
+                                           ; SOURCE LINE # 82
+                 E     MOV     DPTR,#BT_CmdRptr+01H
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                 E     MOV     DPTR,#BT_CmdRptr
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     A,R2
+                       MOV     R6,A
+                       MOV     A,R7
+;---- Variable 'rptr' assigned to Register 'R6/R7' ----
+                                           ; SOURCE LINE # 83
+                       MOV     A,R5
+                       ADD     A,#080H
+                       MOV     R5,A
+                       CLR     A
+                       ADDC    A,R4
+                       MOV     R4,A
+                       CLR     C
+                       MOV     A,R5
+                       SUBB    A,R7
+                       MOV     R7,A
+                       MOV     A,R4
+                       SUBB    A,R6
+                       MOV     R6,#00H
+                       MOV     A,R7
+                       ANL     A,#07FH
+                       MOV     R7,A
+;---- Variable 'len' assigned to Register 'R6/R7' ----
+                                           ; SOURCE LINE # 84
+                                           ; SOURCE LINE # 85
+             ?C0021:
+                       RET     
+             ; FUNCTION BT_GetCmdFifoDepth (END)
+
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 11  
+
+             ; FUNCTION BT_GetEvtFifoDepth (BEGIN)
+                                           ; SOURCE LINE # 87
+                                           ; SOURCE LINE # 88
+                                           ; SOURCE LINE # 90
+                 E     MOV     DPTR,#BT_EventWptr+01H
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                 E     MOV     DPTR,#BT_EventWptr
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     A,R4
+                       MOV     A,R7
+;---- Variable 'wptr' assigned to Register 'R4/R5' ----
+                       MOV     R5,A
+                                           ; SOURCE LINE # 91
+                 E     MOV     DPTR,#BT_EventRptr+01H
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                 E     MOV     DPTR,#BT_EventRptr
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     A,R2
+                       MOV     R6,A
+                       MOV     A,R7
+;---- Variable 'rptr' assigned to Register 'R6/R7' ----
+                                           ; SOURCE LINE # 92
+                       MOV     A,R5
+                       ADD     A,#080H
+                       MOV     R5,A
+                       CLR     A
+                       ADDC    A,R4
+                       MOV     R4,A
+                       CLR     C
+                       MOV     A,R5
+                       SUBB    A,R7
+                       MOV     R7,A
+                       MOV     A,R4
+                       SUBB    A,R6
+                       MOV     R6,#00H
+                       MOV     A,R7
+                       ANL     A,#07FH
+                       MOV     R7,A
+;---- Variable 'len' assigned to Register 'R6/R7' ----
+                                           ; SOURCE LINE # 93
+                                           ; SOURCE LINE # 94
+             ?C0022:
+                       RET     
+             ; FUNCTION BT_GetEvtFifoDepth (END)
+
+             ; FUNCTION BT_CmdFifoEmpty (BEGIN)
+                                           ; SOURCE LINE # 96
+                                           ; SOURCE LINE # 97
+                                           ; SOURCE LINE # 98
+                 R     CALL    BT_GetCmdFifoDepth
+                       MOV     A,R7
+                 R     xJNZ    ?C0023
+                                           ; SOURCE LINE # 99
+                                           ; SOURCE LINE # 100
+                       SETB    C
+                       RET     
+                                           ; SOURCE LINE # 101
+             ?C0023:
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 12  
+
+                                           ; SOURCE LINE # 102
+                       CLR     C
+                                           ; SOURCE LINE # 103
+             ?C0024:
+                       RET     
+             ; FUNCTION BT_CmdFifoEmpty (END)
+
+             ; FUNCTION _BT_CmdFifoFull (BEGIN)
+                                           ; SOURCE LINE # 105
+                 R     MOV     DPTR,#pFIFO
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 106
+                                           ; SOURCE LINE # 107
+                 R     CALL    BT_GetCmdFifoDepth
+                 R     MOV     DPTR,#pFIFO
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                 E     CALL    ?C?CLDPTR
+                       ADD     A,R7
+                       MOV     R7,A
+                       CLR     A
+                       RLC     A
+                       XCH     A,R7
+                       ADD     A,#01H
+                       XCH     A,R7
+                       ADDC    A,#00H
+                       MOV     R6,A
+                       SETB    C
+                       MOV     A,R7
+                       SUBB    A,#080H
+                       MOV     A,R6
+                       XRL     A,#080H
+                       SUBB    A,#080H
+                 R     xJLT    ?C0025
+                                           ; SOURCE LINE # 108
+                       SETB    C
+                       RET     
+             ?C0025:
+                                           ; SOURCE LINE # 109
+                       CLR     C
+                                           ; SOURCE LINE # 110
+             ?C0026:
+                       RET     
+             ; FUNCTION _BT_CmdFifoFull (END)
+
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 13  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+s8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  CHAR     -----  1
+u8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+pxdbyte. . . . . . . . . . . . . . . .  TYPEDEF  DATA   PTR      -----  2
+pdbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  1
+CS_Weight_T. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+DFIFO0 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0094H  1
+DFIFO1 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0095H  1
+dbyte. . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_CHAR   -----  1
+CS_ComState. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  4
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  fail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+DFIFO2 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0096H  1
+pxbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  2
+ibyte. . . . . . . . . . . . . . . . .  TYPEDEF  IDATA  U_CHAR   -----  1
+BT_EVENTFIFO . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UtilTimer . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+BT_CmdFifoEmpty. . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+BT_EventRptr . . . . . . . . . . . . .  EXTERN   XDATA  U_INT    -----  2
+_BT_CmdFifoFull. . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  pFIFO. . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+BT_EventWptr . . . . . . . . . . . . .  EXTERN   XDATA  U_INT    -----  2
+s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
+BT_GetCmdFifoDepth . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  wptr . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0004H  2
+  rptr . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0006H  2
+  len. . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0006H  2
+bool . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+u32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+s16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  INT      -----  2
+xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
+u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
+byte . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+BT_CmdRptr . . . . . . . . . . . . . .  EXTERN   XDATA  U_INT    -----  2
+DeviceInfo_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  registerFlag . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  bindFlag . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  loginFlag. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  userNum. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  deviceID . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0004H  6
+BT_CmdWptr . . . . . . . . . . . . . .  EXTERN   XDATA  U_INT    -----  2
+_BT_EventFifoOut . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  event. . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+  new_rprt . . . . . . . . . . . . . .  AUTO     XDATA  U_INT    0003H  2
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 14  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  i. . . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0006H  2
+  event_prefix . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+BT_CMDFIFO_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+BT_GetEvtFifoDepth . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  wptr . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0004H  2
+  rptr . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0006H  2
+  len. . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0006H  2
+_BT_CmdFifoIn. . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  pFIFO. . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+  new_wprt . . . . . . . . . . . . . .  AUTO     XDATA  U_INT    0003H  2
+  new_cmd_len. . . . . . . . . . . . .  * REG *  DATA   U_INT    0006H  2
+  i. . . . . . . . . . . . . . . . . .  AUTO     XDATA  U_INT    0005H  2
+p_TimerCallback. . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  3
+HistoryList_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  63
+  head . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  tail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  size . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  measureData. . . . . . . . . . . . .  MEMBER   -----  ARRAY    0003H  60
+BT_CMDFIFO . . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+UserMeasureData. . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  weight . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  UTCTime. . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0002H  4
+BT_EVENTFIFO_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UtilTimer_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+_CS_Weight_T . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+_CS_ComState . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  4
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  fail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    776    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      15
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+C51 COMPILER V9.01   BT_IPC                                                                03/23/2017 16:16:35 PAGE 15  
+
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

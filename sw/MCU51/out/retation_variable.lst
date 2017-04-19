@@ -1,0 +1,185 @@
+C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/18/2017 13:28:34 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE RETATION_VARIABLE
+OBJECT MODULE PLACED IN out/retation_variable.obj
+COMPILER INVOKED BY: C:\Keil\c51\bin\C51.exe retation_variable.c OBJECT(out/retation_variable.obj) OBJECTADVANCED OPTIMI
+                    -ZE(9,SPEED) BROWSE CODE SYMBOLS DF(ENABLE_APE) PR(out/retation_variable.lst) OT(7,SPEED) LARGE
+
+line level    source
+
+   1          #include "hwreg.h"
+   2          #include "btreg.h"
+   3          #include "retation_variable.h"
+   4          
+   5          #define RETATION_BASE 0x4C00
+   6          
+   7          //ipc variable
+   8          volatile u16_t xdata BT_CmdRptr _at_  mem_cmd_rptr;
+   9          volatile u16_t xdata BT_CmdWptr _at_ mem_cmd_wptr;
+  10          volatile u16_t xdata BT_EventRptr _at_ mem_event_rptr;
+  11          volatile u16_t xdata BT_EventWptr _at_ mem_event_wptr;
+  12          
+  13          //bt variable
+  14          //spiflash_data:6bytes sensor data; 10bytes register data; 60:userdata
+  15          u8_t xdata sensor_data[6] _at_(RETATION_BASE+0);
+  16          DeviceInfo_t xdata deviceInfo _at_(RETATION_BASE+6);
+  17          HistoryList_t xdata historyUserData _at_(RETATION_BASE+16);
+  18          u8_t sys_state;
+  19          u8_t xdata notifyValueUUIDA621 _at_ (RETATION_BASE+89);
+  20          u8_t xdata notifyValueUUIDA625 _at_ (RETATION_BASE+90);
+  21          u8_t xdata bleConnStatus _at_(RETATION_BASE+91);
+  22          u8_t xdata lxOptStatus _at_ (RETATION_BASE+92);
+  23          u8_t xdata handleIndicationConfirm _at_ (RETATION_BASE+93);
+  24          s32_t xdata UTCTime _at_ (RETATION_BASE+94);
+  25          u8_t xdata R_Test _at_ (RETATION_BASE+98);
+  26          
+  27          /*
+  28          u8_t xdata prev_wechatStatus _at_ (RETATION_BASE+1);
+  29          u8_t xdata wechatStatus _at_ (RETATION_BASE+2);
+  30          u16_t xdata wechatSendLen _at_ (RETATION_BASE+3);
+  31          u16_t xdata wechatRcvLen _at_ (RETATION_BASE+5);
+  32          u16_t xdata wechatRcvTotalLen _at_ (RETATION_BASE+7);
+  33          u16_t xdata wechatRcvCmd _at_ (RETATION_BASE+9);
+  34          u8_t xdata wechatRcvProtoalbufBaseResponseErr _at_ (RETATION_BASE+11);
+  35          u16_t xdata wechatSeq _at_ (RETATION_BASE+12);
+  36          u8_t xdata userData[49] _at_ (RETATION_BASE+55);                        //byte 0 is length
+  37          */
+  38          
+  39          BT_CMDFIFO_t btCmdBuf _at_ (RETATION_BASE+99);
+  40          
+  41          
+  42          
+  43          
+  44          
+  45          
+  46          
+  47          
+  48          
+C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/18/2017 13:28:34 PAGE 2   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/18/2017 13:28:34 PAGE 3   
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+UTCTime. . . . . . . . . . . . . . . .  PUBLIC   XDATA  LONG     4C5EH  4
+s8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  CHAR     -----  1
+u8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+deviceInfo . . . . . . . . . . . . . .  PUBLIC   XDATA  STRUCT   4C06H  10
+pxdbyte. . . . . . . . . . . . . . . .  TYPEDEF  DATA   PTR      -----  2
+btCmdBuf . . . . . . . . . . . . . . .  PUBLIC   XDATA  STRUCT   4C63H  25
+pdbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  1
+CS_Weight_T. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+DFIFO0 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0094H  1
+sensor_data. . . . . . . . . . . . . .  PUBLIC   XDATA  ARRAY    4C00H  6
+dbyte. . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_CHAR   -----  1
+DFIFO1 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0095H  1
+CS_ComState. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  3
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+DFIFO2 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0096H  1
+pxbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  2
+ibyte. . . . . . . . . . . . . . . . .  TYPEDEF  IDATA  U_CHAR   -----  1
+BT_EVENTFIFO . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UtilTimer . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+lxOptStatus. . . . . . . . . . . . . .  PUBLIC   XDATA  U_CHAR   4C5CH  1
+BT_EventRptr . . . . . . . . . . . . .  PUBLIC   XDATA  U_INT    4A04H  2
+BT_EventWptr . . . . . . . . . . . . .  PUBLIC   XDATA  U_INT    4A06H  2
+s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
+bool . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+u32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+s16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  INT      -----  2
+xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
+u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
+notifyValueUUIDA621. . . . . . . . . .  PUBLIC   XDATA  U_CHAR   4C59H  1
+historyUserData. . . . . . . . . . . .  PUBLIC   XDATA  STRUCT   4C10H  63
+byte . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+notifyValueUUIDA625. . . . . . . . . .  PUBLIC   XDATA  U_CHAR   4C5AH  1
+BT_CmdRptr . . . . . . . . . . . . . .  PUBLIC   XDATA  U_INT    4A00H  2
+DeviceInfo_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  registerFlag . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  bindFlag . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  loginFlag. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  userNum. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  deviceID . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0004H  6
+BT_CmdWptr . . . . . . . . . . . . . .  PUBLIC   XDATA  U_INT    4A02H  2
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+BT_CMDFIFO_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/18/2017 13:28:34 PAGE 4   
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+handleIndicationConfirm. . . . . . . .  PUBLIC   XDATA  U_CHAR   4C5DH  1
+bleConnStatus. . . . . . . . . . . . .  PUBLIC   XDATA  U_CHAR   4C5BH  1
+R_Test . . . . . . . . . . . . . . . .  PUBLIC   XDATA  U_CHAR   4C62H  1
+sys_state. . . . . . . . . . . . . . .  PUBLIC   XDATA  U_CHAR   0000H  1
+p_TimerCallback. . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  3
+HistoryList_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  63
+  head . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  tail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  size . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  measureData. . . . . . . . . . . . .  MEMBER   -----  ARRAY    0003H  60
+BT_CMDFIFO . . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+UserMeasureData. . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  weight . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  UTCTime. . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0002H  4
+BT_EVENTFIFO_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UtilTimer_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+_CS_Weight_T . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+_CS_ComState . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  3
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   ----    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      1    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

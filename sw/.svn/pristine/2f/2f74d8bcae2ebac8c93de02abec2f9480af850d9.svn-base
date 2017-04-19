@@ -1,0 +1,547 @@
+C51 COMPILER V9.01   YC_UTILITIES                                                          03/23/2017 20:13:10 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE YC_UTILITIES
+OBJECT MODULE PLACED IN out/YC_Utilities.obj
+COMPILER INVOKED BY: C:\Keil51\c51\bin\C51.exe YC_Utilities.c OBJECT(out/YC_Utilities.obj) OBJECTADVANCED OPTIMIZE(9,SPE
+                    -ED) BROWSE CODE SYMBOLS DF(ENABLE_APE) PR(out/YC_Utilities.lst) OT(7,SPEED) LARGE
+
+line level    source
+
+   1          #include "YC_Utilities.h"
+   2          #include "hwreg.h"
+   3          
+   4          void YC_Ice_break()
+   5          {
+   6   1              CPUB_ICE_CTRL = 1;
+   7   1              return;
+   8   1      }
+   9          
+  10          void xmemset(pxbyte addr, u8_t value, u8_t len) small
+  11          {
+  12   1              while(len--)
+  13   1                      *addr++ = value;
+  14   1              return;
+  15   1      }
+  16          void xmemcpy(pxbyte dest, u8_t* src, u8_t len) small
+  17          {
+  18   1              while(len--)
+  19   1                      *dest++ = *src++;
+  20   1              return;
+  21   1      }
+  22          void dmemcpy(u8_t *dest, u8_t* src, u8_t len) small
+  23          {
+  24   1              while(len--)
+  25   1                      *dest++ = *src++;
+  26   1              return;
+  27   1      }
+  28          void cmemcpy(pxbyte dest, const u8_t* src, u8_t len) small
+  29          {
+  30   1              while(len--)
+  31   1                      *dest++ = (u8_t)(*src++);
+  32   1              return;
+  33   1      }
+  34          bool YC_MemCheckEmpty(u8_t *mem, u8_t len)
+  35          {
+  36   1              int i;
+  37   1              for(i=0;i<len;i++)
+  38   1              {
+  39   2                      if(mem[i])
+  40   2                      {
+  41   3                              break;
+  42   3                      }
+  43   2                      if(i==(len-1)&&mem[i]==0)
+  44   2                      {
+  45   3                              return 0;
+  46   3                      }
+  47   2              }
+  48   1              return 1;
+  49   1      }
+  50          
+  51          void YC_Delay1ms(u8_t Time)
+  52          {
+  53   1              u16_t j; 
+  54   1              for(;Time>0;Time--)
+C51 COMPILER V9.01   YC_UTILITIES                                                          03/23/2017 20:13:10 PAGE 2   
+
+  55   1              {
+  56   2                      for(j=0;j<1160;j++);
+  57   2              }
+  58   1      }
+  59          
+  60          void YC_Delay10ms(u8_t Time)
+  61          {
+  62   1              u16_t j; 
+  63   1              for(;Time>0;Time--)
+  64   1              {
+  65   2                      for(j=0;j<11900;j++);
+  66   2              }
+  67   1      }
+  68          
+  69          void YC_Delay1S(u8_t Time)
+  70          {
+  71   1              u16_t j,k;
+  72   1              for(;Time>0;Time--)
+  73   1              {
+  74   2                      for(j=0;j<1000;j++)
+  75   2                      {
+  76   3                              for(k=0;k<1150;k++);
+  77   3                      }
+  78   2              }
+  79   1      }
+  80          
+  81          
+C51 COMPILER V9.01   YC_UTILITIES                                                          03/23/2017 20:13:10 PAGE 3   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION YC_Ice_break (BEGIN)
+                                           ; SOURCE LINE # 4
+                                           ; SOURCE LINE # 5
+                                           ; SOURCE LINE # 6
+                       MOV     DPTR,#08280H
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 8
+             ?C0001:
+                       RET     
+             ; FUNCTION YC_Ice_break (END)
+
+             ; FUNCTION _xmemset (BEGIN)
+                                           ; SOURCE LINE # 10
+                 R     MOV     addr,R6
+                 R     MOV     addr+01H,R7
+;---- Variable 'len' assigned to Register 'R3' ----
+;---- Variable 'value' assigned to Register 'R5' ----
+             ?C0002:
+                                           ; SOURCE LINE # 12
+                       MOV     R7,AR3
+                       DEC     R3
+                       MOV     A,R7
+                 R     xJZ     ?C0004
+                                           ; SOURCE LINE # 13
+                 R     INC     addr+01H
+                 R     MOV     A,addr+01H
+                 R     MOV     R6,addr
+                 R     JNZ     ?C0044
+                 R     INC     addr
+             ?C0044:
+                       DEC     A
+                       MOV     DPL,A
+                       MOV     DPH,R6
+                       MOV     A,R5
+                       MOVX    @DPTR,A
+                 R     xJMP    ?C0002
+                                           ; SOURCE LINE # 15
+             ?C0004:
+                       RET     
+             ; FUNCTION _xmemset (END)
+
+             ; FUNCTION _xmemcpy (BEGIN)
+                                           ; SOURCE LINE # 16
+                 R     MOV     dest,R6
+                 R     MOV     dest+01H,R7
+                 R     MOV     src,R3
+                 R     MOV     src+01H,R2
+                 R     MOV     src+02H,R1
+             ?C0005:
+                                           ; SOURCE LINE # 18
+                 R     MOV     R7,len
+                 R     DEC     len
+                       MOV     A,R7
+                 R     xJZ     ?C0007
+                                           ; SOURCE LINE # 19
+                 R     MOV     R3,src
+                 R     INC     src+02H
+                 R     MOV     A,src+02H
+C51 COMPILER V9.01   YC_UTILITIES                                                          03/23/2017 20:13:10 PAGE 4   
+
+                 R     MOV     R2,src+01H
+                 R     JNZ     ?C0045
+                 R     INC     src+01H
+             ?C0045:
+                       DEC     A
+                       MOV     R1,A
+                 E     CALL    ?C?CLDPTR
+                       MOV     R7,A
+                 R     INC     dest+01H
+                 R     MOV     A,dest+01H
+                 R     MOV     R4,dest
+                 R     JNZ     ?C0046
+                 R     INC     dest
+             ?C0046:
+                       DEC     A
+                       MOV     DPL,A
+                       MOV     DPH,R4
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                 R     xJMP    ?C0005
+                                           ; SOURCE LINE # 21
+             ?C0007:
+                       RET     
+             ; FUNCTION _xmemcpy (END)
+
+             ; FUNCTION _dmemcpy (BEGIN)
+                                           ; SOURCE LINE # 22
+                 R     MOV     dest,R3
+                 R     MOV     dest+01H,R2
+                 R     MOV     dest+02H,R1
+             ?C0008:
+                                           ; SOURCE LINE # 24
+                 R     MOV     R7,len
+                 R     DEC     len
+                       MOV     A,R7
+                 R     xJZ     ?C0010
+                                           ; SOURCE LINE # 25
+                 R     MOV     R3,src
+                 R     INC     src+02H
+                 R     MOV     A,src+02H
+                 R     MOV     R2,src+01H
+                 R     JNZ     ?C0047
+                 R     INC     src+01H
+             ?C0047:
+                       DEC     A
+                       MOV     R1,A
+                 E     CALL    ?C?CLDPTR
+                       MOV     R7,A
+                 R     MOV     R3,dest
+                 R     INC     dest+02H
+                 R     MOV     A,dest+02H
+                 R     MOV     R2,dest+01H
+                 R     JNZ     ?C0048
+                 R     INC     dest+01H
+             ?C0048:
+                       DEC     A
+                       MOV     R1,A
+                       MOV     A,R7
+                 E     CALL    ?C?CSTPTR
+                 R     xJMP    ?C0008
+                                           ; SOURCE LINE # 27
+             ?C0010:
+C51 COMPILER V9.01   YC_UTILITIES                                                          03/23/2017 20:13:10 PAGE 5   
+
+                       RET     
+             ; FUNCTION _dmemcpy (END)
+
+             ; FUNCTION _cmemcpy (BEGIN)
+                                           ; SOURCE LINE # 28
+                 R     MOV     dest,R6
+                 R     MOV     dest+01H,R7
+                 R     MOV     src,R3
+                 R     MOV     src+01H,R2
+                 R     MOV     src+02H,R1
+             ?C0011:
+                                           ; SOURCE LINE # 30
+                 R     MOV     R7,len
+                 R     DEC     len
+                       MOV     A,R7
+                 R     xJZ     ?C0013
+                                           ; SOURCE LINE # 31
+                 R     MOV     R3,src
+                 R     INC     src+02H
+                 R     MOV     A,src+02H
+                 R     MOV     R2,src+01H
+                 R     JNZ     ?C0049
+                 R     INC     src+01H
+             ?C0049:
+                       DEC     A
+                       MOV     R1,A
+                 E     CALL    ?C?CLDPTR
+                       MOV     R7,A
+                 R     INC     dest+01H
+                 R     MOV     A,dest+01H
+                 R     MOV     R4,dest
+                 R     JNZ     ?C0050
+                 R     INC     dest
+             ?C0050:
+                       DEC     A
+                       MOV     DPL,A
+                       MOV     DPH,R4
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                 R     xJMP    ?C0011
+                                           ; SOURCE LINE # 33
+             ?C0013:
+                       RET     
+             ; FUNCTION _cmemcpy (END)
+
+             ; FUNCTION _YC_MemCheckEmpty (BEGIN)
+                                           ; SOURCE LINE # 34
+                 R     MOV     DPTR,#mem
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R5
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 35
+                                           ; SOURCE LINE # 37
+;---- Variable 'i' assigned to Register 'R6/R7' ----
+C51 COMPILER V9.01   YC_UTILITIES                                                          03/23/2017 20:13:10 PAGE 6   
+
+                       CLR     A
+                       MOV     R7,A
+                       MOV     R6,A
+             ?C0014:
+                 R     MOV     DPTR,#len
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       CLR     C
+                       MOV     A,R7
+                       SUBB    A,R5
+                       MOV     A,#080H
+                       MOV     R0,A
+                       XRL     A,R6
+                       SUBB    A,R0
+                 R     xJGE    ?C0015
+                                           ; SOURCE LINE # 38
+                                           ; SOURCE LINE # 39
+                 R     MOV     DPTR,#mem
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPL,R7
+                       MOV     DPH,R6
+                 E     CALL    ?C?CLDOPTR
+                       MOV     R5,A
+                 R     xJNZ    ?C0015
+                                           ; SOURCE LINE # 40
+                                           ; SOURCE LINE # 41
+                                           ; SOURCE LINE # 42
+             ?C0017:
+                                           ; SOURCE LINE # 43
+                 R     MOV     DPTR,#len
+                       MOVX    A,@DPTR
+                       ADD     A,#0FFH
+                       MOV     R3,A
+                       CLR     A
+                       ADDC    A,#0FFH
+                       MOV     R2,A
+                       MOV     A,R3
+                 R     xJNE    A,AR7,?C0016
+                       MOV     A,R2
+                 R     xJNE    A,AR6,?C0016
+                       MOV     A,R5
+                 R     xJNZ    ?C0016
+                                           ; SOURCE LINE # 44
+                                           ; SOURCE LINE # 45
+                       CLR     C
+                       RET     
+                                           ; SOURCE LINE # 46
+                                           ; SOURCE LINE # 47
+             ?C0016:
+                       INC     R7
+                 R     CJNE    R7,#00H,?C0052
+                       INC     R6
+             ?C0052:
+                 R     xJMP    ?C0014
+             ?C0015:
+C51 COMPILER V9.01   YC_UTILITIES                                                          03/23/2017 20:13:10 PAGE 7   
+
+                                           ; SOURCE LINE # 48
+                       SETB    C
+                                           ; SOURCE LINE # 49
+             ?C0019:
+                       RET     
+             ; FUNCTION _YC_MemCheckEmpty (END)
+
+             ; FUNCTION _YC_Delay1ms (BEGIN)
+                                           ; SOURCE LINE # 51
+;---- Variable 'Time' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 52
+                                           ; SOURCE LINE # 54
+             ?C0020:
+                       MOV     A,R7
+                       SETB    C
+                       SUBB    A,#00H
+                 R     xJLT    ?C0026
+                                           ; SOURCE LINE # 55
+                                           ; SOURCE LINE # 56
+;---- Variable 'j' assigned to Register 'R4/R5' ----
+                       CLR     A
+                       MOV     R5,A
+                       MOV     R4,A
+             ?C0023:
+                       INC     R5
+                 R     CJNE    R5,#00H,?C0053
+                       INC     R4
+             ?C0053:
+                 R     xJNE    R4,#04H,?C0023
+                 R     xJNE    R5,#088H,?C0023
+                                           ; SOURCE LINE # 57
+             ?C0022:
+                       DEC     R7
+                 R     xJMP    ?C0020
+                                           ; SOURCE LINE # 58
+             ?C0026:
+                       RET     
+             ; FUNCTION _YC_Delay1ms (END)
+
+             ; FUNCTION _YC_Delay10ms (BEGIN)
+                                           ; SOURCE LINE # 60
+;---- Variable 'Time' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 61
+                                           ; SOURCE LINE # 63
+             ?C0027:
+                       MOV     A,R7
+                       SETB    C
+                       SUBB    A,#00H
+                 R     xJLT    ?C0033
+                                           ; SOURCE LINE # 64
+                                           ; SOURCE LINE # 65
+;---- Variable 'j' assigned to Register 'R4/R5' ----
+                       CLR     A
+                       MOV     R5,A
+                       MOV     R4,A
+             ?C0030:
+                       INC     R5
+                 R     CJNE    R5,#00H,?C0054
+                       INC     R4
+             ?C0054:
+                 R     xJNE    R4,#02EH,?C0030
+                 R     xJNE    R5,#07CH,?C0030
+C51 COMPILER V9.01   YC_UTILITIES                                                          03/23/2017 20:13:10 PAGE 8   
+
+                                           ; SOURCE LINE # 66
+             ?C0029:
+                       DEC     R7
+                 R     xJMP    ?C0027
+                                           ; SOURCE LINE # 67
+             ?C0033:
+                       RET     
+             ; FUNCTION _YC_Delay10ms (END)
+
+             ; FUNCTION _YC_Delay1S (BEGIN)
+                                           ; SOURCE LINE # 69
+;---- Variable 'Time' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 70
+                                           ; SOURCE LINE # 72
+             ?C0034:
+                       MOV     A,R7
+                       SETB    C
+                       SUBB    A,#00H
+                 R     xJLT    ?C0043
+                                           ; SOURCE LINE # 73
+                                           ; SOURCE LINE # 74
+;---- Variable 'j' assigned to Register 'R4/R5' ----
+                       CLR     A
+                       MOV     R5,A
+                       MOV     R4,A
+             ?C0037:
+                                           ; SOURCE LINE # 75
+                                           ; SOURCE LINE # 76
+;---- Variable 'k' assigned to Register 'R2/R3' ----
+                       CLR     A
+                       MOV     R3,A
+                       MOV     R2,A
+             ?C0040:
+                       INC     R3
+                 R     CJNE    R3,#00H,?C0055
+                       INC     R2
+             ?C0055:
+                 R     xJNE    R2,#04H,?C0040
+                 R     xJNE    R3,#07EH,?C0040
+                                           ; SOURCE LINE # 77
+             ?C0039:
+                       INC     R5
+                 R     CJNE    R5,#00H,?C0056
+                       INC     R4
+             ?C0056:
+                 R     xJNE    R4,#03H,?C0037
+                 R     xJNE    R5,#0E8H,?C0037
+                                           ; SOURCE LINE # 78
+             ?C0036:
+                       DEC     R7
+                 R     xJMP    ?C0034
+                                           ; SOURCE LINE # 79
+             ?C0043:
+                       RET     
+             ; FUNCTION _YC_Delay1S (END)
+
+C51 COMPILER V9.01   YC_UTILITIES                                                          03/23/2017 20:13:10 PAGE 9   
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+s8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  CHAR     -----  1
+_YC_Delay1ms . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  Time . . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+  j. . . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0004H  2
+u8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+pxdbyte. . . . . . . . . . . . . . . .  TYPEDEF  DATA   PTR      -----  2
+_xmemcpy . . . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  dest . . . . . . . . . . . . . . . .  AUTO     DATA   PTR      0000H  2
+  src. . . . . . . . . . . . . . . . .  AUTO     DATA   PTR      0002H  3
+  len. . . . . . . . . . . . . . . . .  AUTO     DATA   U_CHAR   0005H  1
+_xmemset . . . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  addr . . . . . . . . . . . . . . . .  AUTO     DATA   PTR      0000H  2
+  value. . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0005H  1
+  len. . . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0003H  1
+pdbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  1
+_YC_MemCheckEmpty. . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  mem. . . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+  len. . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0003H  1
+  i. . . . . . . . . . . . . . . . . .  * REG *  DATA   INT      0006H  2
+DFIFO0 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0094H  1
+DFIFO1 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0095H  1
+dbyte. . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_CHAR   -----  1
+DFIFO2 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0096H  1
+pxbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  2
+ibyte. . . . . . . . . . . . . . . . .  TYPEDEF  IDATA  U_CHAR   -----  1
+s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
+bool . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+u32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+s16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  INT      -----  2
+xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
+u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
+_YC_Delay10ms. . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  Time . . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+  j. . . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0004H  2
+byte . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+_cmemcpy . . . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  dest . . . . . . . . . . . . . . . .  AUTO     DATA   PTR      0000H  2
+  src. . . . . . . . . . . . . . . . .  AUTO     DATA   PTR      0002H  3
+  len. . . . . . . . . . . . . . . . .  AUTO     DATA   U_CHAR   0005H  1
+_YC_Delay1S. . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  Time . . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+  j. . . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0004H  2
+  k. . . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0002H  2
+_dmemcpy . . . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  dest . . . . . . . . . . . . . . . .  AUTO     DATA   PTR      0000H  3
+  src. . . . . . . . . . . . . . . . .  AUTO     DATA   PTR      0003H  3
+  len. . . . . . . . . . . . . . . . .  AUTO     DATA   U_CHAR   0006H  1
+YC_Ice_break . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    459    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       4
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      21
+C51 COMPILER V9.01   YC_UTILITIES                                                          03/23/2017 20:13:10 PAGE 10  
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,199 @@
+LX51 LINKER/LOCATER V4.41                                                               11/24/2016  19:46:49  PAGE 1
+
+
+
+
+
+ASSEMBLER CODE PACKING OF MODULE:  OUTPUT\FW (RAM)
+
+
+----- FUNCTION main (BEGIN) -----
+ FILE: 'ram.c'
+   23: void main()
+;----                  JMP     soft_reset
+   24: {
+   25: 	soft_reset();
+----- FUNCTION main (END) -------
+
+
+----- FUNCTION soft_reset (BEGIN) -----
+ FILE: 'ram.c'
+   61: void soft_reset(){
+   62: 
+   63: 	uint i = 0;
+00003A E4                CLR     A
+00003B 904C03            MOV     DPTR,#i
+00003E F0                MOVX    @DPTR,A
+00003F A3                INC     DPTR
+000040 F0                MOVX    @DPTR,A
+   64: 	YC_GPIOSetPullup(RESET_GPIO_NUM);
+000041 7F05              MOV     R7,#05H
+000043 1182              ACALL   _YC_GPIOSetPullup
+000045         ?C0006?RAM:
+   65: 	while(1){
+   66: 		
+   67: 	for(i = 0; i < RESET_MAX_CNT; i ++){
+000045 E4                CLR     A
+000046 904C03            MOV     DPTR,#i
+000049 F0                MOVX    @DPTR,A
+00004A A3                INC     DPTR
+00004B F0                MOVX    @DPTR,A
+00004C         ?C0008?RAM:
+00004C 904C03            MOV     DPTR,#i
+00004F E0                MOVX    A,@DPTR
+000050 FE                MOV     R6,A
+000051 A3                INC     DPTR
+000052 E0                MOVX    A,@DPTR
+000053 FF                MOV     R7,A
+000054 C3                CLR     C
+000055 94A0              SUBB    A,#0A0H
+000057 EE                MOV     A,R6
+000058 940F              SUBB    A,#0FH
+00005A 5017              JNC     ?C0009?RAM
+   68: 		if(RESET_GPIO_DATA != (HREAD(RESET_GPIO_IN_REG) & RESET_GPIO_BIT_MASK)){
+00005C 90811C            MOV     DPTR,#0811CH
+00005F E0                MOVX    A,@DPTR
+000060 20E510            JB      ACC.5,?C0009?RAM
+   69: 			break;
+   70: 		}
+000063         ?C0011?RAM:
+   71: 	}
+000063         ?C0010?RAM:
+000063 904C04            MOV     DPTR,#i+01H
+000066 E0                MOVX    A,@DPTR
+000067 04                INC     A
+000068 F0                MOVX    @DPTR,A
+000069 7006              JNZ     ?C0018?RAM
+00006B 904C03            MOV     DPTR,#i
+00006E E0                MOVX    A,@DPTR
+00006F 04                INC     A
+000070 F0                MOVX    @DPTR,A
+000071         ?C0018?RAM:
+000071 80D9              SJMP    ?C0008?RAM
+000073         ?C0009?RAM:
+   72: 	
+   73: 	if(RESET_MAX_CNT == i){
+000073 BE0FCF            CJNE    R6,#0FH,?C0006?RAM
+000076 BFA0CC            CJNE    R7,#0A0H,?C0006?RAM
+   74: 			HWRITE(0x8010, 1);  // hjam 1,0x8010
+000079 908010            MOV     DPTR,#08010H
+00007C 7401              MOV     A,#01H
+00007E F0                MOVX    @DPTR,A
+   75: 		}
+   76: 	}	
+00007F 80C4              SJMP    ?C0006?RAM
+000081 22                RET     
+----- FUNCTION soft_reset (END) -------
+
+
+----- FUNCTION _YC_GPIOSetPullup (BEGIN) -----
+ FILE: 'ram.c'
+   39: void YC_GPIOSetPullup(u8_t gpio_num)
+   40: {
+;---- Variable 'gpio_num' assigned to Register 'R7' ----
+   41: 	YC_GPIOSetBit(gpio_num, &REG_GPIO_PUP(0), 1);	
+   42: }
+000082 7B01              MOV     R3,#01H
+000084 7A80              MOV     R2,#080H
+000086 7978              MOV     R1,#078H
+000088 D200              SETB    ?_YC_GPIOSetBit?BIT
+;----                  JMP     _YC_GPIOSetBit
+----- FUNCTION _YC_GPIOSetPullup (END) -------
+
+
+----- FUNCTION _YC_GPIOSetBit (BEGIN) -----
+ FILE: 'ram.c'
+   44: void YC_GPIOSetBit(u8_t gpio_num, char *reg_base, bool bit_val)
+   45: {
+00008A 904C00            MOV     DPTR,#reg_base
+00008D EB                MOV     A,R3
+00008E F0                MOVX    @DPTR,A
+00008F A3                INC     DPTR
+000090 EA                MOV     A,R2
+000091 F0                MOVX    @DPTR,A
+000092 A3                INC     DPTR
+000093 E9                MOV     A,R1
+000094 F0                MOVX    @DPTR,A
+;---- Variable 'gpio_num' assigned to Register 'R7' ----
+   46: 	u8_t queue, group;
+   47: 
+   48: 	queue = (gpio_num & 7);
+000095 EF                MOV     A,R7
+000096 5407              ANL     A,#07H
+000098 FE                MOV     R6,A
+;---- Variable 'queue' assigned to Register 'R6' ----
+   49: 	group = gpio_num >> 3 & 3;
+000099 EF                MOV     A,R7
+00009A 13                RRC     A
+00009B 13                RRC     A
+00009C 13                RRC     A
+00009D 5403              ANL     A,#03H
+00009F FF                MOV     R7,A
+;---- Variable 'group' assigned to Register 'R7' ----
+   50: 
+   51: 	if(bit_val)
+0000A0 300020            JNB     bit_val,?C0003?RAM
+   52: 	{
+   53: 		*(reg_base + group) |= 1<<queue;
+0000A3 904C00            MOV     DPTR,#reg_base
+0000A6 E0                MOVX    A,@DPTR
+0000A7 FB                MOV     R3,A
+0000A8 A3                INC     DPTR
+0000A9 E0                MOVX    A,@DPTR
+0000AA FA                MOV     R2,A
+0000AB A3                INC     DPTR
+0000AC E0                MOVX    A,@DPTR
+0000AD 2F                ADD     A,R7
+0000AE F9                MOV     R1,A
+0000AF E4                CLR     A
+0000B0 3A                ADDC    A,R2
+0000B1 FA                MOV     R2,A
+0000B2 1103              ACALL   ?C?CLDPTR
+0000B4 FF                MOV     R7,A
+0000B5 7401              MOV     A,#01H
+0000B7 A806              MOV     R0,AR6
+0000B9 08                INC     R0
+0000BA 8002              SJMP    ?C0015?RAM
+0000BC         ?C0014?RAM:
+0000BC C3                CLR     C
+0000BD 33                RLC     A
+0000BE         ?C0015?RAM:
+0000BE D8FC              DJNZ    R0,?C0014?RAM
+0000C0 4F                ORL     A,R7
+0000C1 011C              AJMP    ?C?CSTPTR
+   54: 	}
+0000C3         ?C0003?RAM:
+   55: 	else
+   56: 	{
+   57: 		*(reg_base + group) &= ~(1<<queue);
+0000C3 904C00            MOV     DPTR,#reg_base
+0000C6 E0                MOVX    A,@DPTR
+0000C7 FB                MOV     R3,A
+0000C8 A3                INC     DPTR
+0000C9 E0                MOVX    A,@DPTR
+0000CA FA                MOV     R2,A
+0000CB A3                INC     DPTR
+0000CC E0                MOVX    A,@DPTR
+0000CD 2F                ADD     A,R7
+0000CE F9                MOV     R1,A
+0000CF E4                CLR     A
+0000D0 3A                ADDC    A,R2
+0000D1 FA                MOV     R2,A
+0000D2 1103              ACALL   ?C?CLDPTR
+0000D4 FF                MOV     R7,A
+0000D5 7401              MOV     A,#01H
+0000D7 A806              MOV     R0,AR6
+0000D9 08                INC     R0
+0000DA 8002              SJMP    ?C0017?RAM
+0000DC         ?C0016?RAM:
+0000DC C3                CLR     C
+0000DD 33                RLC     A
+0000DE         ?C0017?RAM:
+0000DE D8FC              DJNZ    R0,?C0016?RAM
+0000E0 F4                CPL     A
+0000E1 5F                ANL     A,R7
+0000E2 011C              AJMP    ?C?CSTPTR
+   58: 	}
+----- FUNCTION _YC_GPIOSetBit (END) -------
+
+

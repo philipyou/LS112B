@@ -1,0 +1,185 @@
+
+mem_baud:d0 00						#baudrate:115200bps:d0 00;	9600bps:c4 09
+mem_txdb:00							#tx power,00 or 05 or FB
+mem_le_lap:11 ff 66 55 44 33		#bluetooth MAC address
+
+mem_le_name_len:  					#bluetooth name
+'Chipsea-BLE
+
+mem_conn_min_interv:08 00			#1.25ms unit, connection interval
+mem_conn_max_interv:10 00
+mem_conn_latency:00
+mem_conn_timeout:64 00				#10ms unit
+
+mem_lpm_mode:01				#lpm mode enable flag
+mem_lpm_interval:00 01		#0.625ms unit, advertise interval
+
+mem_le_adv_type:00 
+mem_le_adv_direct_addr_type:01
+mem_le_adv_direct_addr:00 00 00 00 00 00 
+
+mem_adv_lap_ptr:mem_le_adv_data+9
+mem_le_adv_enable:01
+mem_le_adv_data_len:0f
+mem_le_adv_data:
+02
+01
+06
+03
+02
+E0
+FF
+07
+ff
+78
+a5
+04
+0d
+75
+96
+
+
+mem_le_scan_data_len:13
+mem_le_scan_data:
+12
+09
+45
+6c
+65
+63
+74
+72
+6f
+6e
+69
+63
+20
+53
+63
+61
+6c
+65
+73
+
+#attribute list: handle 2bytes, uuid 2bytes, length 1bytes, attribute Nbytes
+mem_le_att_list:
+
+#Primary service GAP ------
+01 00 00 28 02 00 18
+
+#Device name
+02 00 03 28 01 0a
+03 00 00 2a 14 41 73 74 20 4c 45 20 4d 6f 75 73 65 20 20 20 20 20 20 20 20
+
+#Appearance
+04 00 03 28 01 02
+05 00 01 2a 02 c8 00 #3c2=hid mouse
+
+#Peripheral Preferred Connection Parameters
+06 00 03 28 01 02
+07 00 04 2a 08 06 00 06 00 64 00 2c 01 # interval 6ms, latency 100, timeout 300
+
+
+#privcy flag
+08 00 03 28 01 02
+09 00 02 2a 01 01
+
+#Primary service device infomation
+0a 00 00 28 02 0a 18
+
+#Characteristic manufactor name
+0b 00 03 28 01 02
+0c 00 29 2a 07 43 68 69 70 73 65 61
+
+#Characteristic module number
+0d 00 03 28 01 02
+0e 00 24 2a 08 43 53 54 33 34 4d 39 37
+
+#Characteristic serial number
+0f 00 03 28 01 02
+10 00 25 2a 04 63 6f 6d 33
+
+#Characteristic firmware version
+11 00 03 28 01 02
+12 00 26 2a 03 31 2e 30
+
+#Characteristic hardware version
+13 00 03 28 01 02
+14 00 27 2a 03 31 2e 30
+
+#Primary service serial data  ------0x181B body composition
+15 00 00 28 02 1B 18
+#Characteristic 1--read 0x2A9B
+16 00 03 28 01 02
+17 00 9b 2a 04 00 00 00 00
+#Characteristic 2--indicate 0x2A9C
+18 00 03 28 01 20
+19 00 9c 2a 08 00 00 00 00 00 00 00 00
+#Client Characteristic Configuration
+1a 00 02 29 02 00 00
+
+#Primary service serial data  ------0x181D weight scale
+1b 00 00 28 02 1D 18
+#Characteristic 1--read 0x2A9E
+1c 00 03 28 01 02
+1d 00 9e 2a 04 00 00 00 00
+#Characteristic 2--indicate 0x2A9D
+1e 00 03 28 01 20
+1f 00 9D 2a 03 00 00 00
+#Client Characteristic Configuration
+20 00 02 29 02 00 00
+
+#Primary service serial data  ------0x181C userdata
+21 00 00 28 02 1C 18
+#Characteristic 1--read,write 0x2A80
+22 00 03 28 01 0a
+23 00 80 2a 01 00
+#Characteristic 2--read,write 0x2A8C
+24 00 03 28 01 0a
+25 00 8c 2a 01 00
+#Characteristic 3--read,write 0x2A8E
+26 00 03 28 01 0a
+27 00 8e 2a 02 00 00
+
+#Primary service serial data  ------0x180F battery
+28 00 00 28 02 0F 18
+#Characteristic 1--read,notify 0x2A19
+29 00 03 28 01 12
+2a 00 19 2a 01 00
+#Client Characteristic Configuration
+2b 00 02 29 02 00 00
+
+#Primary service serial data  ------0x1805 current time service
+2c 00 00 28 02 05 18
+#Characteristic 1--read,write,notify 0x2A2B
+2d 00 03 28 01 1a
+2e 00 2b 2a 0a E0 07 0a 01 08 08 08 01 00 00
+#Client Characteristic Configuration
+2f 00 02 29 02 00 00
+#Characteristic 2--read,write 0x2A0F
+30 00 03 28 01 0a
+31 00 0F 2a 02 00 00
+#Characteristic 3--read  0x2A14
+32 00 03 28 01 02
+33 00 14 2a 04 04 ff  ff  ff
+
+#Primary service serial data  ------0xfaa0 OTA 
+34 00 00 28 02 a0 fa
+#Characteristic 1--write  0xfaa1
+35 00 03 28 01 08
+36 00 a1 fa 14 00 00  00  00 00 00  00  00 00 00  00  00 00 00  00  00 00 00  00  00
+#Characteristic 2--read,notify 0xfaa2
+37 00 03 28 01 12
+38 00 a2 fa 14 00 00  00  00 00 00  00  00 00 00  00  00 00 00  00  00 00 00  00  00
+#Client Characteristic Configuration
+39 00 02 29 02 00 00
+
+mem_le_readReqHandleFlag:
+00 00 	#handle is 0x00~0x0f
+00 00 	#handle is 0x10~0x1f
+00 40 	#handle is 0x20~0x2f	handle=0x2e
+00 00	#handle is 0x30~0x3f
+00 00 	#handle is 0x40~0x4f
+00 00 	#handle is 0x50~0x5f
+00 00 	#handle is 0x60~0x6f
+00 00	#handle is 0x70~0x0f

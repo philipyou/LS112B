@@ -1,0 +1,895 @@
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE SYSTEM
+OBJECT MODULE PLACED IN out/system.obj
+COMPILER INVOKED BY: C:\Keil51\c51\bin\C51.exe system.c OBJECT(out/system.obj) OBJECTADVANCED OPTIMIZE(9,SPEED) BROWSE C
+                    -ODE SYMBOLS DF(ENABLE_APE) PR(out/system.lst) OT(7,SPEED) LARGE
+
+line level    source
+
+   1          #include "system.h"
+   2          #include "YC_Define.h"
+   3          #include "hwreg.h"
+   4          #include "YC_SYS.h"
+   5          #include "YC_Utilities.h"
+   6          #include "YC_Peripheral.h"
+   7          #include "btreg.h"
+   8          #include "BT_IPC.h"
+   9          //#include "wechat.h"
+  10          #include "CS_Scale_Proc.h"
+  11          #include "CS_CommTo1186.h"
+  12          #include "CS_ScaleDisplay.h"
+  13          #include "retation_variable.h"
+  14          
+  15          #include "spiflash.h"
+  16          #include "lxProtocol.h"
+  17          
+  18          u8_t xdata SoftTimer_1STimerID;
+  19          u8_t xdata SoftTimer_10msTimerID;
+  20          void SoftTimer_1SCallback(void)
+  21          {
+  22   1              u8_t buf[10] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0x00};
+  23   1              //YC_UARTSendData(buf, 10);
+  24   1              YC_UtilTimerStart(1, SoftTimer_1SCallback, &SoftTimer_1STimerID);
+  25   1              //add user function
+  26   1              CS_Scale_TimeOutProc(CS_SetTimeBase1S);
+  27   1              CS_MemoryWeightClear_Timer(MemWeightTimerInc);
+  28   1              UTCTime++;
+  29   1      
+  30   1              /*
+  31   1              R_Debug_temp = 1234;
+  32   1              CS_ScaleDisplay_Debug();
+  33   1              
+  34   1              */
+  35   1              
+  36   1      /*
+  37   1              SPIFlashInit();
+  38   1              SPIFlashEraseSector(0x8000);
+  39   1              SPIFlashWrite(buf,0x8000,10);
+  40   1              SPIFlashRead(SF_RX_BUF,0x8000,10);      
+  41   1              */
+  42   1      }
+  43          void SoftTimer_10mSCallback(void)
+  44          {
+  45   1              YC_UtilTimerStartMs(10, SoftTimer_10mSCallback, &SoftTimer_10msTimerID);
+  46   1              //add user function
+  47   1              if(uartTimeoutCnt<255) {
+  48   2                      uartTimeoutCnt++;
+  49   2              }
+  50   1              
+  51   1      
+  52   1              CS_SoftTimer(SoftTimerInc);
+  53   1      
+  54   1              CS_KeyScan();
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 2   
+
+  55   1      
+  56   1      }
+  57          
+  58          void systemInit(void)
+  59          {
+  60   1              LPM_DISABLE();
+  61   1              if(*mem_poweron_flag == CS_POWERON_FLAG         //poweron or reset
+  62   1              /*|| *mem_poweron_flag == CS_IOWAKE_FLAG*/) {           //iowake from sleep
+  63   2                      sys_state = SYS_ST_RUN;
+  64   2                      R_Scale_state = CS_Scale_state_init;
+  65   2      
+  66   2                      QueueInit();
+  67   2                      //read spiflash data,save to buffer
+  68   2                      SpiFlashOperator(CS_CMD_READ_FLASH);
+  69   2                      bleConnStatus = BLE_STATUS_DISCONN;
+  70   2                      if(deviceInfo.registerFlag != DEVICE_REGISTERED)
+  71   2                      {
+  72   3                              xmemset(mem_register_buf, 0, sizeof(deviceInfo));
+  73   3                      }
+  74   2                      *(mem_le_adv_data + 13) = deviceInfo.registerFlag;
+  75   2                              
+  76   2                      YC_UtilTimerInit();
+  77   2                      YC_UtilTimerStart(1, SoftTimer_1SCallback, &SoftTimer_1STimerID);
+  78   2                      YC_UtilTimerStartMs(10, SoftTimer_10mSCallback, &SoftTimer_10msTimerID);
+  79   2                      CS_Scale_PowerOn();     
+  80   2                      
+  81   2              }
+  82   1              else {  //wake from LPM mode
+  83   2                      if(YC_GPIOGetInputStatus(5) == 0 ||     //GPIO5, key is  down   
+  84   2                      YC_GPIOGetInputStatus(27) == 0) {       //GPIO27, scale wakeup
+  85   3                              sys_state = SYS_ST_RUN;
+  86   3                              R_Scale_state = CS_Scale_state_standby;
+  87   3                              YC_UtilTimerInit();
+  88   3                              YC_UtilTimerStart(1, SoftTimer_1SCallback, &SoftTimer_1STimerID);
+  89   3                              YC_UtilTimerStartMs(10, SoftTimer_10mSCallback, &SoftTimer_10msTimerID);
+  90   3                              //CS_Scale_PowerOn();   
+  91   3      
+  92   3                              //R_Debug_temp=R_Scale_state;
+  93   3                              //CS_ScaleDisplay_Debug();
+  94   3                              //while(1);
+  95   3                      }
+  96   2                      else {  //remote bluetooth wakeup
+  97   3                              sys_state = SYS_ST_IDLE;
+  98   3                      }
+  99   2              }
+ 100   1              *mem_poweron_flag = CS_NULL_FLAG;
+ 101   1      }
+ 102          
+ 103          u8_t generateChecksum(u8_t *buf,u8_t len)
+ 104          {
+ 105   1              u8_t result;
+ 106   1              result = 0;
+ 107   1              while(len--) {
+ 108   2                      result^=*buf++;
+ 109   2              }
+ 110   1              return result;
+ 111   1      }
+ 112          
+ 113          void BTControlProcess(void)
+ 114          {
+ 115   1              BT_EVENTFIFO_t event;
+ 116   1              //normal process
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 3   
+
+ 117   1              BT_EventFifoOut(&event);
+ 118   1              if(event.len != 0)
+ 119   1              {
+ 120   2                      //YC_UARTSendData(event.DATA, event.len);
+ 121   2                      switch(event.DATA[0]) {
+ 122   3                              case CS_NOTIFY_POWERON:
+ 123   3                                      break;
+ 124   3                              case CS_NOTIFY_DISC:            //bluetooth disconnect
+ 125   3                                      notifyValueUUIDA621 = NOTIFY_INDICATE_DISABLE;
+ 126   3                                      notifyValueUUIDA625 = NOTIFY_INDICATE_DISABLE;
+ 127   3                                      bleConnStatus= BLE_STATUS_DISCONN;
+ 128   3                                      break;
+ 129   3                              case CS_NOTIFY_CONN:    //bluetooth connected
+ 130   3                                      lxOptStatus = OPT_IDLE;
+ 131   3                                      bleConnStatus= BLE_STATUS_CONN;
+ 132   3                                      break;
+ 133   3                              case CS_NOTIFY_DATA:    //receive data
+ 134   3                                      lxRecvDataFromApp(&event);
+ 135   3                                      break; 
+ 136   3                              case CS_NOTIFY_OPENHANDLE:
+ 137   3                                      if(event.DATA[1] == HANDLE_UUIDA621_NOTIFY)
+ 138   3                                      {
+ 139   4                                              notifyValueUUIDA621 = event.DATA[3];
+ 140   4                                      }
+ 141   3                                      else if(event.DATA[1] == HANDLE_UUIDA625_NOTIFY)
+ 142   3                                      {
+ 143   4                                              notifyValueUUIDA625 = event.DATA[3];
+ 144   4                                      }
+ 145   3      
+ 146   3                                      if(*mem_register_buf == DEVICE_REGISTERED &&
+ 147   3                                              notifyValueUUIDA621 == NOTIFY_ENABLE &&
+ 148   3                                              notifyValueUUIDA625 == NOTIFY_ENABLE)
+ 149   3                                      {
+ 150   4                                              lxOptStatus = OPT_LOGIN_REQ;
+ 151   4                                      }
+ 152   3                                      break;
+ 153   3                              case CS_NOTIFY_READ_REQ:
+ 154   3                                      break;
+ 155   3                              case CS_NOTIFY_INDICATE_CONFIRM:
+ 156   3                                      handleIndicationConfirm = 1;
+ 157   3                                      break;
+ 158   3                      }
+ 159   2              }
+ 160   1      }
+ 161          
+ 162          
+ 163          void SysStatusProcess(void) 
+ 164          {
+ 165   1              if( sys_state == SYS_ST_IDLE) { //can enter LPM
+ 166   2                      if(bleConnStatus ==BLE_STATUS_DISCONN)
+ 167   2                      {
+ 168   3                              YC_UARTWaitSendData();
+ 169   3                              YC_UARTClearBuffer();
+ 170   3                              LPM_ENABLE();
+ 171   3      
+ 172   3                              btCmdBuf.len = 0x01;
+ 173   3                              btCmdBuf.DATA[0] = CS_CMD_SLEEP_REQ;
+ 174   3                              BT_CmdFifoIn(&btCmdBuf);
+ 175   3      
+ 176   3                                      
+ 177   3                      }
+ 178   2              }
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 4   
+
+ 179   1              else if( sys_state == SYS_ST_SLEEP) {//can enter LPM
+ 180   2                      YC_UARTWaitSendData();
+ 181   2                      YC_UARTClearBuffer();
+ 182   2                      LPM_ENABLE();
+ 183   2              } 
+ 184   1              else {
+ 185   2                      LPM_DISABLE();
+ 186   2              }
+ 187   1      }
+ 188          
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 5   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION SoftTimer_1SCallback (BEGIN)
+                                           ; SOURCE LINE # 20
+                                           ; SOURCE LINE # 21
+                                           ; SOURCE LINE # 22
+                 R     MOV     R0,#LOW buf
+                 R     MOV     R4,#HIGH buf
+                       MOV     R5,#01H
+                       MOV     R3,#0FFH
+                 R     MOV     R2,#HIGH _?ix1000
+                 R     MOV     R1,#LOW _?ix1000
+                       MOV     R6,#00H
+                       MOV     R7,#0AH
+                 E     CALL    ?C?COPY
+                                           ; SOURCE LINE # 24
+                       MOV     R3,#0FFH
+                 R     MOV     R2,#HIGH SoftTimer_1SCallback
+                 R     MOV     R1,#LOW SoftTimer_1SCallback
+                 E     MOV     DPTR,#?_YC_UtilTimerStart?BYTE+05H
+                 R     MOV     A,#HIGH SoftTimer_1STimerID
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                 R     MOV     A,#LOW SoftTimer_1STimerID
+                       MOVX    @DPTR,A
+                       MOV     R7,#01H
+                       MOV     R6,#00H
+                 E     CALL    _YC_UtilTimerStart
+                                           ; SOURCE LINE # 26
+                       MOV     R7,#07H
+                 E     CALL    _CS_Scale_TimeOutProc
+                                           ; SOURCE LINE # 27
+                       MOV     R7,#02H
+                 E     CALL    _CS_MemoryWeightClear_Timer
+                                           ; SOURCE LINE # 28
+                 E     MOV     DPTR,#UTCTime
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R2,A
+                       MOV     R1,A
+                       MOV     R0,A
+                       MOV     A,R7
+                       ADD     A,#01H
+                       MOV     R7,A
+                       MOV     A,R2
+                       ADDC    A,R6
+                       MOV     R6,A
+                       MOV     A,R1
+                       ADDC    A,R5
+                       MOV     R5,A
+                       MOV     A,R0
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 6   
+
+                       ADDC    A,R4
+                       MOV     R4,A
+                 E     MOV     DPTR,#UTCTime
+                 E     CALL    ?C?LSTXDATA
+                                           ; SOURCE LINE # 42
+                       RET     
+             ; FUNCTION SoftTimer_1SCallback (END)
+
+             ; FUNCTION SoftTimer_10mSCallback (BEGIN)
+                                           ; SOURCE LINE # 43
+                                           ; SOURCE LINE # 44
+                                           ; SOURCE LINE # 45
+                       MOV     R3,#0FFH
+                 R     MOV     R2,#HIGH SoftTimer_10mSCallback
+                 R     MOV     R1,#LOW SoftTimer_10mSCallback
+                 E     MOV     DPTR,#?_YC_UtilTimerStartMs?BYTE+05H
+                 R     MOV     A,#HIGH SoftTimer_10msTimerID
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                 R     MOV     A,#LOW SoftTimer_10msTimerID
+                       MOVX    @DPTR,A
+                       MOV     R7,#0AH
+                       MOV     R6,#00H
+                 E     CALL    _YC_UtilTimerStartMs
+                                           ; SOURCE LINE # 47
+                 E     MOV     DPTR,#uartTimeoutCnt
+                       MOVX    A,@DPTR
+                       CLR     C
+                       SUBB    A,#0FFH
+                 R     xJGE    ?C0002
+                                           ; SOURCE LINE # 48
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 49
+             ?C0002:
+                                           ; SOURCE LINE # 52
+                       CLR     A
+                       MOV     R7,A
+                 E     CALL    _CS_SoftTimer
+                                           ; SOURCE LINE # 54
+                 E     CALL    CS_KeyScan
+                                           ; SOURCE LINE # 56
+                       RET     
+             ; FUNCTION SoftTimer_10mSCallback (END)
+
+             ; FUNCTION systemInit (BEGIN)
+                                           ; SOURCE LINE # 58
+                                           ; SOURCE LINE # 59
+                                           ; SOURCE LINE # 60
+                       MOV     DPTR,#049FEH
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 61
+                       MOV     DPTR,#049FCH
+                       MOVX    A,@DPTR
+                       XRL     A,#010H
+                 R     xJNZ    ?C0004
+                                           ; SOURCE LINE # 62
+                                           ; SOURCE LINE # 63
+                 E     MOV     DPTR,#sys_state
+                       MOV     A,#02H
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 7   
+
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 64
+                       CLR     A
+                 E     MOV     DPTR,#R_Scale_state
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 66
+                 E     CALL    QueueInit
+                                           ; SOURCE LINE # 68
+                       MOV     R7,#040H
+                 E     CALL    _SpiFlashOperator
+                                           ; SOURCE LINE # 69
+                       CLR     A
+                 E     MOV     DPTR,#bleConnStatus
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 70
+                 E     MOV     DPTR,#deviceInfo
+                       MOVX    A,@DPTR
+                       XRL     A,#01H
+                 R     xJZ     ?C0005
+                                           ; SOURCE LINE # 71
+                                           ; SOURCE LINE # 72
+                       MOV     R3,#0AH
+                       CLR     A
+                       MOV     R5,A
+                       MOV     R7,#0EH
+                       MOV     R6,#04CH
+                 E     CALL    _xmemset
+                                           ; SOURCE LINE # 73
+             ?C0005:
+                                           ; SOURCE LINE # 74
+                 E     MOV     DPTR,#deviceInfo
+                       MOVX    A,@DPTR
+                       MOV     DPTR,#043E7H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 76
+                 E     CALL    YC_UtilTimerInit
+                                           ; SOURCE LINE # 77
+                       MOV     R3,#0FFH
+                 R     MOV     R2,#HIGH SoftTimer_1SCallback
+                 R     MOV     R1,#LOW SoftTimer_1SCallback
+                 E     MOV     DPTR,#?_YC_UtilTimerStart?BYTE+05H
+                 R     MOV     A,#HIGH SoftTimer_1STimerID
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                 R     MOV     A,#LOW SoftTimer_1STimerID
+                       MOVX    @DPTR,A
+                       MOV     R7,#01H
+                       MOV     R6,#00H
+                 E     CALL    _YC_UtilTimerStart
+                                           ; SOURCE LINE # 78
+                       MOV     R3,#0FFH
+                 R     MOV     R2,#HIGH SoftTimer_10mSCallback
+                 R     MOV     R1,#LOW SoftTimer_10mSCallback
+                 E     MOV     DPTR,#?_YC_UtilTimerStartMs?BYTE+05H
+                 R     MOV     A,#HIGH SoftTimer_10msTimerID
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                 R     MOV     A,#LOW SoftTimer_10msTimerID
+                       MOVX    @DPTR,A
+                       MOV     R7,#0AH
+                       MOV     R6,#00H
+                 E     CALL    _YC_UtilTimerStartMs
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 8   
+
+                                           ; SOURCE LINE # 79
+                 E     CALL    CS_Scale_PowerOn
+                                           ; SOURCE LINE # 81
+                 R     xJMP    ?C0006
+             ?C0004:
+                                           ; SOURCE LINE # 82
+                                           ; SOURCE LINE # 83
+                       MOV     R7,#05H
+                 E     CALL    _YC_GPIOGetInputStatus
+                 R     xJNC    ?C0008
+                       MOV     R7,#01BH
+                 E     CALL    _YC_GPIOGetInputStatus
+                 R     xJC     ?C0007
+             ?C0008:
+                                           ; SOURCE LINE # 84
+                                           ; SOURCE LINE # 85
+                 E     MOV     DPTR,#sys_state
+                       MOV     A,#02H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 86
+                 E     MOV     DPTR,#R_Scale_state
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 87
+                 E     CALL    YC_UtilTimerInit
+                                           ; SOURCE LINE # 88
+                       MOV     R3,#0FFH
+                 R     MOV     R2,#HIGH SoftTimer_1SCallback
+                 R     MOV     R1,#LOW SoftTimer_1SCallback
+                 E     MOV     DPTR,#?_YC_UtilTimerStart?BYTE+05H
+                 R     MOV     A,#HIGH SoftTimer_1STimerID
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                 R     MOV     A,#LOW SoftTimer_1STimerID
+                       MOVX    @DPTR,A
+                       MOV     R7,#01H
+                       MOV     R6,#00H
+                 E     CALL    _YC_UtilTimerStart
+                                           ; SOURCE LINE # 89
+                       MOV     R3,#0FFH
+                 R     MOV     R2,#HIGH SoftTimer_10mSCallback
+                 R     MOV     R1,#LOW SoftTimer_10mSCallback
+                 E     MOV     DPTR,#?_YC_UtilTimerStartMs?BYTE+05H
+                 R     MOV     A,#HIGH SoftTimer_10msTimerID
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                 R     MOV     A,#LOW SoftTimer_10msTimerID
+                       MOVX    @DPTR,A
+                       MOV     R7,#0AH
+                       MOV     R6,#00H
+                 E     CALL    _YC_UtilTimerStartMs
+                                           ; SOURCE LINE # 95
+                 R     xJMP    ?C0006
+             ?C0007:
+                                           ; SOURCE LINE # 96
+                                           ; SOURCE LINE # 97
+                 E     MOV     DPTR,#sys_state
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 98
+                                           ; SOURCE LINE # 99
+             ?C0006:
+                                           ; SOURCE LINE # 100
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 9   
+
+                       MOV     DPTR,#049FCH
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 101
+                       RET     
+             ; FUNCTION systemInit (END)
+
+             ; FUNCTION _generateChecksum (BEGIN)
+                                           ; SOURCE LINE # 103
+                 R     MOV     DPTR,#buf
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+;---- Variable 'len' assigned to Register 'R5' ----
+                                           ; SOURCE LINE # 104
+                                           ; SOURCE LINE # 106
+;---- Variable 'result' assigned to Register 'R7' ----
+                       CLR     A
+                       MOV     R7,A
+             ?C0011:
+                                           ; SOURCE LINE # 107
+                       MOV     R6,AR5
+                       DEC     R5
+                       MOV     A,R6
+                 R     xJZ     ?C0012
+                                           ; SOURCE LINE # 108
+                 R     MOV     DPTR,#buf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       CLR     A
+                       MOV     B,#01H
+                 E     CALL    ?C?ILDIX
+                       MOV     R1,B
+                       MOV     R2,A
+                 E     CALL    ?C?CLDPTR
+                       XRL     A,R7
+                       MOV     R7,A
+                                           ; SOURCE LINE # 109
+                 R     xJMP    ?C0011
+             ?C0012:
+                                           ; SOURCE LINE # 110
+                                           ; SOURCE LINE # 111
+             ?C0013:
+                       RET     
+             ; FUNCTION _generateChecksum (END)
+
+             ; FUNCTION BTControlProcess (BEGIN)
+                                           ; SOURCE LINE # 113
+                                           ; SOURCE LINE # 114
+                                           ; SOURCE LINE # 117
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH event
+                 R     MOV     R1,#LOW event
+                 E     CALL    _BT_EventFifoOut
+                                           ; SOURCE LINE # 118
+                 R     MOV     DPTR,#event
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 10  
+
+                       MOVX    A,@DPTR
+                 R     xJZ     ?C0027
+                                           ; SOURCE LINE # 119
+                                           ; SOURCE LINE # 121
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ADD     A,#0EEH
+                 R     xJZ     ?C0018
+                       DEC     A
+                 R     xJZ     ?C0019
+                       DEC     A
+                 R     xJZ     ?C0020
+                       ADD     A,#0FCH
+                 R     xJZ     ?C0026
+                       ADD     A,#07H
+                 R     xJNZ    ?C0027
+                                           ; SOURCE LINE # 122
+                                           ; SOURCE LINE # 123
+                                           ; SOURCE LINE # 124
+             ?C0017:
+                                           ; SOURCE LINE # 125
+                       CLR     A
+                 E     MOV     DPTR,#notifyValueUUIDA621
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 126
+                 E     MOV     DPTR,#notifyValueUUIDA625
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 127
+                 E     MOV     DPTR,#bleConnStatus
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 128
+                       RET     
+                                           ; SOURCE LINE # 129
+             ?C0018:
+                                           ; SOURCE LINE # 130
+                       CLR     A
+                 E     MOV     DPTR,#lxOptStatus
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 131
+                 E     MOV     DPTR,#bleConnStatus
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 132
+                       RET     
+                                           ; SOURCE LINE # 133
+             ?C0019:
+                                           ; SOURCE LINE # 134
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH event
+                 R     MOV     R1,#LOW event
+                 E     CALL    _lxRecvDataFromApp
+                                           ; SOURCE LINE # 135
+                       RET     
+                                           ; SOURCE LINE # 136
+             ?C0020:
+                                           ; SOURCE LINE # 137
+                 R     MOV     DPTR,#event+02H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     xJNE    A,#01CH,?C0021
+                                           ; SOURCE LINE # 138
+                                           ; SOURCE LINE # 139
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 11  
+
+                 R     MOV     DPTR,#event+04H
+                       MOVX    A,@DPTR
+                 E     MOV     DPTR,#notifyValueUUIDA621
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 140
+                 R     xJMP    ?C0022
+             ?C0021:
+                                           ; SOURCE LINE # 141
+                       MOV     A,R7
+                 R     xJNE    A,#025H,?C0022
+                                           ; SOURCE LINE # 142
+                                           ; SOURCE LINE # 143
+                 R     MOV     DPTR,#event+04H
+                       MOVX    A,@DPTR
+                 E     MOV     DPTR,#notifyValueUUIDA625
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 144
+             ?C0022:
+                                           ; SOURCE LINE # 146
+                       MOV     DPTR,#04C0EH
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#01H,?C0027
+                 E     MOV     DPTR,#notifyValueUUIDA621
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#01H,?C0027
+                 E     MOV     DPTR,#notifyValueUUIDA625
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#01H,?C0027
+                                           ; SOURCE LINE # 149
+                                           ; SOURCE LINE # 150
+                 E     MOV     DPTR,#lxOptStatus
+                       MOV     A,#016H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 151
+                                           ; SOURCE LINE # 152
+                       RET     
+                                           ; SOURCE LINE # 153
+                                           ; SOURCE LINE # 154
+                                           ; SOURCE LINE # 155
+             ?C0026:
+                                           ; SOURCE LINE # 156
+                 E     MOV     DPTR,#handleIndicationConfirm
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 157
+                                           ; SOURCE LINE # 158
+                                           ; SOURCE LINE # 159
+                                           ; SOURCE LINE # 160
+             ?C0027:
+                       RET     
+             ; FUNCTION BTControlProcess (END)
+
+             ; FUNCTION SysStatusProcess (BEGIN)
+                                           ; SOURCE LINE # 163
+                                           ; SOURCE LINE # 164
+                                           ; SOURCE LINE # 165
+                 E     MOV     DPTR,#sys_state
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#01H,?C0028
+                                           ; SOURCE LINE # 166
+                 E     MOV     DPTR,#bleConnStatus
+                       MOVX    A,@DPTR
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 12  
+
+                 R     xJNZ    ?C0033
+                                           ; SOURCE LINE # 167
+                                           ; SOURCE LINE # 168
+                 E     CALL    YC_UARTWaitSendData
+                                           ; SOURCE LINE # 169
+                 E     CALL    YC_UARTClearBuffer
+                                           ; SOURCE LINE # 170
+                       MOV     DPTR,#049FEH
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 172
+                 E     MOV     DPTR,#btCmdBuf
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 173
+                       INC     DPTR
+                       MOV     A,#020H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 174
+                       MOV     R3,#01H
+                 E     MOV     R2,#HIGH btCmdBuf
+                 E     MOV     R1,#LOW btCmdBuf
+                 E     CALL    _BT_CmdFifoIn
+                                           ; SOURCE LINE # 177
+                                           ; SOURCE LINE # 178
+                       RET     
+             ?C0028:
+                                           ; SOURCE LINE # 179
+                 E     MOV     DPTR,#sys_state
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#03H,?C0031
+                                           ; SOURCE LINE # 180
+                 E     CALL    YC_UARTWaitSendData
+                                           ; SOURCE LINE # 181
+                 E     CALL    YC_UARTClearBuffer
+                                           ; SOURCE LINE # 182
+                       MOV     DPTR,#049FEH
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 183
+                       RET     
+             ?C0031:
+                                           ; SOURCE LINE # 184
+                                           ; SOURCE LINE # 185
+                       MOV     DPTR,#049FEH
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 186
+                                           ; SOURCE LINE # 187
+             ?C0033:
+                       RET     
+             ; FUNCTION SysStatusProcess (END)
+
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 13  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+UTCTime. . . . . . . . . . . . . . . .  EXTERN   XDATA  LONG     -----  4
+s8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  CHAR     -----  1
+u8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+deviceInfo . . . . . . . . . . . . . .  EXTERN   XDATA  STRUCT   -----  10
+UART_CardProtcol . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+YC_UARTPARAM_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  15
+  uartCtrl . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pRxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  pTxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0004H  3
+  rxBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0007H  2
+  txBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0009H  2
+  baud . . . . . . . . . . . . . . . .  MEMBER   -----  U_LONG   000BH  4
+YC_UARTClearBuffer . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+pxdbyte. . . . . . . . . . . . . . . .  TYPEDEF  DATA   PTR      -----  2
+YC_LedBlink. . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  6
+  active_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  gpio_num . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  light_time . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  dark_time. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+_xmemset . . . . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+_generateChecksum. . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  buf. . . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+  len. . . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0005H  1
+  result . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+btCmdBuf . . . . . . . . . . . . . . .  EXTERN   XDATA  STRUCT   -----  25
+pdbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  1
+CS_Scale_PowerOn . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+UART_HalfDuplex. . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+CS_Weight_T. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+_CS_SoftTimer. . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+DFIFO0 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0094H  1
+SoftTimer_1SCallback . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  buf. . . . . . . . . . . . . . . . .  AUTO     XDATA  ARRAY    0000H  10
+SoftTimer_1STimerID. . . . . . . . . .  PUBLIC   XDATA  U_CHAR   0000H  1
+UART_Parity. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+DFIFO1 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0095H  1
+dbyte. . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_CHAR   -----  1
+CS_ComState. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  4
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  fail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+DFIFO2 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0096H  1
+QueueInit. . . . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+pxbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  2
+ibyte. . . . . . . . . . . . . . . . .  TYPEDEF  IDATA  U_CHAR   -----  1
+BT_EVENTFIFO . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+R_Scale_state. . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+YC_UtilTimer . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 14  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+lxOptStatus. . . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+_CS_Scale_TimeOutProc. . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+CS_KeyScan . . . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
+YC_UARTPARAM . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  15
+  uartCtrl . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pRxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  pTxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0004H  3
+  rxBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0007H  2
+  txBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0009H  2
+  baud . . . . . . . . . . . . . . . .  MEMBER   -----  U_LONG   000BH  4
+SysStatusProcess . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+bool . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+_lxRecvDataFromApp . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+u32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+s16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  INT      -----  2
+xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
+_CS_MemoryWeightClear_Timer. . . . . .  EXTERN   CODE   PROC     -----  -----
+u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
+notifyValueUUIDA621. . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+_YC_UtilTimerStart . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+byte . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+notifyValueUUIDA625. . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+DeviceInfo_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  registerFlag . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  bindFlag . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  loginFlag. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  userNum. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  deviceID . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0004H  6
+SoftTimer_10mSCallback . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+YC_UartCTRLBit_e . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+YC_UtilTimerInit . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+UART_DataLen . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+_BT_EventFifoOut . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+systemInit . . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+_?ix1000 . . . . . . . . . . . . . . .  STATIC   CODE   ARRAY    0000H  10
+BT_CMDFIFO_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+UART_BaudSet . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+_BT_CmdFifoIn. . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+handleIndicationConfirm. . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+bleConnStatus. . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+uartTimeoutCnt . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+SoftTimer_10msTimerID. . . . . . . . .  PUBLIC   XDATA  U_CHAR   0001H  1
+YC_LedBlink_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  active_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  gpio_num . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  light_time . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  dark_time. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+YC_UARTWaitSendData. . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+BTControlProcess . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+C51 COMPILER V9.01   SYSTEM                                                                03/23/2017 16:16:34 PAGE 15  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  event. . . . . . . . . . . . . . . .  AUTO     XDATA  STRUCT   0000H  25
+sys_state. . . . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+p_TimerCallback. . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  3
+UART_Enable. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+HistoryList_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  63
+  head . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  tail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  size . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  measureData. . . . . . . . . . . . .  MEMBER   -----  ARRAY    0003H  60
+UART_EnableFlowControl . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+_YC_GPIOGetInputStatus . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+_SpiFlashOperator. . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+BT_CMDFIFO . . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UartCTRLBit . . . . . . . . . . . .  * TAG *  -----  ENUM     -----  -----
+UserMeasureData. . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  weight . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  UTCTime. . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0002H  4
+BT_EVENTFIFO_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+_YC_UtilTimerStartMs . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+_CS_Weight_T . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+YC_UtilTimer_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+_CS_ComState . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  4
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  fail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    664    ----
+   CONSTANT SIZE    =     10    ----
+   XDATA SIZE       =      2      38
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

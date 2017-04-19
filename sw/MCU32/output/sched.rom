@@ -1,0 +1,303 @@
+
+mem_patch00:
+40   #mem_patch00
+00   #mem_patch01
+00   #mem_patch02
+00   #mem_patch03
+00   #mem_patch04
+00   #mem_patch05
+00   #mem_patch06
+00   #mem_patch07
+00   #mem_patch08
+00   #mem_patch09
+00   #mem_patch0A
+00   #mem_patch0B
+00   #mem_patch0C
+00   #mem_patch0D
+00   #mem_patch0E
+00   #mem_patch0F
+00   #mem_patch10
+00   #mem_patch11
+15   #mem_patch12	#15
+00   #mem_patch13
+00   #mem_patch14
+80   #mem_patch15
+01   #mem_patch16
+00   #mem_patch17
+00   #mem_patch18
+00   #mem_patch19
+02   #mem_patch1A
+00   #mem_patch1B
+00   #mem_patch1C
+00   #mem_patch1D
+00   #mem_patch1E
+00   #mem_patch1F
+00   #mem_patch20
+00   #mem_patch21
+00   #mem_patch22
+00   #mem_patch23
+00   #mem_patch24
+00   #mem_patch25
+00   #mem_patch26
+60   #mem_patch27
+00   #mem_patch28
+58   #mem_patch29	#18
+00   #mem_patch2A
+00   #mem_patch2B
+28   #mem_patch2C
+88   #mem_patch2D
+00   #mem_patch2E
+00   #mem_patch2F
+80   #mem_patch30
+22   #mem_patch31
+00   #mem_patch32
+00   #mem_patch33
+00   #mem_patch34
+00   #mem_patch35
+00   #mem_patch36
+00   #mem_patch37
+00   #mem_patch38
+60   #mem_patch39
+00   #mem_patch3A
+00   #mem_patch3B
+00   #mem_patch3C
+00   #mem_patch3D
+00   #mem_patch3E
+00   #mem_patch3F
+
+mem_le_scan_type:01
+mem_le_scan_own_addr_type:00
+mem_le_scan_filter_policy:00
+mem_le_scan_interval:28
+mem_le_scan_window:0c 00
+
+mem_ui_profile_supported:40
+mem_lpm_mult:02
+mem_lpm_mult_timeout:02
+mem_lpm_overhead:06
+mem_led_light_time:90 01
+mem_led_dark_time:90 01
+mem_ui_button_gpio:05
+mem_module_wake_up_gpio:1b		#GPIO27
+mem_module_connect_state_gpio:84
+mem_module_state:02
+
+mem_module_version:
+56 
+31 
+2e 
+30 
+30 
+31
+
+mem_device_option:0a
+
+
+mem_app_connection_options:13
+
+mem_at_using_flag:ff
+
+
+memui_uuid_table:mem_module_uuid_list
+
+# mem_le_adv_interval_min:fc 00 	
+# mem_le_adv_interval_max:fc  00 
+
+mem_le_adv_own_addr_type:00
+
+mem_le_adv_channel_map:07 
+mem_le_adv_filter_policy:00
+mem_le_transmit_window:50
+
+mem_fcomp_mul:02
+mem_fcomp_div:24
+
+mem_le_notify_handle:14
+mem_le_sleep_flag:00
+
+
+
+
+
+mem_baud:e2 04						#baudrate:115200bps:d0 00;	9600bps:c4 09 ;19200bps E2 04
+mem_txdb:00							#tx power,00 or 05 or FB
+mem_le_lap:A8 79 A3 BE 7C 34			#bluetooth MAC address
+
+mem_le_name_len:  					#bluetooth name
+'LS112B
+
+mem_conn_min_interv:08 00			#1.25ms unit, connection interval
+mem_conn_max_interv:10 00
+mem_conn_latency:00
+mem_conn_timeout:64 00				#10ms unit
+
+mem_lpm_mode:01				#lpm mode enable flag
+mem_lpm_interval:64 06		#0.625ms unit, advertise interval 0x0664:1.0225s
+
+mem_le_adv_type:00 
+mem_le_adv_direct_addr_type:01
+mem_le_adv_direct_addr:00 00 00 00 00 00 
+
+mem_adv_lap_ptr:mem_le_adv_data+14
+mem_le_adv_enable:01
+mem_le_adv_data_len:14
+mem_le_adv_data:
+02
+01
+06
+03
+03
+02
+A6
+0c
+FF
+01
+00
+01
+00
+00
+33
+44
+55
+66
+77
+11
+
+
+mem_le_scan_data_len:13
+mem_le_scan_data:
+12
+09
+45
+6c
+65
+63
+74
+72
+6f
+6e
+69
+63
+20
+53
+63
+61
+6c
+65
+73
+
+#attribute list: handle 2bytes, uuid 2bytes, length 1bytes, attribute Nbytes
+mem_le_att_list:
+#Primary service GAP ------
+01 00 00 28 02 00 18
+#Device name
+02 00 03 28 01 0a
+03 00 00 2a 14 41 73 74 20 4c 45 20 4d 6f 75 73 65 20 20 20 20 20 20 20 20
+#Appearance
+04 00 03 28 01 02
+05 00 01 2a 02 c8 00 #3c2=hid mouse
+#Peripheral Preferred Connection Parameters
+06 00 03 28 01 02
+07 00 04 2a 08 06 00 06 00 64 00 2c 01 # interval 6ms, latency 100, timeout 300
+
+#privcy flag
+08 00 03 28 01 02
+09 00 02 2a 01 01
+
+#Primary service device infomation
+0a 00 00 28 02 0a 18
+#Characteristic manufactor name
+0b 00 03 28 01 02
+0c 00 29 2a 07 43 68 69 70 73 65 61
+#Characteristic module number
+0d 00 03 28 01 02
+0e 00 24 2a 08 43 53 54 33 34 4d 39 35
+#Characteristic serial number
+0f 00 03 28 01 02
+10 00 25 2a 04 63 6f 6d 33
+#Characteristic firmware version
+11 00 03 28 01 02
+12 00 26 2a 0c 46 31 2e 30 2e 30 5f 50 41 36 31 30
+#Characteristic hardware version
+13 00 03 28 01 02
+14 00 27 2a 03 31 2e 30
+#Characteristic software version
+15 00 03 28 01 02
+16 00 28 2a 03 31 2e 30
+
+#Primary service ------0xA602 lx service
+17 00 00 28 02 02 a6
+#Characteristic --indicate
+18 00 03 28 01 20
+19 00 20 a6 14 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+#Client Characteristic Configuration
+1a 00 02 29 02 00 00
+#Characteristic --notify
+1b 00 03 28 01 10
+1c 00 21 a6 14 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+#Client Characteristic Configuration
+1d 00 02 29 02 00 00
+#Characteristic --write
+1e 00 03 28 01 04
+1f 00 22 a6 14 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+#Characteristic --write with response
+20 00 03 28 01 08
+21 00 23 a6 14 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+#Characteristic --write
+22 00 03 28 01 04
+23 00 24 a6 14 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+#Characteristic --notify
+24 00 03 28 01 10
+25 00 25 a6 14 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+#Client Characteristic Configuration
+26 00 02 29 02 00 00
+#Characteristic --read
+27 00 03 28 01 02
+28 00 40 a6 01 64
+#Characteristic --read
+29 00 03 28 01 02
+2a 00 41 a6 04 00 00 00 00
+
+mem_le_readReqHandleFlag:
+00 00 	#handle is 0x00~0x0f
+00 00 	#handle is 0x10~0x1f
+00 00 	#handle is 0x20~0x2f	handle=0x2e
+00 00	#handle is 0x30~0x3f
+00 00 	#handle is 0x40~0x4f
+00 00 	#handle is 0x50~0x5f
+00 00 	#handle is 0x60~0x6f
+00 00	#handle is 0x70~0x0f
+
+mem_lpm_config:8f 10 ca
+mem_lpm_xtalcnt:00 0a 0b ef 0f
+mem_lpm_hibernate_switch:00
+mem_gpio_wakeup_low:00 00 00 00 00 00 00 00
+mem_fcomp_mul:02
+mem_fcomp_div:24
+mem_iscan_window:12 00
+mem_iscan_interval:00 10
+mem_pscan_window:12 00
+mem_pscan_interval:00 08
+mem_inq_window:20 00
+mem_page_window:20 00
+mem_page_to:00 20
+mem_rx_window_init:80 03
+mem_rx_window_sniff:00 06
+
+
+mem_eeprom_base:30 0f
+mem_eeprom_block_size:20
+
+#pointers to tail space of mem_le_att_list
+mem_le_att_list+485:
+68 e4
+69 00
+6a 00
+6b 30
+57 4c
+58 6c
+59 50
+ff
+mem_rf_init_ptr:mem_le_att_list+485
+
+

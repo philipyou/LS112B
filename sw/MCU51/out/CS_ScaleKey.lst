@@ -1,0 +1,484 @@
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE CS_SCALEKEY
+OBJECT MODULE PLACED IN out/CS_ScaleKey.obj
+COMPILER INVOKED BY: C:\Keil\c51\bin\C51.exe CS_ScaleKey.c OBJECT(out/CS_ScaleKey.obj) OBJECTADVANCED OPTIMIZE(9,SPEED) 
+                    -BROWSE CODE SYMBOLS DF(ENABLE_APE) PR(out/CS_ScaleKey.lst) OT(7,SPEED) LARGE
+
+line level    source
+
+   1          #include "YC_Define.h"
+   2          #include "YC_Peripheral.h"
+   3          #include "system.h"
+   4          #include "CS_CommTo1186.h"
+   5          #include "CS_Scale_Proc.h"
+   6          #include "CS_ScaleDisplay.h"
+   7          #include "CS_ScaleKey.h"
+   8          
+   9          
+  10          #define KEY_SHORT_PUSH_CNT              3
+  11          #define KEY_LONG_PUSH_CNT                       50
+  12          #define KEY_SHORT_PRESS_TIME            15
+  13          #define KEY_DOWN                                        0
+  14          #define KEY_UP                                          1
+  15          
+  16          
+  17          void CS_KeyScan(void)
+  18          {
+  19   1              u8_t  keyState;
+  20   1              static u8_t xdata keyState_prev=1;
+  21   1              static u8_t xdata keyStateCnt;
+  22   1              static u8_t xdata KeyPressDeal=0;
+  23   1              static u8_t xdata KeyLongPressDeal=0;
+  24   1              static u8_t xdata ShortPressCount=0;
+  25   1              static u8_t xdata PressTimesCount=0;
+  26   1              static u8_t xdata Press;
+  27   1              
+  28   1              
+  29   1              keyState = YC_GPIOGetInputStatus(5);    //GPIO5 
+  30   1      
+  31   1              if(ShortPressCount<255)         //短按计时
+  32   1                      ShortPressCount++;
+  33   1              
+  34   1              if(keyState ==KEY_UP)
+  35   1                      {
+  36   2                      keyState_prev = KEY_UP; 
+  37   2                      keyStateCnt = 0; 
+  38   2      
+  39   2                      if(KeyLongPressDeal==1)
+  40   2                              Press = false;
+  41   2                      
+  42   2                      KeyPressDeal=0;
+  43   2                      KeyLongPressDeal=0;
+  44   2                      
+  45   2                      if(Press == true)
+  46   2                              {
+  47   3                              Press = false;
+  48   3                                                      
+  49   3                              //短按弹起处理
+  50   3                              if(ShortPressCount <KEY_SHORT_PRESS_TIME)
+  51   3                                      PressTimesCount++;
+  52   3                              else
+  53   3                                      {
+  54   4                                      PressTimesCount = 0;
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 2   
+
+  55   4                                      CS_Scale_ChangeUnit();  
+  56   4                                      }
+  57   3                              ShortPressCount =0;     
+  58   3                              }
+  59   2                      }
+  60   1              else
+  61   1                      {
+  62   2                      if(keyState_prev == KEY_DOWN)
+  63   2                              {       
+  64   3                              if(keyStateCnt<255)
+  65   3                                      keyStateCnt++;
+  66   3                               if(keyStateCnt > KEY_SHORT_PUSH_CNT)
+  67   3                                      {
+  68   4                                      Press =true;
+  69   4                                      if(KeyPressDeal==0)
+  70   4                                              {
+  71   5                                              KeyPressDeal=1;
+  72   5                                              //按键刚按下的处理
+  73   5                                              if(ShortPressCount > KEY_SHORT_PRESS_TIME)
+  74   5                                                      PressTimesCount = 0;
+  75   5                                              ShortPressCount=0;
+  76   5                                              }
+  77   4                                      }
+  78   3                               if(keyStateCnt > KEY_LONG_PUSH_CNT)
+  79   3                                      {
+  80   4                                      if(KeyLongPressDeal==0)
+  81   4                                              {
+  82   5                                              //按键刚长按下的处理    
+  83   5                                              KeyLongPressDeal=1;                                     
+  84   5                                              if(PressTimesCount==3)
+  85   5                                                      {
+  86   6                                                      R_Scale_state = CS_Scale_state_caling;  
+  87   6                                                      CS_Scale_CaliProc(CaliProcReset);
+  88   6                                                      Press = false;
+  89   6                                                      keyStateCnt=0;
+  90   6                                                      }
+  91   5                                              PressTimesCount = 0;
+  92   5                                              ShortPressCount =0;
+  93   5                                              }
+  94   4                                      }
+  95   3                              }
+  96   2                      else
+  97   2                              {
+  98   3                              keyState_prev = KEY_DOWN;
+  99   3                              Press = false;
+ 100   3                              }
+ 101   2                      }
+ 102   1      }
+ 103          
+ 104          
+ 105          
+ 106          
+ 107          
+ 108          
+ 109          
+ 110          
+ 111          
+ 112          
+ 113          
+ 114          
+ 115          
+ 116          
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 3   
+
+ 117          
+ 118          
+ 119          
+ 120          
+ 121          
+ 122          
+ 123          
+ 124          
+ 125          
+ 126          
+ 127          
+ 128          
+ 129          
+ 130          
+ 131          
+ 132          
+ 133          
+ 134          
+ 135          
+ 136          
+ 137          
+ 138          
+ 139          
+ 140          
+ 141          
+ 142          
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 4   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION CS_KeyScan (BEGIN)
+                                           ; SOURCE LINE # 17
+                                           ; SOURCE LINE # 18
+                                           ; SOURCE LINE # 29
+                       MOV     R7,#05H
+                 E     CALL    _YC_GPIOGetInputStatus
+                       CLR     A
+                       RLC     A
+                       MOV     R7,A
+;---- Variable 'keyState' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 31
+                 R     MOV     DPTR,#ShortPressCount
+                       MOVX    A,@DPTR
+                       CLR     C
+                       SUBB    A,#0FFH
+                 R     xJGE    ?C0001
+                                           ; SOURCE LINE # 32
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+             ?C0001:
+                                           ; SOURCE LINE # 34
+                       MOV     A,R7
+                       XRL     A,#01H
+                 R     xJNZ    ?C0002
+                                           ; SOURCE LINE # 35
+                                           ; SOURCE LINE # 36
+                 R     MOV     DPTR,#keyState_prev
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 37
+                       CLR     A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 39
+                 R     MOV     DPTR,#KeyLongPressDeal
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#01H,?C0003
+                                           ; SOURCE LINE # 40
+                       CLR     A
+                 R     MOV     DPTR,#Press
+                       MOVX    @DPTR,A
+             ?C0003:
+                                           ; SOURCE LINE # 42
+                       CLR     A
+                 R     MOV     DPTR,#KeyPressDeal
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 43
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 45
+                 R     MOV     DPTR,#Press
+                       MOVX    A,@DPTR
+                       XRL     A,#01H
+                 R     xJNZ    ?C0017
+                                           ; SOURCE LINE # 46
+                                           ; SOURCE LINE # 47
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 50
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 5   
+
+                 R     MOV     DPTR,#ShortPressCount
+                       MOVX    A,@DPTR
+                       CLR     C
+                       SUBB    A,#0FH
+                 R     xJGE    ?C0005
+                                           ; SOURCE LINE # 51
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                 R     xJMP    ?C0006
+             ?C0005:
+                                           ; SOURCE LINE # 53
+                                           ; SOURCE LINE # 54
+                       CLR     A
+                 R     MOV     DPTR,#PressTimesCount
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 55
+                 E     CALL    CS_Scale_ChangeUnit
+                                           ; SOURCE LINE # 56
+             ?C0006:
+                                           ; SOURCE LINE # 57
+                       CLR     A
+                 R     MOV     DPTR,#ShortPressCount
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 58
+                                           ; SOURCE LINE # 59
+                       RET     
+             ?C0002:
+                                           ; SOURCE LINE # 61
+                                           ; SOURCE LINE # 62
+                 R     MOV     DPTR,#keyState_prev
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0008
+                                           ; SOURCE LINE # 63
+                                           ; SOURCE LINE # 64
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       CLR     C
+                       SUBB    A,#0FFH
+                 R     xJGE    ?C0009
+                                           ; SOURCE LINE # 65
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+             ?C0009:
+                                           ; SOURCE LINE # 66
+                 R     MOV     DPTR,#keyStateCnt
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       SETB    C
+                       SUBB    A,#03H
+                 R     xJLT    ?C0010
+                                           ; SOURCE LINE # 67
+                                           ; SOURCE LINE # 68
+                 R     MOV     DPTR,#Press
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 69
+                 R     MOV     DPTR,#KeyPressDeal
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0010
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 6   
+
+                                           ; SOURCE LINE # 70
+                                           ; SOURCE LINE # 71
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 73
+                 R     MOV     DPTR,#ShortPressCount
+                       MOVX    A,@DPTR
+                       SETB    C
+                       SUBB    A,#0FH
+                 R     xJLT    ?C0012
+                                           ; SOURCE LINE # 74
+                       CLR     A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+             ?C0012:
+                                           ; SOURCE LINE # 75
+                       CLR     A
+                 R     MOV     DPTR,#ShortPressCount
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 76
+                                           ; SOURCE LINE # 77
+             ?C0010:
+                                           ; SOURCE LINE # 78
+                       MOV     A,R7
+                       SETB    C
+                       SUBB    A,#032H
+                 R     xJLT    ?C0017
+                                           ; SOURCE LINE # 79
+                                           ; SOURCE LINE # 80
+                 R     MOV     DPTR,#KeyLongPressDeal
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0017
+                                           ; SOURCE LINE # 81
+                                           ; SOURCE LINE # 83
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 84
+                 R     MOV     DPTR,#PressTimesCount
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#03H,?C0015
+                                           ; SOURCE LINE # 85
+                                           ; SOURCE LINE # 86
+                 E     MOV     DPTR,#R_Scale_state
+                       MOV     A,#03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 87
+                       MOV     R7,#05H
+                 E     CALL    _CS_Scale_CaliProc
+                                           ; SOURCE LINE # 88
+                       CLR     A
+                 R     MOV     DPTR,#Press
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 89
+                 R     MOV     DPTR,#keyStateCnt
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 90
+             ?C0015:
+                                           ; SOURCE LINE # 91
+                       CLR     A
+                 R     MOV     DPTR,#PressTimesCount
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 92
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 7   
+
+                 R     MOV     DPTR,#ShortPressCount
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 93
+                                           ; SOURCE LINE # 94
+                                           ; SOURCE LINE # 95
+                       RET     
+             ?C0008:
+                                           ; SOURCE LINE # 97
+                                           ; SOURCE LINE # 98
+                       CLR     A
+                 R     MOV     DPTR,#keyState_prev
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 99
+                 R     MOV     DPTR,#Press
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 100
+                                           ; SOURCE LINE # 101
+                                           ; SOURCE LINE # 102
+             ?C0017:
+                       RET     
+             ; FUNCTION CS_KeyScan (END)
+
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 8   
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+s8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  CHAR     -----  1
+u8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+UART_CardProtcol . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+YC_UARTPARAM_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  15
+  uartCtrl . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pRxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  pTxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0004H  3
+  rxBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0007H  2
+  txBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0009H  2
+  baud . . . . . . . . . . . . . . . .  MEMBER   -----  U_LONG   000BH  4
+pxdbyte. . . . . . . . . . . . . . . .  TYPEDEF  DATA   PTR      -----  2
+YC_LedBlink. . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  6
+  active_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  gpio_num . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  light_time . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  dark_time. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+pdbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  1
+UART_HalfDuplex. . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+CS_Weight_T. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+UART_Parity. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+dbyte. . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_CHAR   -----  1
+CS_ComState. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  3
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+pxbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  2
+ibyte. . . . . . . . . . . . . . . . .  TYPEDEF  IDATA  U_CHAR   -----  1
+R_Scale_state. . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+CS_KeyScan . . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  keyState . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+  keyState_prev. . . . . . . . . . . .  STATIC   XDATA  U_CHAR   0000H  1
+  keyStateCnt. . . . . . . . . . . . .  STATIC   XDATA  U_CHAR   0001H  1
+  KeyPressDeal . . . . . . . . . . . .  STATIC   XDATA  U_CHAR   0002H  1
+  KeyLongPressDeal . . . . . . . . . .  STATIC   XDATA  U_CHAR   0003H  1
+  ShortPressCount. . . . . . . . . . .  STATIC   XDATA  U_CHAR   0004H  1
+  PressTimesCount. . . . . . . . . . .  STATIC   XDATA  U_CHAR   0005H  1
+  Press. . . . . . . . . . . . . . . .  STATIC   XDATA  U_CHAR   0006H  1
+s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
+YC_UARTPARAM . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  15
+  uartCtrl . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pRxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  pTxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0004H  3
+  rxBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0007H  2
+  txBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0009H  2
+  baud . . . . . . . . . . . . . . . .  MEMBER   -----  U_LONG   000BH  4
+bool . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+CS_Scale_ChangeUnit. . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+u32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+s16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  INT      -----  2
+xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
+u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
+C51 COMPILER V9.01   CS_SCALEKEY                                                           04/18/2017 13:28:34 PAGE 9   
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+byte . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+YC_UartCTRLBit_e . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+UART_DataLen . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+UART_BaudSet . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+_CS_Scale_CaliProc . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+YC_LedBlink_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  active_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  gpio_num . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  light_time . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  dark_time. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+UART_Enable. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+UART_EnableFlowControl . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+_YC_GPIOGetInputStatus . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+YC_UartCTRLBit . . . . . . . . . . . .  * TAG *  -----  ENUM     -----  -----
+_CS_Weight_T . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+_CS_ComState . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  3
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    252    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      7    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

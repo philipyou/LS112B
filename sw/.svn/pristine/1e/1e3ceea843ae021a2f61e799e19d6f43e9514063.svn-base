@@ -1,0 +1,3496 @@
+LX51 LINKER/LOCATER V4.41                                                               03/23/2017  16:17:30  PAGE 1
+
+
+LX51 LINKER/LOCATER V4.41, INVOKED BY:
+C:\KEIL51\C51\BIN\LX51.EXE OUT/MAIN.OBJ, OUT/SYSTEM.OBJ, OUT/YC_SYS.OBJ, OUT/YC_PERIPHERAL.OBJ, OUT/SPIFLASH.OBJ, OUT/BT
+>> _IPC.OBJ, OUT/YC_UTILITIES.OBJ, OUT/CS_SCALE_PROC.OBJ, OUT/CS_COMMTO1186.OBJ, OUT/CS_SCALEDISPLAY.OBJ, OUT/CS_SCALEKE
+>> Y.OBJ, OUT/RETATION_VARIABLE.OBJ, OUT/LXPROTOCOL.OBJ, OUT/CRC32.OBJ TO OUT\FW CLASSES (XDATA (X:0X4C80-X:0X4EFF), COD
+>> E (C:0-C:0XFFFF), DATA (D:0X10-0X7F), IDATA (I:0X80-0XCF)) SEGMENTS (?STACK (D:0XD0)) NOOVERLAY PAGELENGTH (60000) CO
+>> DE
+
+
+CPU MODE:     8051 MODE
+MEMORY MODEL: LARGE
+
+
+INPUT MODULES INCLUDED:
+  OUT/MAIN.OBJ (MAIN)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/SYSTEM.OBJ (SYSTEM)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/YC_SYS.OBJ (YC_SYS)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/YC_PERIPHERAL.OBJ (YC_PERIPHERAL)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/SPIFLASH.OBJ (SPIFLASH)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/BT_IPC.OBJ (BT_IPC)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/YC_UTILITIES.OBJ (YC_UTILITIES)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/CS_SCALE_PROC.OBJ (CS_SCALE_PROC)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/CS_COMMTO1186.OBJ (CS_COMMTO1186)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/CS_SCALEDISPLAY.OBJ (CS_SCALEDISPLAY)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/CS_SCALEKEY.OBJ (CS_SCALEKEY)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/RETATION_VARIABLE.OBJ (RETATION_VARIABLE)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/LXPROTOCOL.OBJ (LXPROTOCOL)
+         COMMENT TYPE 0: C51 V9.01
+  OUT/CRC32.OBJ (CRC32)
+         COMMENT TYPE 0: C51 V9.01
+  C:\KEIL51\C51\LIB\C51L.LIB (?C_STARTUP)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?COPY)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?CLDPTR)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?CLDOPTR)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?CSTPTR)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?CSTOPTR)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?UIDIV)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?ILDIX)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?LMUL)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?ULDIV)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?ULCMP)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?ULSHR)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?LSHL)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?LSTXDATA)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?LSTKXDATA)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?CCASE)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?ICASE)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?ICALL)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C?LIMUL)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+  C:\KEIL51\C51\LIB\C51L.LIB (?C_INIT)
+         COMMENT TYPE 1: A51 / ASM51 Assembler
+
+
+ACTIVE MEMORY CLASSES OF MODULE:  OUT\FW (MAIN)
+
+BASE        START       END         USED      MEMORY CLASS
+==========================================================
+X:000000H   X:004C80H   X:004EFFH   00026BH   XDATA
+C:000000H   C:000000H   C:00FFFFH   003E7AH   CODE
+I:000000H   I:000010H   I:00007FH   00001EH   DATA
+I:000000H   I:000080H   I:0000CFH   000001H   IDATA
+C:000000H   C:000000H   C:00FFFFH   000014H   CONST
+I:000020H.0 I:000020H.0 I:00002FH.7 000000H.2 BIT
+
+
+MEMORY MAP OF MODULE:  OUT\FW (MAIN)
+
+
+START     STOP      LENGTH    ALIGN  RELOC    MEMORY CLASS   SEGMENT NAME
+=========================================================================
+
+* * * * * * * * * * *   D A T A   M E M O R Y   * * * * * * * * * * * * *
+000000H   000007H   000008H   ---    AT..     DATA           "REG BANK 0"
+000008H   00000FH   000008H   ---    ---      **GAP**
+000010H   000016H   000007H   BYTE   UNIT     DATA           ?DT?_DMEMCPY?YC_UTILITIES
+000017H   00001CH   000006H   BYTE   UNIT     DATA           ?DT?_XMEMCPY?YC_UTILITIES
+00001DH   00001EH   000002H   BYTE   UNIT     DATA           ?DT?_XMEMSET?YC_UTILITIES
+00001FH   00001FH   000001H   BYTE   UNIT     DATA           ?DT?YC_UTILTIMERPROCESS?YC_SYS
+000020H.0 000020H.0 000000H.1 BIT    UNIT     BIT            ?BI?CS_SCALE_POWERONPROC?CS_SCALE_PROC
+000020H.1 000020H.1 000000H.1 BIT    UNIT     BIT            ?BI?CS_SCALE_PROC
+000020H.2 000020H   000000H.6 ---    ---      **GAP**
+000021H   000026H   000006H   BYTE   UNIT     DATA           ?DT?_CMEMCPY?YC_UTILITIES
+000027H   0000CFH   0000A9H   ---    ---      **GAP**
+0000D0H   0000D0H   000001H   BYTE   UNIT     IDATA          ?STACK
+
+* * * * * * * * * * *   C O D E   M E M O R Y   * * * * * * * * * * * * *
+000000H   000002H   000003H   ---    OFFS..   CODE           ?CO??C_STARTUP?0
+000003H   0003F4H   0003F2H   BYTE   UNIT     CODE           ?C?LIB_CODE
+0003F5H   000480H   00008CH   BYTE   UNIT     CODE           ?C_C51STARTUP
+000481H   0004B7H   000037H   BYTE   UNIT     CODE           ?C_INITSEG
+0004B8H   0004C1H   00000AH   BYTE   UNIT     CONST          ?CO?SYSTEM
+0004C2H   0004CBH   00000AH   BYTE   UNIT     CONST          ?CO?CS_COMMTO1186
+0004CCH   0004EDH   000022H   BYTE   UNIT     CODE           ?PR?MAIN?MAIN
+0004EEH   000531H   000044H   BYTE   UNIT     CODE           ?PR?CS_SCALE_1186COM?CS_COMMTO1186
+000532H   000596H   000065H   BYTE   UNIT     CODE           ?PR?CS_1186COM_SETLCD_PROC?CS_COMMTO1186
+000597H   0005A6H   000010H   BYTE   UNIT     CODE           ?PR?YC_UARTCLEARBUFFER?YC_PERIPHERAL
+0005A7H   0005E6H   000040H   BYTE   UNIT     CODE           ?PR?SYSSTATUSPROCESS?SYSTEM
+0005E7H   00065FH   000079H   BYTE   UNIT     CODE           ?PR?CS_1186COM_READTIME_PROC?CS_COMMTO1186
+000660H   000671H   000012H   BYTE   UNIT     CODE           ?PR?YC_UARTWAITSENDDATA?YC_PERIPHERAL
+000672H   000705H   000094H   BYTE   UNIT     CODE           ?PR?CS_1186COM_SETSLEEPMODE_PROC?CS_COMMTO1186
+000706H   00071FH   00001AH   BYTE   UNIT     CODE           ?PR?CS_1186COM_RESET_PROC?CS_COMMTO1186
+000720H   0007ACH   00008DH   BYTE   UNIT     CODE           ?PR?CS_1186COM_SETOPENWEIGHT_PROC?CS_COMMTO1186
+0007ADH   0007E0H   000034H   BYTE   UNIT     CODE           ?PR?LXOPTPROCESS?LXPROTOCOL
+0007E1H   00092AH   00014AH   BYTE   UNIT     CODE           ?PR?_YC_UARTRECIVEDATAEXPECTED?YC_PERIPHERAL
+00092BH   000982H   000058H   BYTE   UNIT     CODE           ?PR?SOFTTIMER_1SCALLBACK?SYSTEM
+000983H   000AA7H   000125H   BYTE   UNIT     CODE           ?PR?_CS_SCALE_TIMEOUTPROC?CS_SCALE_PROC
+000AA8H   000B52H   0000ABH   BYTE   UNIT     CODE           ?PR?_CS_SCALE_STANDBYPROC?CS_SCALE_PROC
+000B53H   000BBAH   000068H   BYTE   UNIT     CODE           ?PR?CS_SCALE_RETURNLOCK?CS_SCALE_PROC
+000BBBH   000C9AH   0000E0H   BYTE   UNIT     CODE           ?PR?_CS_SCALE_JUDGESTEADY?CS_SCALE_PROC
+000C9BH   000CD8H   00003EH   BYTE   UNIT     CODE           ?PR?_CS_SOFTTIMER?CS_SCALE_PROC
+000CD9H   000E1FH   000147H   BYTE   UNIT     CODE           ?PR?_CS_SCALE_STEADYPROC?CS_SCALE_PROC
+000E20H   000E54H   000035H   BYTE   UNIT     CODE           ?PR?CS_SCALEDISPLAY_STEADYFLASH?CS_SCALEDISPLAY
+000E55H   000EAAH   000056H   BYTE   UNIT     CODE           ?PR?CS_SCALE_PROC?CS_SCALE_PROC
+000EABH   000F70H   0000C6H   BYTE   UNIT     CODE           ?PR?CS_SCALEDISPLAY?CS_SCALEDISPLAY
+000F71H   000F8BH   00001BH   BYTE   UNIT     CODE           ?PR?CS_SCALEDISPLAY_LCDSHOWNODIGIT?CS_SCALEDISPLAY
+000F8CH   000FB4H   000029H   BYTE   UNIT     CODE           ?PR?CS_SCALEDISPLAY_LCDRESTORE?CS_SCALEDISPLAY
+000FB5H   000FC6H   000012H   BYTE   UNIT     CODE           ?PR?_CS_SCALE_JUDGELOWBAT?CS_SCALE_PROC
+000FC7H   000FF0H   00002AH   BYTE   UNIT     CODE           ?PR?CS_SCALE_WEIGHTPROC?CS_SCALE_PROC
+000FF1H   00103BH   00004BH   BYTE   UNIT     CODE           ?PR?_CS_SCALE_JUDGEOVERLOAD?CS_SCALE_PROC
+00103CH   001063H   000028H   BYTE   UNIT     CODE           ?PR?SOFTTIMER_10MSCALLBACK?SYSTEM
+001064H   001134H   0000D1H   BYTE   UNIT     CODE           ?PR?CS_KEYSCAN?CS_SCALEKEY
+001135H   001611H   0004DDH   BYTE   UNIT     CODE           ?PR?_CS_SCALE_CALIPROC?CS_SCALE_PROC
+001612H   0017CDH   0001BCH   BYTE   UNIT     CODE           ?PR?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY
+0017CEH   0017DDH   000010H   BYTE   UNIT     CODE           ?PR?_CS_SCALEDISPLAY_LOOKUPTABLE?CS_SCALEDISPLAY
+0017DEH   00192CH   00014FH   BYTE   UNIT     CODE           ?PR?_CS_SCALE_GETWEIGHT?CS_SCALE_PROC
+00192DH   0019EDH   0000C1H   BYTE   UNIT     CODE           ?PR?SYSTEMINIT?SYSTEM
+0019EEH   001A22H   000035H   BYTE   UNIT     CODE           ?PR?_YC_GPIOGETINPUTSTATUS?YC_PERIPHERAL
+001A23H   001AE5H   0000C3H   BYTE   UNIT     CODE           ?PR?YC_UTILTIMERINIT?YC_SYS
+001AE6H   001C14H   00012FH   BYTE   UNIT     CODE           ?PR?_YC_UTILTIMERSTART?YC_SYS
+001C15H   001D53H   00013FH   BYTE   UNIT     CODE           ?PR?_YC_UTILTIMERSTARTMS?YC_SYS
+001D54H   001D85H   000032H   BYTE   UNIT     CODE           ?PR?CS_SCALE_POWERON?CS_SCALE_PROC
+001D86H   001DCEH   000049H   BYTE   UNIT     CODE           ?PR?_SPIFLASHOPERATOR?LXPROTOCOL
+001DCFH   001F10H   000142H   BYTE   UNIT     CODE           ?PR?_LXRECVDATAFROMAPP?LXPROTOCOL
+001F11H   001F19H   000009H   BYTE   UNIT     CODE           ?PR?_CHANGELXOPTSTATUS?LXPROTOCOL
+001F1AH   001F37H   00001EH   BYTE   UNIT     CODE           ?PR?_XMEMSET?YC_UTILITIES
+001F38H   001F56H   00001FH   BYTE   UNIT     CODE           ?PR?DELUSERDATA?LXPROTOCOL
+001F57H   001F60H   00000AH   BYTE   UNIT     CODE           ?PR?QUEUEINIT?LXPROTOCOL
+001F61H   001F93H   000033H   BYTE   UNIT     CODE           ?PR?_LXSENDRECVDATAACK?LXPROTOCOL
+001F94H   001FABH   000018H   BYTE   UNIT     CODE           ?PR?_YC_DELAY10MS?YC_UTILITIES
+001FACH   001FE2H   000037H   BYTE   UNIT     CODE           ?PR?_XMEMCPY?YC_UTILITIES
+001FE3H   00200DH   00002BH   BYTE   UNIT     CODE           ?PR?_GENERATECHECKSUM?SYSTEM
+00200EH   002092H   000085H   BYTE   UNIT     CODE           ?PR?BTCONTROLPROCESS?SYSTEM
+002093H   002195H   000103H   BYTE   UNIT     CODE           ?PR?_BT_EVENTFIFOOUT?BT_IPC
+002196H   0021C3H   00002EH   BYTE   UNIT     CODE           ?PR?BT_GETEVTFIFODEPTH?BT_IPC
+0021C4H   00221CH   000059H   BYTE   UNIT     CODE           ?PR?_YC_UTILTIMERSTOP?YC_SYS
+00221DH   00247FH   000263H   BYTE   UNIT     CODE           ?PR?YC_UTILTIMERPROCESS?YC_SYS
+002480H   00257EH   0000FFH   BYTE   UNIT     CODE           ?PR?_YC_UARTSENDDATA?YC_PERIPHERAL
+00257FH   0025C8H   00004AH   BYTE   UNIT     CODE           ?PR?SPIFLASHREADSR?SPIFLASH
+0025C9H   0025DAH   000012H   BYTE   UNIT     CODE           ?PR?SPIFLASHWAITBUSY?SPIFLASH
+0025DBH   002650H   000076H   BYTE   UNIT     CODE           ?PR?_SPIFLASHERASESECTOR?SPIFLASH
+002651H   002711H   0000C1H   BYTE   UNIT     CODE           ?PR?_SPIFLASHWRITE?SPIFLASH
+002712H   00273DH   00002CH   BYTE   UNIT     CODE           ?PR?SPIFLASHWRITEENABLE?SPIFLASH
+00273EH   002755H   000018H   BYTE   UNIT     CODE           ?PR?_YC_DELAY1MS?YC_UTILITIES
+002756H   0027F0H   00009BH   BYTE   UNIT     CODE           ?PR?_SPIFLASHREAD?SPIFLASH
+0027F1H   002910H   000120H   BYTE   UNIT     CODE           ?PR?_BT_CMDFIFOIN?BT_IPC
+002911H   00293EH   00002EH   BYTE   UNIT     CODE           ?PR?BT_GETCMDFIFODEPTH?BT_IPC
+00293FH   002947H   000009H   BYTE   UNIT     CODE           ?PR?BT_CMDFIFOEMPTY?BT_IPC
+002948H   00297CH   000035H   BYTE   UNIT     CODE           ?PR?_BT_CMDFIFOFULL?BT_IPC
+00297DH   002983H   000007H   BYTE   UNIT     CODE           ?PR?YC_ICE_BREAK?YC_UTILITIES
+002984H   0029B7H   000034H   BYTE   UNIT     CODE           ?PR?_DMEMCPY?YC_UTILITIES
+0029B8H   002C0AH   000253H   BYTE   UNIT     CODE           ?PR?SENDHISTORYDATA?LXPROTOCOL
+002C0BH   002C64H   00005AH   BYTE   UNIT     CODE           ?PR?QUEUEPOP?LXPROTOCOL
+002C65H   002D1FH   0000BBH   BYTE   UNIT     CODE           ?PR?_BIGLITTLEENDIANSWAP?LXPROTOCOL
+002D20H   002D7CH   00005DH   BYTE   UNIT     CODE           ?PR?_QUEUEPUSH?LXPROTOCOL
+002D7DH   002D84H   000008H   BYTE   UNIT     CODE           ?PR?SENDMEASUREDATA?LXPROTOCOL
+002D85H   002DCBH   000047H   BYTE   UNIT     CODE           ?PR?_LXSETTINGDEVICERESPONE?LXPROTOCOL
+002DCCH   002EC7H   0000FCH   BYTE   UNIT     CODE           ?PR?_CAL_CRC32_MULTIPLE?CRC32
+002EC8H   002EFEH   000037H   BYTE   UNIT     CODE           ?PR?_CMEMCPY?YC_UTILITIES
+002EFFH   002F54H   000056H   BYTE   UNIT     CODE           ?PR?_YC_MEMCHECKEMPTY?YC_UTILITIES
+002F55H   002F7AH   000026H   BYTE   UNIT     CODE           ?PR?_YC_DELAY1S?YC_UTILITIES
+002F7BH   002FDBH   000061H   BYTE   UNIT     CODE           ?PR?_CS_SCALE_GETDELTAAD?CS_SCALE_PROC
+002FDCH   00338BH   0003B0H   BYTE   UNIT     CODE           ?PR?_CS_SCALE_ADCFILTER?CS_SCALE_PROC
+00338CH   0033BDH   000032H   BYTE   UNIT     CODE           ?PR?CS_SCALE_CHANGEUNIT?CS_SCALE_PROC
+0033BEH   003604H   000247H   BYTE   UNIT     CODE           ?PR?_CS_SCALE_ZEROPROC?CS_SCALE_PROC
+003605H   003671H   00006DH   BYTE   UNIT     CODE           ?PR?_CS_SCALE_LOCKPROC?CS_SCALE_PROC
+003672H   003721H   0000B0H   BYTE   UNIT     CODE           ?PR?CS_1186COM_READADZERO_PROC?CS_COMMTO1186
+003722H   003757H   000036H   BYTE   UNIT     CODE           ?PR?_CS_MEMORYWEIGHTCLEAR_TIMER?CS_SCALE_PROC
+003758H   003870H   000119H   BYTE   UNIT     CODE           ?PR?CS_SCALE_POWERONPROC?CS_SCALE_PROC
+003871H   003923H   0000B3H   BYTE   UNIT     CODE           ?PR?CS_1186COM_READMACADRESS_PROC?CS_COMMTO1186
+003924H   003C28H   000305H   BYTE   UNIT     CODE           ?PR?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186
+003C29H   003C82H   00005AH   BYTE   UNIT     CODE           ?PR?_CS_COMMTO1186_XOR?CS_COMMTO1186
+003C83H   003CD2H   000050H   BYTE   UNIT     CODE           ?PR?CS_SCALEDISPLAY_DEBUG?CS_SCALEDISPLAY
+003CD3H   003D0EH   00003CH   BYTE   UNIT     CODE           ?PR?CS_SCALEDISPLAY_LCDBUF_RSHIFT4?CS_SCALEDISPLAY
+003D0FH   003D79H   00006BH   BYTE   UNIT     CODE           ?PR?_CS_SCALEDISPLAY_HEXTOBCD?CS_SCALEDISPLAY
+003D7AH   003E47H   0000CEH   BYTE   UNIT     CODE           ?PR?CS_1186COM_READADC_PROC?CS_COMMTO1186
+003E48H   003E55H   00000EH   BYTE   UNIT     CODE           ?PR?CS_SCALEDISPLAY_LCDSHOWNULL?CS_SCALEDISPLAY
+003E56H   003E64H   00000FH   BYTE   UNIT     CODE           ?PR?CS_SCALEDISPLAY_LCDSHOWALL?CS_SCALEDISPLAY
+003E65H   003E8DH   000029H   BYTE   UNIT     CODE           ?PR?CS_SCALEDISPLAY_LCDBACKUP?CS_SCALEDISPLAY
+
+* * * * * * * * * * *  X D A T A   M E M O R Y  * * * * * * * * * * * * *
+004A00H   004A01H   000002H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?10
+004A02H   004A03H   000002H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?11
+004A04H   004A05H   000002H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?5
+004A06H   004A07H   000002H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?6
+004A08H   004BFFH   0001F8H   ---    ---      **GAP**
+004C00H   004C05H   000006H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?3
+004C06H   004C0FH   00000AH   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?1
+004C10H   004C4EH   00003FH   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?8
+004C4FH   004C58H   00000AH   ---    ---      **GAP**
+004C59H   004C59H   000001H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?7
+004C5AH   004C5AH   000001H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?9
+004C5BH   004C5BH   000001H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?13
+004C5CH   004C5CH   000001H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?4
+004C5DH   004C5DH   000001H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?12
+004C5EH   004C61H   000004H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?0
+004C62H   004C62H   000001H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?14
+004C63H   004C7BH   000019H   BYTE   OFFS..   XDATA          ?XD?RETATION_VARIABLE?2
+004C7CH   004C7FH   000004H   ---    ---      **GAP**
+004C80H   004CDAH   00005BH   BYTE   UNIT     XDATA          ?XD?CS_SCALE_PROC
+004CDBH   004D17H   00003DH   BYTE   UNIT     XDATA          ?XD?YC_SYS
+004D18H   004D3FH   000028H   BYTE   UNIT     XDATA          ?XD?CS_SCALEDISPLAY
+004D40H   004D64H   000025H   BYTE   UNIT     XDATA          ?XD?CS_COMMTO1186
+004D65H   004D7DH   000019H   BYTE   UNIT     XDATA          ?XD?BTCONTROLPROCESS?SYSTEM
+004D7EH   004D8CH   00000FH   BYTE   UNIT     XDATA          ?XD?_CS_COMMTO1186_SENDCMD?CS_COMMTO1186
+004D8DH   004D9BH   00000FH   BYTE   UNIT     XDATA          ?XD?_CAL_CRC32_MULTIPLE?CRC32
+004D9CH   004DA9H   00000EH   BYTE   UNIT     XDATA          ?XD?_CS_SCALE_GETWEIGHT?CS_SCALE_PROC
+004DAAH   004DB3H   00000AH   BYTE   UNIT     XDATA          ?XD?SOFTTIMER_1SCALLBACK?SYSTEM
+004DB4H   004DBDH   00000AH   BYTE   UNIT     XDATA          ?XD?_YC_UARTSENDDATA?YC_PERIPHERAL
+004DBEH   004DC7H   00000AH   BYTE   UNIT     XDATA          ?XD?_BIGLITTLEENDIANSWAP?LXPROTOCOL
+004DC8H   004DD1H   00000AH   BYTE   UNIT     XDATA          ?XD?SENDHISTORYDATA?LXPROTOCOL
+004DD2H   004DDAH   000009H   BYTE   UNIT     XDATA          ?XD?_YC_UARTRECIVEDATAEXPECTED?YC_PERIPHERAL
+004DDBH   004DE2H   000008H   BYTE   UNIT     XDATA          ?XD?_YC_UTILTIMERSTART?YC_SYS
+004DE3H   004DEAH   000008H   BYTE   UNIT     XDATA          ?XD?_YC_UTILTIMERSTARTMS?YC_SYS
+004DEBH   004DF2H   000008H   BYTE   UNIT     XDATA          ?XD?_SPIFLASHWRITE?SPIFLASH
+004DF3H   004DFAH   000008H   BYTE   UNIT     XDATA          ?XD?_SPIFLASHREAD?SPIFLASH
+004DFBH   004E02H   000008H   BYTE   UNIT     XDATA          ?XD?_CS_SCALE_ZEROPROC?CS_SCALE_PROC
+004E03H   004E0AH   000008H   BYTE   UNIT     XDATA          ?XD?_CS_SCALE_STEADYPROC?CS_SCALE_PROC
+004E0BH   004E12H   000008H   BYTE   UNIT     XDATA          ?XD?_CS_SCALE_CALIPROC?CS_SCALE_PROC
+004E13H   004E19H   000007H   BYTE   UNIT     XDATA          ?XD?_BT_CMDFIFOIN?BT_IPC
+004E1AH   004E20H   000007H   BYTE   UNIT     XDATA          ?XD?_CS_SCALE_ADCFILTER?CS_SCALE_PROC
+004E21H   004E27H   000007H   BYTE   UNIT     XDATA          ?XD?CS_SCALEKEY
+004E28H   004E2DH   000006H   BYTE   UNIT     XDATA          ?XD?_CS_SCALEDISPLAY_HEXTOBCD?CS_SCALEDISPLAY
+004E2EH   004E33H   000006H   BYTE   UNIT     XDATA          ?XD?_LXRECVDATAFROMAPP?LXPROTOCOL
+004E34H   004E39H   000006H   BYTE   UNIT     XDATA          ?XD?SENDMEASUREDATA?LXPROTOCOL
+004E3AH   004E3EH   000005H   BYTE   UNIT     XDATA          ?XD?_BT_EVENTFIFOOUT?BT_IPC
+004E3FH   004E43H   000005H   BYTE   UNIT     XDATA          ?XD?CS_SCALEDISPLAY_DEBUG?CS_SCALEDISPLAY
+004E44H   004E47H   000004H   BYTE   UNIT     XDATA          ?XD?_SPIFLASHERASESECTOR?SPIFLASH
+004E48H   004E4BH   000004H   BYTE   UNIT     XDATA          ?XD?_YC_MEMCHECKEMPTY?YC_UTILITIES
+004E4CH   004E4FH   000004H   BYTE   UNIT     XDATA          ?XD?CRC32
+004E50H   004E52H   000003H   BYTE   UNIT     XDATA          ?XD?_GENERATECHECKSUM?SYSTEM
+004E53H   004E55H   000003H   BYTE   UNIT     XDATA          ?XD?_BT_CMDFIFOFULL?BT_IPC
+004E56H   004E58H   000003H   BYTE   UNIT     XDATA          ?XD?_CS_SCALE_GETDELTAAD?CS_SCALE_PROC
+004E59H   004E5BH   000003H   BYTE   UNIT     XDATA          ?XD?CS_1186COM_READMACADRESS_PROC?CS_COMMTO1186
+004E5CH   004E5EH   000003H   BYTE   UNIT     XDATA          ?XD?_CS_COMMTO1186_XOR?CS_COMMTO1186
+004E5FH   004E61H   000003H   BYTE   UNIT     XDATA          ?XD?QUEUEPOP?LXPROTOCOL
+004E62H   004E64H   000003H   BYTE   UNIT     XDATA          ?XD?_QUEUEPUSH?LXPROTOCOL
+004E65H   004E66H   000002H   BYTE   UNIT     XDATA          ?XD?SYSTEM
+004E67H   004E68H   000002H   BYTE   UNIT     XDATA          ?XD?_CS_SCALE_JUDGESTEADY?CS_SCALE_PROC
+004E69H   004E6AH   000002H   BYTE   UNIT     XDATA          ?XD?CS_SCALE_RETURNLOCK?CS_SCALE_PROC
+004E6BH   004E6BH   000001H   BYTE   UNIT     XDATA          ?XD?YC_UTILTIMERINIT?YC_SYS
+004E6CH   004E6CH   000001H   BYTE   UNIT     XDATA          ?XD?SPIFLASHREADSR?SPIFLASH
+004E6DH   004E6DH   000001H   BYTE   UNIT     XDATA          ?XD?_CS_SCALEDISPLAY_FRESHBUF?CS_SCALEDISPLAY
+004E6EH   004E6EH   000001H   BYTE   UNIT     XDATA          ?XD?RETATION_VARIABLE
+004E6FH   004E6FH   000001H   BYTE   UNIT     XDATA          ?XD?LXPROTOCOL
+004E70H   004E70H   000001H   BYTE   UNIT     XDATA          ?XD?_SPIFLASHOPERATOR?LXPROTOCOL
+
+
+
+PUBLIC SYMBOLS OF MODULE:  OUT\FW (MAIN)
+
+
+      VALUE       CLASS    TYPE      PUBLIC SYMBOL NAME
+      =================================================
+      02004D8DH   XDATA    BYTE      ?_cal_crc32_multiple?BYTE
+      00000021H   DATA     BYTE      ?_cmemcpy?BYTE
+      00000010H   DATA     BYTE      ?_dmemcpy?BYTE
+      02004DF3H   XDATA    BYTE      ?_SPIFlashRead?BYTE
+      02004DEBH   XDATA    BYTE      ?_SPIFlashWrite?BYTE
+      00000017H   DATA     BYTE      ?_xmemcpy?BYTE
+      02004DDBH   XDATA    BYTE      ?_YC_UtilTimerStart?BYTE
+      02004DE3H   XDATA    BYTE      ?_YC_UtilTimerStartMs?BYTE
+      0100036FH   CODE     ---       ?C?CCASE
+      01000112H   CODE     ---       ?C?CLDOPTR
+      010000F9H   CODE     ---       ?C?CLDPTR
+      00000000H   NUMBER   ---       ?C?CODESEG
+      010000D3H   CODE     ---       ?C?COPY
+      01000151H   CODE     ---       ?C?CSTOPTR
+      0100013FH   CODE     ---       ?C?CSTPTR
+      010003C2H   CODE     ---       ?C?ICALL
+      010003C6H   CODE     ---       ?C?ICALL2
+      01000395H   CODE     ---       ?C?ICASE
+      010001C8H   CODE     ---       ?C?ILDIX
+      010003C8H   CODE     ---       ?C?LIMUL
+      010001DEH   CODE     ---       ?C?LMUL
+      0100031FH   CODE     ---       ?C?LSHL
+      0100033EH   CODE     ---       ?C?LSTKXDATA
+      01000332H   CODE     ---       ?C?LSTXDATA
+      01000173H   CODE     ---       ?C?UIDIV
+      010002FBH   CODE     ---       ?C?ULCMP
+      01000269H   CODE     ---       ?C?ULDIV
+      0100030CH   CODE     ---       ?C?ULSHR
+      00000000H   NUMBER   ---       ?C?XDATASEG
+      0100043CH   CODE     ---       ?C_START
+      01000000H   CODE     ---       ?C_STARTUP
+      00000020H.0 BIT      BIT       ?CS_Scale_PowerOnProc?BIT
+      02004E34H   XDATA    BYTE      ?sendMeasureData?BYTE
+      01002948H   CODE     ---       _BT_CmdFifoFull
+      010027F1H   CODE     ---       _BT_CmdFifoIn
+      01002093H   CODE     ---       _BT_EventFifoOut
+      01002DCCH   CODE     ---       _cal_crc32_multiple
+      01001F11H   CODE     ---       _changeLxOptStatus
+      01002EC8H   CODE     ---       _cmemcpy
+      01003924H   CODE     ---       _CS_CommTo1186_SendCmd
+      01003C29H   CODE     ---       _CS_CommTo1186_Xor
+      01003722H   CODE     ---       _CS_MemoryWeightClear_Timer
+      01002FDCH   CODE     ---       _CS_Scale_AdcFilter
+      01001135H   CODE     ---       _CS_Scale_CaliProc
+      01002F7BH   CODE     ---       _CS_Scale_GetDeltaAD
+      010017DEH   CODE     ---       _CS_Scale_GetWeight
+      01000FB5H   CODE     ---       _CS_Scale_JudgeLowBat
+      01000FF1H   CODE     ---       _CS_Scale_JudgeOverLoad
+      01000BBBH   CODE     ---       _CS_Scale_JudgeSteady
+      01003605H   CODE     ---       _CS_Scale_LockProc
+      01000AA8H   CODE     ---       _CS_Scale_StandbyProc
+      01000CD9H   CODE     ---       _CS_Scale_SteadyProc
+      01000983H   CODE     ---       _CS_Scale_TimeOutProc
+      010033BEH   CODE     ---       _CS_Scale_ZeroProc
+      01001612H   CODE     ---       _CS_ScaleDisplay_FreshBuf
+      01003D0FH   CODE     ---       _CS_ScaleDisplay_HexToBcd
+      010017CEH   CODE     ---       _CS_ScaleDisplay_LookUpTable
+      01000C9BH   CODE     ---       _CS_SoftTimer
+      01002984H   CODE     ---       _dmemcpy
+      01001FE3H   CODE     ---       _generateChecksum
+      01001DCFH   CODE     ---       _lxRecvDataFromApp
+      010025DBH   CODE     ---       _SPIFlashEraseSector
+      01001D86H   CODE     ---       _SpiFlashOperator
+      01002756H   CODE     ---       _SPIFlashRead
+      01002651H   CODE     ---       _SPIFlashWrite
+      01001FACH   CODE     ---       _xmemcpy
+      01001F1AH   CODE     ---       _xmemset
+      01001F94H   CODE     ---       _YC_Delay10ms
+      0100273EH   CODE     ---       _YC_Delay1ms
+      01002F55H   CODE     ---       _YC_Delay1S
+      010019EEH   CODE     ---       _YC_GPIOGetInputStatus
+      01002EFFH   CODE     ---       _YC_MemCheckEmpty
+      010007E1H   CODE     ---       _YC_UARTReciveDataExpected
+      01002480H   CODE     ---       _YC_UARTSendData
+      01001AE6H   CODE     ---       _YC_UtilTimerStart
+      01001C15H   CODE     ---       _YC_UtilTimerStartMs
+      010021C4H   CODE     ---       _YC_UtilTimerStop
+      00000020H.1 BIT      BIT       B_Debug_Test
+      02004CD7H   XDATA    BYTE      B_Weight_AdOk
+      02004C5BH   XDATA    BYTE      bleConnStatus
+      0100293FH   CODE     ---       BT_CmdFifoEmpty
+      02004A00H   XDATA    WORD      BT_CmdRptr
+      02004A02H   XDATA    WORD      BT_CmdWptr
+      02004A04H   XDATA    WORD      BT_EventRptr
+      02004A06H   XDATA    WORD      BT_EventWptr
+      01002911H   CODE     ---       BT_GetCmdFifoDepth
+      01002196H   CODE     ---       BT_GetEvtFifoDepth
+      02004C63H   XDATA    ---       btCmdBuf
+      0100200EH   CODE     ---       BTControlProcess
+      01003D7AH   CODE     ---       CS_1186Com_ReadAdc_Proc
+      01003672H   CODE     ---       CS_1186Com_ReadAdZero_Proc
+      01003871H   CODE     ---       CS_1186Com_ReadMacAdress_Proc
+      010005E7H   CODE     ---       CS_1186Com_ReadTime_Proc
+      01000706H   CODE     ---       CS_1186Com_Reset_Proc
+      01000532H   CODE     ---       CS_1186Com_SetLcd_Proc
+      01000720H   CODE     ---       CS_1186Com_SetOpenWeight_Proc
+      01000672H   CODE     ---       CS_1186Com_SetSleepMode_Proc
+      01001064H   CODE     ---       CS_KeyScan
+      02004D23H   XDATA    ---       CS_Lcd_Send_Data
+      02004D1DH   XDATA    ---       CS_Lcd_Send_Data_BAK
+      02004D29H   XDATA    ---       CS_Lcd_Table
+      010004EEH   CODE     ---       CS_Scale_1186Com
+      0100338CH   CODE     ---       CS_Scale_ChangeUnit
+      01001D54H   CODE     ---       CS_Scale_PowerOn
+      01003758H   CODE     ---       CS_Scale_PowerOnProc
+      01000E55H   CODE     ---       CS_Scale_Proc
+      01000B53H   CODE     ---       CS_Scale_ReturnLock
+      01000FC7H   CODE     ---       CS_Scale_WeightProc
+      01000EABH   CODE     ---       CS_ScaleDisplay
+      01003C83H   CODE     ---       CS_ScaleDisplay_Debug
+      01003E65H   CODE     ---       CS_ScaleDisplay_LcdBackup
+      01003CD3H   CODE     ---       CS_ScaleDisplay_LcdBuf_rShift4
+      01000F8CH   CODE     ---       CS_ScaleDisplay_LcdRestore
+      01003E56H   CODE     ---       CS_ScaleDisplay_LcdShowAll
+      01000F71H   CODE     ---       CS_ScaleDisplay_LcdShowNoDigit
+      01003E48H   CODE     ---       CS_ScaleDisplay_LcdShowNull
+      01000E20H   CODE     ---       CS_ScaleDisplay_SteadyFlash
+      02004C06H   XDATA    ---       deviceInfo
+      02004C5DH   XDATA    BYTE      handleIndicationConfirm
+      02004C10H   XDATA    ---       historyUserData
+      010007ADH   CODE     ---       lxOptProcess
+      02004C5CH   XDATA    BYTE      lxOptStatus
+      010004CCH   CODE     ---       main
+      02004C59H   XDATA    BYTE      notifyValueUUIDA621
+      02004C5AH   XDATA    BYTE      notifyValueUUIDA625
+      01001F57H   CODE     ---       QueueInit
+      02004CD3H   XDATA    ---       R_1186_RTC
+      02004CDAH   XDATA    BYTE      R_1186sys_state
+      02004CD8H   XDATA    WORD      R_AD_Original
+      02004CC7H   XDATA    WORD      R_Debug_temp
+      02004CC2H   XDATA    BYTE      R_Display_Err
+      02004CC5H   XDATA    BYTE      R_Scale_state
+      02004CC6H   XDATA    BYTE      R_Selet_Unit
+      02004C62H   XDATA    BYTE      R_Test
+      02004CC9H   XDATA    ---       R_UnitWeight
+      02004D50H   XDATA    ---       R_Weight_Com_Coo
+      02004CC0H   XDATA    WORD      R_Weight_Lock
+      02004CC3H   XDATA    WORD      R_Weight_Mem
+      01002D7DH   CODE     ---       sendMeasureData
+      02004C00H   XDATA    ---       sensor_data
+      0100103CH   CODE     ---       SoftTimer_10mSCallback
+      02004E66H   XDATA    BYTE      SoftTimer_10msTimerID
+      0100092BH   CODE     ---       SoftTimer_1SCallback
+      02004E65H   XDATA    BYTE      SoftTimer_1STimerID
+      0100257FH   CODE     ---       SPIFlashReadSR
+      010025CEH   CODE     ---       SPIFlashWaitBusy
+      01002712H   CODE     ---       SPIFlashWriteEnable
+      02004E6EH   XDATA    BYTE      sys_state
+      010005A7H   CODE     ---       SysStatusProcess
+      0100192DH   CODE     ---       systemInit
+      02004D40H   XDATA    ---       uartRcvBuf
+      02004D64H   XDATA    BYTE      uartTimeoutCnt
+      02004D54H   XDATA    ---       uartTxBuf
+      02004C5EH   XDATA    LONG      UTCTime
+      0100297DH   CODE     ---       YC_Ice_break
+      01000597H   CODE     ---       YC_UARTClearBuffer
+      01000660H   CODE     ---       YC_UARTWaitSendData
+      01001A23H   CODE     ---       YC_UtilTimerInit
+      0100221DH   CODE     ---       YC_UtilTimerProcess
+
+
+
+SYMBOL TABLE OF MODULE:  OUT\FW (MAIN)
+
+      VALUE       REP       CLASS    TYPE      SYMBOL NAME
+      ====================================================
+      ---         MODULE    ---      ---       MAIN
+      010004CCH   PUBLIC    CODE     ---       main
+
+      010004CCH   BLOCK     CODE     ---       LVL=0
+      010004CCH   LINE      ---      ---       #20
+      010004CCH   LINE      ---      ---       #21
+      010004CCH   LINE      ---      ---       #22
+      010004D2H   LINE      ---      ---       #23
+      010004D5H   LINE      ---      ---       #24
+      010004D5H   LINE      ---      ---       #25
+      010004D8H   LINE      ---      ---       #26
+      010004DAH   LINE      ---      ---       #28
+      010004DCH   LINE      ---      ---       #29
+      010004E3H   LINE      ---      ---       #30
+      010004E6H   LINE      ---      ---       #31
+      010004E8H   LINE      ---      ---       #32
+      010004EBH   LINE      ---      ---       #33
+      010004EBH   LINE      ---      ---       #34
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      ---         MODULE    ---      ---       SYSTEM
+      02004E66H   PUBLIC    XDATA    BYTE      SoftTimer_10msTimerID
+      02004E65H   PUBLIC    XDATA    BYTE      SoftTimer_1STimerID
+      010005A7H   PUBLIC    CODE     ---       SysStatusProcess
+      0100200EH   PUBLIC    CODE     ---       BTControlProcess
+      01001FE3H   PUBLIC    CODE     ---       _generateChecksum
+      0100192DH   PUBLIC    CODE     ---       systemInit
+      0100103CH   PUBLIC    CODE     ---       SoftTimer_10mSCallback
+      0100092BH   PUBLIC    CODE     ---       SoftTimer_1SCallback
+
+      0100092BH   BLOCK     CODE     ---       LVL=0
+      0100092BH   LINE      ---      ---       #20
+      0100092BH   LINE      ---      ---       #21
+      0100092BH   BLOCK     CODE     NEAR LAB  LVL=1
+      0100092BH   LINE      ---      ---       #22
+      0100093EH   LINE      ---      ---       #24
+      01000955H   LINE      ---      ---       #26
+      01000959H   LINE      ---      ---       #27
+      0100095EH   LINE      ---      ---       #28
+      02004DAAH   SYMBOL    XDATA    VOID      buf
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      0100103CH   BLOCK     CODE     ---       LVL=0
+      0100103CH   LINE      ---      ---       #43
+      0100103CH   LINE      ---      ---       #44
+      0100103CH   LINE      ---      ---       #45
+      01001053H   LINE      ---      ---       #47
+      0100105CH   LINE      ---      ---       #48
+      0100105FH   LINE      ---      ---       #49
+      0100105FH   LINE      ---      ---       #52
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      0100192DH   BLOCK     CODE     ---       LVL=0
+      0100192DH   LINE      ---      ---       #58
+      0100192DH   LINE      ---      ---       #59
+      0100192DH   LINE      ---      ---       #60
+      01001932H   LINE      ---      ---       #61
+      0100193AH   LINE      ---      ---       #62
+      0100193AH   LINE      ---      ---       #63
+      01001940H   LINE      ---      ---       #64
+      01001945H   LINE      ---      ---       #66
+      01001947H   LINE      ---      ---       #68
+      0100194BH   LINE      ---      ---       #69
+      01001950H   LINE      ---      ---       #70
+      01001958H   LINE      ---      ---       #71
+      01001958H   LINE      ---      ---       #72
+      01001962H   LINE      ---      ---       #73
+      01001962H   LINE      ---      ---       #74
+      0100196AH   LINE      ---      ---       #76
+      0100196CH   LINE      ---      ---       #77
+      01001982H   LINE      ---      ---       #78
+      01001998H   LINE      ---      ---       #79
+      0100199AH   LINE      ---      ---       #81
+      0100199CH   LINE      ---      ---       #82
+      0100199CH   LINE      ---      ---       #83
+      010019A8H   LINE      ---      ---       #84
+      010019A8H   LINE      ---      ---       #85
+      010019AEH   LINE      ---      ---       #86
+      010019B2H   LINE      ---      ---       #87
+      010019B4H   LINE      ---      ---       #88
+      010019CAH   LINE      ---      ---       #89
+      010019E0H   LINE      ---      ---       #95
+      010019E2H   LINE      ---      ---       #96
+      010019E2H   LINE      ---      ---       #97
+      010019E8H   LINE      ---      ---       #98
+      010019E8H   LINE      ---      ---       #99
+      010019E8H   LINE      ---      ---       #100
+      010019EDH   LINE      ---      ---       #101
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01001FE3H   BLOCK     CODE     ---       LVL=0
+      01001FE3H   LINE      ---      ---       #103
+      01001FEEH   LINE      ---      ---       #104
+      01001FEEH   BLOCK     CODE     NEAR LAB  LVL=1
+      01001FEEH   LINE      ---      ---       #106
+      01001FF0H   LINE      ---      ---       #107
+      01001FF6H   LINE      ---      ---       #108
+      0100200BH   LINE      ---      ---       #109
+      0100200DH   LINE      ---      ---       #110
+      0100200DH   LINE      ---      ---       #111
+      00000007H   SYMBOL    DATA     VOID      result
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      0100200EH   BLOCK     CODE     ---       LVL=0
+      0100200EH   LINE      ---      ---       #113
+      0100200EH   LINE      ---      ---       #114
+      0100200EH   BLOCK     CODE     NEAR LAB  LVL=1
+      0100200EH   LINE      ---      ---       #117
+      01002016H   LINE      ---      ---       #118
+      0100201CH   LINE      ---      ---       #119
+      0100201CH   LINE      ---      ---       #121
+      01002030H   LINE      ---      ---       #122
+      01002030H   LINE      ---      ---       #123
+      01002030H   LINE      ---      ---       #124
+      01002030H   LINE      ---      ---       #125
+      01002035H   LINE      ---      ---       #126
+      01002039H   LINE      ---      ---       #127
+      0100203DH   LINE      ---      ---       #128
+      0100203EH   LINE      ---      ---       #129
+      0100203EH   LINE      ---      ---       #130
+      01002043H   LINE      ---      ---       #131
+      01002048H   LINE      ---      ---       #132
+      01002049H   LINE      ---      ---       #133
+      01002049H   LINE      ---      ---       #134
+      01002052H   LINE      ---      ---       #135
+      01002052H   LINE      ---      ---       #136
+      01002052H   LINE      ---      ---       #137
+      0100205AH   LINE      ---      ---       #138
+      0100205AH   LINE      ---      ---       #139
+      01002062H   LINE      ---      ---       #140
+      01002064H   LINE      ---      ---       #141
+      01002068H   LINE      ---      ---       #142
+      01002068H   LINE      ---      ---       #143
+      01002070H   LINE      ---      ---       #144
+      01002070H   LINE      ---      ---       #146
+      01002085H   LINE      ---      ---       #149
+      01002085H   LINE      ---      ---       #150
+      0100208BH   LINE      ---      ---       #151
+      0100208BH   LINE      ---      ---       #152
+      0100208CH   LINE      ---      ---       #153
+      0100208CH   LINE      ---      ---       #154
+      0100208CH   LINE      ---      ---       #155
+      0100208CH   LINE      ---      ---       #156
+      01002092H   LINE      ---      ---       #157
+      01002092H   LINE      ---      ---       #158
+      01002092H   LINE      ---      ---       #159
+      01002092H   LINE      ---      ---       #160
+      02004D65H   SYMBOL    XDATA    VOID      event
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      010005A7H   BLOCK     CODE     ---       LVL=0
+      010005A7H   LINE      ---      ---       #163
+      010005A7H   LINE      ---      ---       #164
+      010005A7H   LINE      ---      ---       #165
+      010005AEH   LINE      ---      ---       #166
+      010005B4H   LINE      ---      ---       #167
+      010005B4H   LINE      ---      ---       #168
+      010005B6H   LINE      ---      ---       #169
+      010005B8H   LINE      ---      ---       #170
+      010005BEH   LINE      ---      ---       #172
+      010005C2H   LINE      ---      ---       #173
+      010005C6H   LINE      ---      ---       #174
+      010005CFH   LINE      ---      ---       #177
+      010005CFH   LINE      ---      ---       #178
+      010005CFH   LINE      ---      ---       #179
+      010005D6H   LINE      ---      ---       #180
+      010005D8H   LINE      ---      ---       #181
+      010005DAH   LINE      ---      ---       #182
+      010005E0H   LINE      ---      ---       #183
+      010005E1H   LINE      ---      ---       #184
+      010005E1H   LINE      ---      ---       #185
+      010005E6H   LINE      ---      ---       #186
+      010005E6H   LINE      ---      ---       #187
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      ---         MODULE    ---      ---       YC_SYS
+      0100221DH   PUBLIC    CODE     ---       YC_UtilTimerProcess
+      010021C4H   PUBLIC    CODE     ---       _YC_UtilTimerStop
+      02004DE3H   PUBLIC    XDATA    BYTE      ?_YC_UtilTimerStartMs?BYTE
+      01001C15H   PUBLIC    CODE     ---       _YC_UtilTimerStartMs
+      02004DDBH   PUBLIC    XDATA    BYTE      ?_YC_UtilTimerStart?BYTE
+      01001AE6H   PUBLIC    CODE     ---       _YC_UtilTimerStart
+      01001A23H   PUBLIC    CODE     ---       YC_UtilTimerInit
+
+      01001A23H   BLOCK     CODE     ---       LVL=0
+      01001A23H   LINE      ---      ---       #8
+      01001A23H   LINE      ---      ---       #9
+      01001A23H   BLOCK     CODE     NEAR LAB  LVL=1
+      01001A23H   LINE      ---      ---       #12
+      01001A28H   LINE      ---      ---       #13
+      01001AA5H   LINE      ---      ---       #14
+      01001AB4H   LINE      ---      ---       #15
+      01001AC8H   LINE      ---      ---       #16
+      01001ADDH   LINE      ---      ---       #17
+      01001AE5H   LINE      ---      ---       #19
+      02004E6BH   SYMBOL    XDATA    VOID      i
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01001AE6H   BLOCK     CODE     ---       LVL=0
+      01001AE6H   LINE      ---      ---       #21
+      01001AEEH   LINE      ---      ---       #22
+      01001AEEH   BLOCK     CODE     NEAR LAB  LVL=1
+      01001AEEH   LINE      ---      ---       #23
+      01001AF3H   LINE      ---      ---       #26
+      01001AFAH   LINE      ---      ---       #27
+      01001AFCH   LINE      ---      ---       #28
+      01001AFCH   LINE      ---      ---       #29
+      01001B06H   LINE      ---      ---       #30
+      01001B17H   LINE      ---      ---       #31
+      01001B22H   LINE      ---      ---       #32
+      01001B29H   LINE      ---      ---       #33
+      01001B2BH   LINE      ---      ---       #34
+      01001B2BH   LINE      ---      ---       #35
+      01001B31H   LINE      ---      ---       #36
+      01001B33H   LINE      ---      ---       #37
+      01001B4DH   LINE      ---      ---       #38
+      01001B63H   LINE      ---      ---       #39
+      01001C13H   LINE      ---      ---       #41
+      01001C14H   LINE      ---      ---       #42
+      02004DE2H   SYMBOL    XDATA    VOID      i
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01001C15H   BLOCK     CODE     ---       LVL=0
+      01001C15H   LINE      ---      ---       #44
+      01001C1DH   LINE      ---      ---       #45
+      01001C1DH   BLOCK     CODE     NEAR LAB  LVL=1
+      01001C1DH   LINE      ---      ---       #46
+      01001C22H   LINE      ---      ---       #49
+      01001C29H   LINE      ---      ---       #50
+      01001C2BH   LINE      ---      ---       #51
+      01001C2BH   LINE      ---      ---       #52
+      01001C35H   LINE      ---      ---       #53
+      01001C46H   LINE      ---      ---       #54
+      01001C51H   LINE      ---      ---       #55
+      01001C58H   LINE      ---      ---       #56
+      01001C5AH   LINE      ---      ---       #57
+      01001C5AH   LINE      ---      ---       #58
+      01001C60H   LINE      ---      ---       #59
+      01001C62H   LINE      ---      ---       #60
+      01001C7CH   LINE      ---      ---       #61
+      01001C92H   LINE      ---      ---       #62
+      01001D52H   LINE      ---      ---       #63
+      01001D53H   LINE      ---      ---       #64
+      02004DEAH   SYMBOL    XDATA    VOID      i
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      010021C4H   BLOCK     CODE     ---       LVL=0
+      010021C4H   LINE      ---      ---       #66
+      010021C6H   LINE      ---      ---       #68
+      010021DDH   LINE      ---      ---       #69
+      010021DFH   LINE      ---      ---       #70
+      010021F2H   LINE      ---      ---       #71
+      01002206H   LINE      ---      ---       #72
+      0100221BH   LINE      ---      ---       #73
+      0100221CH   LINE      ---      ---       #74
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      0100221DH   BLOCK     CODE     ---       LVL=0
+      0100221DH   LINE      ---      ---       #76
+      0100221DH   BLOCK     CODE     NEAR LAB  LVL=1
+      0100221DH   LINE      ---      ---       #80
+      010022B5H   LINE      ---      ---       #81
+      010022B8H   LINE      ---      ---       #82
+      010022CBH   LINE      ---      ---       #83
+      0100230BH   LINE      ---      ---       #84
+      0100230BH   LINE      ---      ---       #85
+      01002312H   LINE      ---      ---       #86
+      01002312H   LINE      ---      ---       #87
+      0100238FH   LINE      ---      ---       #88
+      01002392H   LINE      ---      ---       #89
+      010023A7H   LINE      ---      ---       #90
+      0100243EH   LINE      ---      ---       #91
+      01002456H   LINE      ---      ---       #92
+      01002474H   LINE      ---      ---       #93
+      01002474H   LINE      ---      ---       #94
+      01002474H   LINE      ---      ---       #95
+      0100247FH   LINE      ---      ---       #97
+      0000001FH   SYMBOL    DATA     VOID      i
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      ---         MODULE    ---      ---       YC_PERIPHERAL
+      01000597H   PUBLIC    CODE     ---       YC_UARTClearBuffer
+      010007E1H   PUBLIC    CODE     ---       _YC_UARTReciveDataExpected
+      01000660H   PUBLIC    CODE     ---       YC_UARTWaitSendData
+      01002480H   PUBLIC    CODE     ---       _YC_UARTSendData
+      010019EEH   PUBLIC    CODE     ---       _YC_GPIOGetInputStatus
+
+      010019EEH   BLOCK     CODE     ---       LVL=0
+      010019EEH   LINE      ---      ---       #140
+      010019EEH   LINE      ---      ---       #141
+      010019EEH   BLOCK     CODE     NEAR LAB  LVL=1
+      010019EEH   LINE      ---      ---       #144
+      010019F2H   LINE      ---      ---       #145
+      010019F9H   LINE      ---      ---       #147
+      01001A22H   LINE      ---      ---       #148
+      00000006H   SYMBOL    DATA     VOID      queue
+      00000007H   SYMBOL    DATA     VOID      group
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01002480H   BLOCK     CODE     ---       LVL=0
+      01002480H   LINE      ---      ---       #351
+      01002491H   LINE      ---      ---       #352
+      01002491H   BLOCK     CODE     NEAR LAB  LVL=1
+      01002491H   LINE      ---      ---       #354
+      010024ADH   LINE      ---      ---       #356
+      010024CBH   LINE      ---      ---       #357
+      010024CBH   LINE      ---      ---       #358
+      010024F0H   LINE      ---      ---       #360
+      01002516H   LINE      ---      ---       #361
+      01002516H   LINE      ---      ---       #362
+      01002523H   LINE      ---      ---       #363
+      01002534H   LINE      ---      ---       #365
+      01002550H   LINE      ---      ---       #366
+      01002550H   LINE      ---      ---       #367
+      01002560H   LINE      ---      ---       #369
+      0100257EH   LINE      ---      ---       #371
+      02004DB9H   SYMBOL    XDATA    VOID      i
+      02004DBBH   SYMBOL    XDATA    VOID      twptr
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000660H   BLOCK     CODE     ---       LVL=0
+      01000660H   LINE      ---      ---       #373
+      01000660H   LINE      ---      ---       #374
+      01000660H   LINE      ---      ---       #375
+      01000671H   LINE      ---      ---       #376
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      010007E1H   BLOCK     CODE     ---       LVL=0
+      010007E1H   LINE      ---      ---       #378
+      010007F2H   LINE      ---      ---       #379
+      010007F2H   BLOCK     CODE     NEAR LAB  LVL=1
+      010007F2H   LINE      ---      ---       #380
+      010007F7H   LINE      ---      ---       #381
+      0100080DH   LINE      ---      ---       #383
+      01000828H   LINE      ---      ---       #384
+      01000828H   LINE      ---      ---       #385
+      0100082CH   LINE      ---      ---       #386
+      0100082CH   LINE      ---      ---       #388
+      0100084AH   LINE      ---      ---       #389
+      0100084AH   LINE      ---      ---       #390
+      01000876H   LINE      ---      ---       #392
+      01000898H   LINE      ---      ---       #393
+      01000898H   LINE      ---      ---       #394
+      010008AEH   LINE      ---      ---       #395
+      010008AEH   LINE      ---      ---       #397
+      010008CCH   LINE      ---      ---       #398
+      010008CCH   LINE      ---      ---       #399
+      010008E6H   LINE      ---      ---       #400
+      010008F5H   LINE      ---      ---       #401
+      010008F5H   LINE      ---      ---       #402
+      01000905H   LINE      ---      ---       #404
+      01000922H   LINE      ---      ---       #406
+      0100092AH   LINE      ---      ---       #407
+      02004DD7H   SYMBOL    XDATA    VOID      i
+      02004DD9H   SYMBOL    XDATA    VOID      rrptr
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000597H   BLOCK     CODE     ---       LVL=0
+      01000597H   LINE      ---      ---       #409
+      01000597H   LINE      ---      ---       #410
+      01000597H   LINE      ---      ---       #411
+      010005A6H   LINE      ---      ---       #413
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      ---         MODULE    ---      ---       SPIFLASH
+      02004DF3H   PUBLIC    XDATA    BYTE      ?_SPIFlashRead?BYTE
+      01002756H   PUBLIC    CODE     ---       _SPIFlashRead
+      02004DEBH   PUBLIC    XDATA    BYTE      ?_SPIFlashWrite?BYTE
+      01002651H   PUBLIC    CODE     ---       _SPIFlashWrite
+      010025DBH   PUBLIC    CODE     ---       _SPIFlashEraseSector
+      010025CEH   PUBLIC    CODE     ---       SPIFlashWaitBusy
+      01002712H   PUBLIC    CODE     ---       SPIFlashWriteEnable
+      0100257FH   PUBLIC    CODE     ---       SPIFlashReadSR
+
+      0100257FH   BLOCK     CODE     ---       LVL=0
+      0100257FH   LINE      ---      ---       #21
+      0100257FH   LINE      ---      ---       #22
+      0100257FH   BLOCK     CODE     NEAR LAB  LVL=1
+      0100257FH   LINE      ---      ---       #24
+      01002585H   LINE      ---      ---       #25
+      0100258EH   LINE      ---      ---       #26
+      01002596H   LINE      ---      ---       #27
+      0100259CH   LINE      ---      ---       #28
+      010025A6H   LINE      ---      ---       #29
+      010025B6H   LINE      ---      ---       #30
+      010025BCH   LINE      ---      ---       #31
+      010025C3H   LINE      ---      ---       #33
+      010025C8H   LINE      ---      ---       #34
+      02004E6CH   SYMBOL    XDATA    VOID      status
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01002712H   BLOCK     CODE     ---       LVL=0
+      01002712H   LINE      ---      ---       #35
+      01002712H   LINE      ---      ---       #36
+      01002712H   LINE      ---      ---       #37
+      01002719H   LINE      ---      ---       #38
+      01002721H   LINE      ---      ---       #39
+      01002727H   LINE      ---      ---       #40
+      01002731H   LINE      ---      ---       #41
+      01002736H   LINE      ---      ---       #42
+      0100273DH   LINE      ---      ---       #43
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      010025C9H   BLOCK     CODE     ---       LVL=0
+      010025CEH   LINE      ---      ---       #44
+      010025CEH   LINE      ---      ---       #45
+      010025CEH   LINE      ---      ---       #46
+      010025D4H   LINE      ---      ---       #47
+      010025D8H   LINE      ---      ---       #48
+      010025DAH   LINE      ---      ---       #49
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      010025DBH   BLOCK     CODE     ---       LVL=0
+      010025DBH   LINE      ---      ---       #50
+      010025E0H   LINE      ---      ---       #54
+      010025E6H   LINE      ---      ---       #55
+      010025FEH   LINE      ---      ---       #56
+      01002616H   LINE      ---      ---       #57
+      0100262AH   LINE      ---      ---       #58
+      01002633H   LINE      ---      ---       #59
+      0100263BH   LINE      ---      ---       #60
+      01002642H   LINE      ---      ---       #61
+      01002648H   LINE      ---      ---       #62
+      0100264FH   LINE      ---      ---       #63
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01002651H   BLOCK     CODE     ---       LVL=0
+      01002651H   LINE      ---      ---       #65
+      0100265DH   BLOCK     CODE     NEAR LAB  LVL=1
+      0100265FH   LINE      ---      ---       #70
+      0100266BH   LINE      ---      ---       #71
+      0100268BH   LINE      ---      ---       #72
+      0100268EH   LINE      ---      ---       #73
+      01002694H   LINE      ---      ---       #74
+      010026ACH   LINE      ---      ---       #75
+      010026C4H   LINE      ---      ---       #76
+      010026D8H   LINE      ---      ---       #77
+      010026F4H   LINE      ---      ---       #78
+      010026FCH   LINE      ---      ---       #79
+      01002703H   LINE      ---      ---       #80
+      01002709H   LINE      ---      ---       #81
+      01002710H   LINE      ---      ---       #82
+      00000007H   SYMBOL    DATA     VOID      i
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01002756H   BLOCK     CODE     ---       LVL=0
+      01002756H   LINE      ---      ---       #84
+      0100275CH   LINE      ---      ---       #85
+      0100275CH   LINE      ---      ---       #86
+      0100276BH   LINE      ---      ---       #87
+      01002774H   LINE      ---      ---       #88
+      0100277AH   LINE      ---      ---       #89
+      01002792H   LINE      ---      ---       #90
+      010027AAH   LINE      ---      ---       #91
+      010027BEH   LINE      ---      ---       #92
+      010027C8H   LINE      ---      ---       #93
+      010027D5H   LINE      ---      ---       #94
+      010027DCH   LINE      ---      ---       #95
+      010027E2H   LINE      ---      ---       #97
+      010027E9H   LINE      ---      ---       #98
+      010027F0H   LINE      ---      ---       #100
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      ---         MODULE    ---      ---       BT_IPC
+      01002948H   PUBLIC    CODE     ---       _BT_CmdFifoFull
+      0100293FH   PUBLIC    CODE     ---       BT_CmdFifoEmpty
+      01002196H   PUBLIC    CODE     ---       BT_GetEvtFifoDepth
+      01002911H   PUBLIC    CODE     ---       BT_GetCmdFifoDepth
+      01002093H   PUBLIC    CODE     ---       _BT_EventFifoOut
+      010027F1H   PUBLIC    CODE     ---       _BT_CmdFifoIn
+
+      010027F1H   BLOCK     CODE     ---       LVL=0
+      010027F1H   LINE      ---      ---       #7
+      010027FCH   LINE      ---      ---       #8
+      010027FCH   BLOCK     CODE     NEAR LAB  LVL=1
+      010027FCH   LINE      ---      ---       #10
+      01002801H   LINE      ---      ---       #11
+      01002803H   LINE      ---      ---       #12
+      0100281FH   LINE      ---      ---       #13
+      0100282AH   LINE      ---      ---       #14
+      0100282AH   LINE      ---      ---       #15
+      0100283FH   LINE      ---      ---       #16
+      01002851H   LINE      ---      ---       #17
+      0100285DH   LINE      ---      ---       #18
+      0100285DH   LINE      ---      ---       #19
+      01002866H   LINE      ---      ---       #20
+      01002866H   LINE      ---      ---       #21
+      01002877H   LINE      ---      ---       #22
+      01002883H   LINE      ---      ---       #23
+      01002883H   LINE      ---      ---       #24
+      0100288CH   LINE      ---      ---       #25
+      0100288CH   LINE      ---      ---       #26
+      010028B1H   LINE      ---      ---       #27
+      010028B1H   LINE      ---      ---       #28
+      010028D3H   LINE      ---      ---       #29
+      010028DFH   LINE      ---      ---       #30
+      010028DFH   LINE      ---      ---       #31
+      010028E8H   LINE      ---      ---       #32
+      010028E8H   LINE      ---      ---       #33
+      010028F8H   LINE      ---      ---       #34
+      0100290DH   LINE      ---      ---       #35
+      0100290FH   LINE      ---      ---       #36
+      0100290FH   LINE      ---      ---       #38
+      0100290FH   LINE      ---      ---       #39
+      01002910H   LINE      ---      ---       #40
+      01002910H   LINE      ---      ---       #41
+      02004E16H   SYMBOL    XDATA    VOID      new_wprt
+      00000006H   SYMBOL    DATA     VOID      new_cmd_len
+      02004E18H   SYMBOL    XDATA    VOID      i
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01002093H   BLOCK     CODE     ---       LVL=0
+      01002093H   LINE      ---      ---       #43
+      0100209EH   LINE      ---      ---       #44
+      0100209EH   BLOCK     CODE     NEAR LAB  LVL=1
+      0100209EH   LINE      ---      ---       #47
+      010020A8H   LINE      ---      ---       #48
+      010020A8H   LINE      ---      ---       #49
+      010020BDH   LINE      ---      ---       #50
+      010020CEH   LINE      ---      ---       #51
+      010020D4H   LINE      ---      ---       #52
+      010020F3H   LINE      ---      ---       #53
+      010020FFH   LINE      ---      ---       #54
+      010020FFH   LINE      ---      ---       #55
+      01002109H   LINE      ---      ---       #56
+      01002109H   LINE      ---      ---       #57
+      01002123H   LINE      ---      ---       #58
+      01002123H   LINE      ---      ---       #59
+      01002145H   LINE      ---      ---       #60
+      01002151H   LINE      ---      ---       #61
+      01002151H   LINE      ---      ---       #62
+      0100215BH   LINE      ---      ---       #63
+      0100215BH   LINE      ---      ---       #64
+      01002162H   LINE      ---      ---       #65
+      01002162H   LINE      ---      ---       #66
+      01002162H   LINE      ---      ---       #67
+      01002171H   LINE      ---      ---       #68
+      01002171H   LINE      ---      ---       #69
+      01002186H   LINE      ---      ---       #70
+      01002187H   LINE      ---      ---       #72
+      01002187H   LINE      ---      ---       #73
+      02004E3DH   SYMBOL    XDATA    VOID      new_rprt
+      00000006H   SYMBOL    DATA     VOID      i
+      00000007H   SYMBOL    DATA     VOID      event_prefix
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01002911H   BLOCK     CODE     ---       LVL=0
+      01002911H   LINE      ---      ---       #78
+      01002911H   LINE      ---      ---       #79
+      01002911H   BLOCK     CODE     NEAR LAB  LVL=1
+      01002911H   LINE      ---      ---       #81
+      0100291EH   LINE      ---      ---       #82
+      0100292BH   LINE      ---      ---       #83
+      0100293EH   LINE      ---      ---       #84
+      0100293EH   LINE      ---      ---       #85
+      00000004H   SYMBOL    DATA     VOID      wptr
+      00000006H   SYMBOL    DATA     VOID      rptr
+      00000006H   SYMBOL    DATA     VOID      len
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01002196H   BLOCK     CODE     ---       LVL=0
+      01002196H   LINE      ---      ---       #87
+      01002196H   LINE      ---      ---       #88
+      01002196H   BLOCK     CODE     NEAR LAB  LVL=1
+      01002196H   LINE      ---      ---       #90
+      010021A3H   LINE      ---      ---       #91
+      010021B0H   LINE      ---      ---       #92
+      010021C3H   LINE      ---      ---       #93
+      010021C3H   LINE      ---      ---       #94
+      00000004H   SYMBOL    DATA     VOID      wptr
+      00000006H   SYMBOL    DATA     VOID      rptr
+      00000006H   SYMBOL    DATA     VOID      len
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      0100293FH   BLOCK     CODE     ---       LVL=0
+      0100293FH   LINE      ---      ---       #96
+      0100293FH   LINE      ---      ---       #97
+      0100293FH   LINE      ---      ---       #98
+      01002944H   LINE      ---      ---       #99
+      01002944H   LINE      ---      ---       #100
+      01002946H   LINE      ---      ---       #101
+      01002946H   LINE      ---      ---       #102
+      01002947H   LINE      ---      ---       #103
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01002948H   BLOCK     CODE     ---       LVL=0
+      01002948H   LINE      ---      ---       #105
+      01002953H   LINE      ---      ---       #106
+      01002953H   LINE      ---      ---       #107
+      01002979H   LINE      ---      ---       #108
+      0100297BH   LINE      ---      ---       #109
+      0100297CH   LINE      ---      ---       #110
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      ---         MODULE    ---      ---       YC_UTILITIES
+      01002F55H   PUBLIC    CODE     ---       _YC_Delay1S
+      01001F94H   PUBLIC    CODE     ---       _YC_Delay10ms
+      0100273EH   PUBLIC    CODE     ---       _YC_Delay1ms
+      01002EFFH   PUBLIC    CODE     ---       _YC_MemCheckEmpty
+      00000021H   PUBLIC    DATA     BYTE      ?_cmemcpy?BYTE
+      01002EC8H   PUBLIC    CODE     ---       _cmemcpy
+      00000010H   PUBLIC    DATA     BYTE      ?_dmemcpy?BYTE
+      01002984H   PUBLIC    CODE     ---       _dmemcpy
+      00000017H   PUBLIC    DATA     BYTE      ?_xmemcpy?BYTE
+      01001FACH   PUBLIC    CODE     ---       _xmemcpy
+      01001F1AH   PUBLIC    CODE     ---       _xmemset
+      0100297DH   PUBLIC    CODE     ---       YC_Ice_break
+
+      0100297DH   BLOCK     CODE     ---       LVL=0
+      0100297DH   LINE      ---      ---       #4
+      0100297DH   LINE      ---      ---       #5
+      0100297DH   LINE      ---      ---       #6
+      01002983H   LINE      ---      ---       #8
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01001F1AH   BLOCK     CODE     ---       LVL=0
+      01001F1AH   LINE      ---      ---       #10
+      01001F1EH   LINE      ---      ---       #12
+      01001F24H   LINE      ---      ---       #13
+      01001F37H   LINE      ---      ---       #15
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01001FACH   BLOCK     CODE     ---       LVL=0
+      01001FACH   LINE      ---      ---       #16
+      01001FB6H   LINE      ---      ---       #18
+      01001FBDH   LINE      ---      ---       #19
+      01001FE2H   LINE      ---      ---       #21
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01002984H   BLOCK     CODE     ---       LVL=0
+      01002984H   LINE      ---      ---       #22
+      0100298AH   LINE      ---      ---       #24
+      01002991H   LINE      ---      ---       #25
+      010029B7H   LINE      ---      ---       #27
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01002EC8H   BLOCK     CODE     ---       LVL=0
+      01002EC8H   LINE      ---      ---       #28
+      01002ED2H   LINE      ---      ---       #30
+      01002ED9H   LINE      ---      ---       #31
+      01002EFEH   LINE      ---      ---       #33
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01002EFFH   BLOCK     CODE     ---       LVL=0
+      01002EFFH   LINE      ---      ---       #34
+      01002F0DH   LINE      ---      ---       #35
+      01002F0DH   BLOCK     CODE     NEAR LAB  LVL=1
+      01002F0DH   LINE      ---      ---       #37
+      01002F1FH   LINE      ---      ---       #38
+      01002F1FH   LINE      ---      ---       #39
+      01002F34H   LINE      ---      ---       #40
+      01002F34H   LINE      ---      ---       #41
+      01002F34H   LINE      ---      ---       #42
+      01002F34H   LINE      ---      ---       #43
+      01002F4AH   LINE      ---      ---       #44
+      01002F4AH   LINE      ---      ---       #45
+      01002F4CH   LINE      ---      ---       #46
+      01002F4CH   LINE      ---      ---       #47
+      01002F53H   LINE      ---      ---       #48
+      01002F54H   LINE      ---      ---       #49
+      00000006H   SYMBOL    DATA     VOID      i
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      0100273EH   BLOCK     CODE     ---       LVL=0
+      0100273EH   LINE      ---      ---       #51
+      0100273EH   LINE      ---      ---       #52
+      0100273EH   BLOCK     CODE     NEAR LAB  LVL=1
+      0100273EH   LINE      ---      ---       #54
+      01002744H   LINE      ---      ---       #55
+      01002744H   LINE      ---      ---       #56
+      01002752H   LINE      ---      ---       #57
+      01002755H   LINE      ---      ---       #58
+      00000004H   SYMBOL    DATA     VOID      j
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01001F94H   BLOCK     CODE     ---       LVL=0
+      01001F94H   LINE      ---      ---       #60
+      01001F94H   LINE      ---      ---       #61
+      01001F94H   BLOCK     CODE     NEAR LAB  LVL=1
+      01001F94H   LINE      ---      ---       #63
+      01001F9AH   LINE      ---      ---       #64
+      01001F9AH   LINE      ---      ---       #65
+      01001FA8H   LINE      ---      ---       #66
+      01001FABH   LINE      ---      ---       #67
+      00000004H   SYMBOL    DATA     VOID      j
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01002F55H   BLOCK     CODE     ---       LVL=0
+      01002F55H   LINE      ---      ---       #69
+      01002F55H   LINE      ---      ---       #70
+      01002F55H   BLOCK     CODE     NEAR LAB  LVL=1
+      01002F55H   LINE      ---      ---       #72
+      01002F5BH   LINE      ---      ---       #73
+      01002F5BH   LINE      ---      ---       #74
+      01002F5EH   LINE      ---      ---       #75
+      01002F5EH   LINE      ---      ---       #76
+      01002F6CH   LINE      ---      ---       #77
+      01002F77H   LINE      ---      ---       #78
+      01002F7AH   LINE      ---      ---       #79
+      00000004H   SYMBOL    DATA     VOID      j
+      00000002H   SYMBOL    DATA     VOID      k
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      ---         MODULE    ---      ---       CS_SCALE_PROC
+      02004CDAH   PUBLIC    XDATA    BYTE      R_1186sys_state
+      02004CD8H   PUBLIC    XDATA    WORD      R_AD_Original
+      02004CD7H   PUBLIC    XDATA    BYTE      B_Weight_AdOk
+      02004CD3H   PUBLIC    XDATA    ---       R_1186_RTC
+      02004CC9H   PUBLIC    XDATA    ---       R_UnitWeight
+      02004CC7H   PUBLIC    XDATA    WORD      R_Debug_temp
+      02004CC6H   PUBLIC    XDATA    BYTE      R_Selet_Unit
+      02004CC5H   PUBLIC    XDATA    BYTE      R_Scale_state
+      02004CC3H   PUBLIC    XDATA    WORD      R_Weight_Mem
+      02004CC2H   PUBLIC    XDATA    BYTE      R_Display_Err
+      00000020H.1 PUBLIC    BIT      BIT       B_Debug_Test
+      02004CC0H   PUBLIC    XDATA    WORD      R_Weight_Lock
+      01000983H   PUBLIC    CODE     ---       _CS_Scale_TimeOutProc
+      01000C9BH   PUBLIC    CODE     ---       _CS_SoftTimer
+      00000020H.0 PUBLIC    BIT      BIT       ?CS_Scale_PowerOnProc?BIT
+      01003758H   PUBLIC    CODE     ---       CS_Scale_PowerOnProc
+      01000AA8H   PUBLIC    CODE     ---       _CS_Scale_StandbyProc
+      01001135H   PUBLIC    CODE     ---       _CS_Scale_CaliProc
+      01003722H   PUBLIC    CODE     ---       _CS_MemoryWeightClear_Timer
+      01000B53H   PUBLIC    CODE     ---       CS_Scale_ReturnLock
+      01000CD9H   PUBLIC    CODE     ---       _CS_Scale_SteadyProc
+      01000BBBH   PUBLIC    CODE     ---       _CS_Scale_JudgeSteady
+      01000FF1H   PUBLIC    CODE     ---       _CS_Scale_JudgeOverLoad
+      01000FB5H   PUBLIC    CODE     ---       _CS_Scale_JudgeLowBat
+      01003605H   PUBLIC    CODE     ---       _CS_Scale_LockProc
+      010033BEH   PUBLIC    CODE     ---       _CS_Scale_ZeroProc
+      0100338CH   PUBLIC    CODE     ---       CS_Scale_ChangeUnit
+      010017DEH   PUBLIC    CODE     ---       _CS_Scale_GetWeight
+      01002FDCH   PUBLIC    CODE     ---       _CS_Scale_AdcFilter
+      01002F7BH   PUBLIC    CODE     ---       _CS_Scale_GetDeltaAD
+      01000FC7H   PUBLIC    CODE     ---       CS_Scale_WeightProc
+      01001D54H   PUBLIC    CODE     ---       CS_Scale_PowerOn
+      01000E55H   PUBLIC    CODE     ---       CS_Scale_Proc
+
+      01000E55H   BLOCK     CODE     ---       LVL=0
+      01000E55H   LINE      ---      ---       #122
+      01000E55H   LINE      ---      ---       #123
+      01000E55H   LINE      ---      ---       #124
+      01000E5BH   LINE      ---      ---       #125
+      01000E5BH   LINE      ---      ---       #126
+      01000E60H   LINE      ---      ---       #127
+      01000E60H   LINE      ---      ---       #128
+      01000E67H   LINE      ---      ---       #129
+      01000E67H   LINE      ---      ---       #130
+      01000E6BH   LINE      ---      ---       #131
+      01000E6BH   LINE      ---      ---       #133
+      01000E73H   LINE      ---      ---       #134
+      01000E73H   LINE      ---      ---       #135
+      01000E74H   LINE      ---      ---       #137
+      01000E7FH   LINE      ---      ---       #138
+      01000E7FH   LINE      ---      ---       #139
+      01000E86H   LINE      ---      ---       #140
+      01000E86H   LINE      ---      ---       #142
+      01000E86H   LINE      ---      ---       #144
+      01000E8DH   LINE      ---      ---       #145
+      01000E8DH   LINE      ---      ---       #146
+      01000E8FH   LINE      ---      ---       #147
+      01000E91H   LINE      ---      ---       #148
+      01000E91H   LINE      ---      ---       #149
+      01000E98H   LINE      ---      ---       #150
+      01000E98H   LINE      ---      ---       #151
+      01000E9AH   LINE      ---      ---       #152
+      01000E9EH   LINE      ---      ---       #153
+      01000E9EH   LINE      ---      ---       #154
+      01000EA5H   LINE      ---      ---       #155
+      01000EA5H   LINE      ---      ---       #156
+      01000EAAH   LINE      ---      ---       #157
+      01000EAAH   LINE      ---      ---       #160
+      01000EAAH   LINE      ---      ---       #161
+      01000EAAH   LINE      ---      ---       #162
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01001D54H   BLOCK     CODE     ---       LVL=0
+      01001D54H   LINE      ---      ---       #170
+      01001D54H   LINE      ---      ---       #171
+      01001D54H   LINE      ---      ---       #173
+      01001D5AH   LINE      ---      ---       #174
+      01001D5AH   LINE      ---      ---       #175
+      01001D5EH   LINE      ---      ---       #176
+      01001D62H   LINE      ---      ---       #177
+      01001D66H   LINE      ---      ---       #179
+      01001D6AH   LINE      ---      ---       #181
+      01001D6EH   LINE      ---      ---       #183
+      01001D73H   LINE      ---      ---       #184
+      01001D7BH   LINE      ---      ---       #186
+      01001D80H   LINE      ---      ---       #187
+      01001D85H   LINE      ---      ---       #188
+      01001D85H   LINE      ---      ---       #189
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01000FC7H   BLOCK     CODE     ---       LVL=0
+      01000FC7H   LINE      ---      ---       #198
+      01000FC7H   LINE      ---      ---       #199
+      01000FC7H   BLOCK     CODE     NEAR LAB  LVL=1
+      01000FC7H   LINE      ---      ---       #202
+      01000FCCH   LINE      ---      ---       #203
+      01000FD5H   LINE      ---      ---       #204
+      01000FD8H   LINE      ---      ---       #205
+      01000FE0H   LINE      ---      ---       #206
+      01000FE5H   LINE      ---      ---       #207
+      01000FE9H   LINE      ---      ---       #208
+      01000FEDH   LINE      ---      ---       #209
+      00000006H   SYMBOL    DATA     VOID      R_AD_BUF
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01002F7BH   BLOCK     CODE     ---       LVL=0
+      01002F7BH   LINE      ---      ---       #215
+      01002F80H   LINE      ---      ---       #216
+      01002F80H   BLOCK     CODE     NEAR LAB  LVL=1
+      01002F80H   LINE      ---      ---       #220
+      01002F88H   LINE      ---      ---       #221
+      01002F96H   LINE      ---      ---       #222
+      01002F96H   LINE      ---      ---       #223
+      01002FA2H   LINE      ---      ---       #224
+      01002FA8H   LINE      ---      ---       #226
+      01002FAAH   LINE      ---      ---       #228
+      01002FAAH   LINE      ---      ---       #229
+      01002FBFH   LINE      ---      ---       #230
+      01002FC4H   LINE      ---      ---       #231
+      01002FC4H   LINE      ---      ---       #234
+      01002FCBH   LINE      ---      ---       #235
+      01002FCBH   LINE      ---      ---       #236
+      01002FD3H   LINE      ---      ---       #237
+      01002FD3H   LINE      ---      ---       #238
+      01002FDBH   LINE      ---      ---       #239
+      02004C80H   SYMBOL    XDATA    VOID      B_Weight_Pos
+      02004E57H   SYMBOL    XDATA    VOID      ad_temp
+      00000006H   SYMBOL    DATA     VOID      R_AD_Zero
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01002FDCH   BLOCK     CODE     ---       LVL=0
+      01002FDCH   LINE      ---      ---       #244
+      01002FE9H   LINE      ---      ---       #245
+      01002FE9H   BLOCK     CODE     NEAR LAB  LVL=1
+      01002FE9H   LINE      ---      ---       #258
+      01002FECH   LINE      ---      ---       #259
+      01002FECH   LINE      ---      ---       #260
+      01002FF5H   LINE      ---      ---       #261
+      01002FF5H   LINE      ---      ---       #264
+      0100300BH   LINE      ---      ---       #265
+      01003022H   LINE      ---      ---       #267
+      01003040H   LINE      ---      ---       #269
+      0100304FH   LINE      ---      ---       #271
+      01003070H   LINE      ---      ---       #272
+      01003070H   LINE      ---      ---       #273
+      01003077H   LINE      ---      ---       #274
+      0100307DH   LINE      ---      ---       #275
+      01003081H   LINE      ---      ---       #276
+      01003085H   LINE      ---      ---       #277
+      01003089H   LINE      ---      ---       #278
+      0100308DH   LINE      ---      ---       #279
+      01003091H   LINE      ---      ---       #280
+      01003095H   LINE      ---      ---       #281
+      01003099H   LINE      ---      ---       #282
+      0100309BH   LINE      ---      ---       #284
+      0100309BH   LINE      ---      ---       #285
+      010030AAH   LINE      ---      ---       #286
+      010030B6H   LINE      ---      ---       #288
+      010030C6H   LINE      ---      ---       #289
+      010030D5H   LINE      ---      ---       #290
+      010030DEH   LINE      ---      ---       #291
+      010030EDH   LINE      ---      ---       #292
+      010030FCH   LINE      ---      ---       #293
+      0100310BH   LINE      ---      ---       #294
+      0100311BH   LINE      ---      ---       #295
+      0100312AH   LINE      ---      ---       #296
+      01003133H   LINE      ---      ---       #297
+      01003142H   LINE      ---      ---       #298
+      01003151H   LINE      ---      ---       #299
+      01003160H   LINE      ---      ---       #300
+      01003170H   LINE      ---      ---       #301
+      0100317FH   LINE      ---      ---       #302
+      01003188H   LINE      ---      ---       #303
+      01003197H   LINE      ---      ---       #304
+      010031A6H   LINE      ---      ---       #305
+      010031A6H   LINE      ---      ---       #306
+      010031B5H   LINE      ---      ---       #307
+      010031C4H   LINE      ---      ---       #308
+      010031D3H   LINE      ---      ---       #309
+      010031E2H   LINE      ---      ---       #310
+      010031F1H   LINE      ---      ---       #311
+      01003200H   LINE      ---      ---       #312
+      0100320FH   LINE      ---      ---       #313
+      0100321EH   LINE      ---      ---       #314
+      0100321EH   LINE      ---      ---       #316
+      0100322FH   LINE      ---      ---       #317
+      0100325AH   LINE      ---      ---       #318
+      01003285H   LINE      ---      ---       #319
+      010032B0H   LINE      ---      ---       #320
+      010032DBH   LINE      ---      ---       #321
+      01003306H   LINE      ---      ---       #322
+      01003331H   LINE      ---      ---       #323
+      0100335CH   LINE      ---      ---       #325
+      0100337BH   LINE      ---      ---       #326
+      01003383H   LINE      ---      ---       #327
+      01003383H   LINE      ---      ---       #328
+      0100338BH   LINE      ---      ---       #329
+      02004E1DH   SYMBOL    XDATA    VOID      ad_temp
+      02004C81H   SYMBOL    XDATA    VOID      R_AD_FilTimes
+      02004C83H   SYMBOL    XDATA    VOID      R_AD_BUF_OLD
+      02004C85H   SYMBOL    XDATA    VOID      R_AD_F1
+      02004C87H   SYMBOL    XDATA    VOID      R_AD_F2
+      02004C89H   SYMBOL    XDATA    VOID      R_AD_F3
+      02004C8BH   SYMBOL    XDATA    VOID      R_AD_F4
+      02004C8DH   SYMBOL    XDATA    VOID      R_AD_F5
+      02004C8FH   SYMBOL    XDATA    VOID      R_AD_F6
+      02004C91H   SYMBOL    XDATA    VOID      R_AD_F7
+      02004C93H   SYMBOL    XDATA    VOID      R_AD_F8
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      010017DEH   BLOCK     CODE     ---       LVL=0
+      010017DEH   LINE      ---      ---       #334
+      010017E6H   LINE      ---      ---       #335
+      010017E6H   BLOCK     CODE     NEAR LAB  LVL=1
+      010017E6H   LINE      ---      ---       #340
+      010017F2H   LINE      ---      ---       #341
+      010017FEH   LINE      ---      ---       #342
+      0100180BH   LINE      ---      ---       #344
+      01001821H   LINE      ---      ---       #345
+      01001821H   LINE      ---      ---       #346
+      0100182CH   LINE      ---      ---       #347
+      01001854H   LINE      ---      ---       #349
+      01001854H   LINE      ---      ---       #350
+      01001870H   LINE      ---      ---       #352
+      0100187DH   LINE      ---      ---       #353
+      0100187DH   LINE      ---      ---       #354
+      01001892H   LINE      ---      ---       #355
+      010018C0H   LINE      ---      ---       #357
+      010018C0H   LINE      ---      ---       #359
+      010018EAH   LINE      ---      ---       #360
+      010018FFH   LINE      ---      ---       #361
+      0100192CH   LINE      ---      ---       #364
+      02004D9EH   SYMBOL    XDATA    VOID      ad_temp
+      02004DA2H   SYMBOL    XDATA    VOID      ad_cal
+      02004DA4H   SYMBOL    XDATA    VOID      CaliDot1
+      02004DA6H   SYMBOL    XDATA    VOID      CaliDot2
+      02004DA8H   SYMBOL    XDATA    VOID      CaliDot3
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      0100338CH   BLOCK     CODE     ---       LVL=0
+      0100338CH   LINE      ---      ---       #367
+      0100338CH   LINE      ---      ---       #368
+      0100338CH   LINE      ---      ---       #369
+      0100339DH   LINE      ---      ---       #370
+      0100339DH   LINE      ---      ---       #371
+      0100339DH   LINE      ---      ---       #372
+      010033A3H   LINE      ---      ---       #373
+      010033A4H   LINE      ---      ---       #374
+      010033A4H   LINE      ---      ---       #375
+      010033AAH   LINE      ---      ---       #376
+      010033ABH   LINE      ---      ---       #377
+      010033ABH   LINE      ---      ---       #378
+      010033B1H   LINE      ---      ---       #379
+      010033B2H   LINE      ---      ---       #380
+      010033B2H   LINE      ---      ---       #381
+      010033B7H   LINE      ---      ---       #382
+      010033B8H   LINE      ---      ---       #383
+      010033B8H   LINE      ---      ---       #384
+      010033BDH   LINE      ---      ---       #385
+      010033BDH   LINE      ---      ---       #386
+      010033BDH   LINE      ---      ---       #387
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      010033BEH   BLOCK     CODE     ---       LVL=0
+      010033BEH   LINE      ---      ---       #391
+      010033C3H   LINE      ---      ---       #392
+      010033C3H   BLOCK     CODE     NEAR LAB  LVL=1
+      010033C3H   LINE      ---      ---       #409
+      010033C6H   LINE      ---      ---       #410
+      010033C6H   LINE      ---      ---       #411
+      010033CBH   LINE      ---      ---       #412
+      010033CEH   LINE      ---      ---       #413
+      010033CEH   LINE      ---      ---       #414
+      010033D6H   LINE      ---      ---       #415
+      010033D6H   LINE      ---      ---       #416
+      010033DEH   LINE      ---      ---       #417
+      010033E2H   LINE      ---      ---       #418
+      010033E2H   LINE      ---      ---       #419
+      010033E6H   LINE      ---      ---       #420
+      010033E6H   LINE      ---      ---       #421
+      010033F0H   LINE      ---      ---       #422
+      010033F4H   LINE      ---      ---       #423
+      010033F4H   LINE      ---      ---       #424
+      010033FCH   LINE      ---      ---       #425
+      010033FCH   LINE      ---      ---       #426
+      01003401H   LINE      ---      ---       #427
+      01003404H   LINE      ---      ---       #428
+      01003404H   LINE      ---      ---       #430
+      01003409H   LINE      ---      ---       #431
+      01003409H   LINE      ---      ---       #434
+      01003412H   LINE      ---      ---       #435
+      01003412H   LINE      ---      ---       #436
+      01003415H   LINE      ---      ---       #438
+      01003427H   LINE      ---      ---       #439
+      01003436H   LINE      ---      ---       #440
+      0100343BH   LINE      ---      ---       #442
+      01003444H   LINE      ---      ---       #443
+      01003444H   LINE      ---      ---       #444
+      01003454H   LINE      ---      ---       #445
+      0100345CH   LINE      ---      ---       #446
+      01003462H   LINE      ---      ---       #447
+      01003462H   LINE      ---      ---       #448
+      01003464H   LINE      ---      ---       #450
+      01003464H   LINE      ---      ---       #451
+      0100346EH   LINE      ---      ---       #452
+      01003478H   LINE      ---      ---       #453
+      0100347EH   LINE      ---      ---       #454
+      0100347EH   LINE      ---      ---       #456
+      0100347EH   LINE      ---      ---       #458
+      01003488H   LINE      ---      ---       #459
+      01003488H   LINE      ---      ---       #460
+      0100348CH   LINE      ---      ---       #462
+      01003496H   LINE      ---      ---       #463
+      010034A3H   LINE      ---      ---       #465
+      010034B9H   LINE      ---      ---       #466
+      010034BFH   LINE      ---      ---       #468
+      010034D0H   LINE      ---      ---       #469
+      010034D0H   LINE      ---      ---       #470
+      010034DCH   LINE      ---      ---       #471
+      010034DCH   LINE      ---      ---       #473
+      010034E1H   LINE      ---      ---       #476
+      010034E8H   LINE      ---      ---       #477
+      010034E8H   LINE      ---      ---       #478
+      010034FEH   LINE      ---      ---       #479
+      010034FEH   LINE      ---      ---       #480
+      0100350BH   LINE      ---      ---       #481
+      0100351AH   LINE      ---      ---       #482
+      01003529H   LINE      ---      ---       #483
+      0100352BH   LINE      ---      ---       #485
+      0100353AH   LINE      ---      ---       #486
+      0100353CH   LINE      ---      ---       #489
+      0100353CH   LINE      ---      ---       #490
+      01003542H   LINE      ---      ---       #491
+      01003542H   LINE      ---      ---       #492
+      01003558H   LINE      ---      ---       #493
+      01003566H   LINE      ---      ---       #495
+      01003581H   LINE      ---      ---       #500
+      01003590H   LINE      ---      ---       #501
+      0100359FH   LINE      ---      ---       #502
+      0100359FH   LINE      ---      ---       #504
+      010035A5H   LINE      ---      ---       #505
+      010035ABH   LINE      ---      ---       #506
+      010035AFH   LINE      ---      ---       #507
+      010035AFH   LINE      ---      ---       #508
+      010035B5H   LINE      ---      ---       #511
+      010035B5H   LINE      ---      ---       #512
+      010035B5H   LINE      ---      ---       #514
+      010035B5H   LINE      ---      ---       #515
+      010035B5H   LINE      ---      ---       #516
+      010035B9H   LINE      ---      ---       #517
+      010035B9H   LINE      ---      ---       #519
+      010035C0H   LINE      ---      ---       #520
+      010035C9H   LINE      ---      ---       #521
+      010035CDH   LINE      ---      ---       #522
+      010035D5H   LINE      ---      ---       #523
+      010035DDH   LINE      ---      ---       #524
+      010035E6H   LINE      ---      ---       #525
+      010035EAH   LINE      ---      ---       #526
+      010035F2H   LINE      ---      ---       #527
+      010035F9H   LINE      ---      ---       #528
+      01003601H   LINE      ---      ---       #530
+      01003604H   LINE      ---      ---       #531
+      02004C95H   SYMBOL    XDATA    VOID      R_Weight_GetZeroTimeOut
+      02004C96H   SYMBOL    XDATA    VOID      R_AD_PowerOnZero
+      02004C98H   SYMBOL    XDATA    VOID      R_AD_Zero
+      02004C9AH   SYMBOL    XDATA    VOID      B_Weight_Zero
+      02004C9BH   SYMBOL    XDATA    VOID      B_Weight_ZeroOk
+      02004C9CH   SYMBOL    XDATA    VOID      B_LockDownCheck
+      02004C9DH   SYMBOL    XDATA    VOID      B_WeightZeroErr
+      00000006H   SYMBOL    DATA     VOID      R_AdFilTimes
+      02004DFCH   SYMBOL    XDATA    VOID      R_AD_BUF
+      02004DFEH   SYMBOL    XDATA    VOID      weight_temp
+      02004E00H   SYMBOL    XDATA    VOID      R_Open_Weight
+      02004E02H   SYMBOL    XDATA    VOID      B_Weight_Pos
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01003605H   BLOCK     CODE     ---       LVL=0
+      01003605H   LINE      ---      ---       #542
+      01003605H   LINE      ---      ---       #543
+      01003605H   BLOCK     CODE     NEAR LAB  LVL=1
+      01003605H   LINE      ---      ---       #546
+      01003609H   LINE      ---      ---       #547
+      01003609H   LINE      ---      ---       #548
+      0100360FH   LINE      ---      ---       #549
+      01003612H   LINE      ---      ---       #550
+      01003612H   LINE      ---      ---       #552
+      01003616H   LINE      ---      ---       #553
+      01003616H   LINE      ---      ---       #554
+      0100361CH   LINE      ---      ---       #555
+      0100361CH   LINE      ---      ---       #556
+      01003620H   LINE      ---      ---       #557
+      01003620H   LINE      ---      ---       #558
+      01003625H   LINE      ---      ---       #559
+      01003627H   LINE      ---      ---       #560
+      01003627H   LINE      ---      ---       #562
+      01003634H   LINE      ---      ---       #563
+      01003634H   LINE      ---      ---       #564
+      0100363BH   LINE      ---      ---       #566
+      0100363EH   LINE      ---      ---       #567
+      0100364DH   LINE      ---      ---       #568
+      0100364FH   LINE      ---      ---       #570
+      0100364FH   LINE      ---      ---       #571
+      01003657H   LINE      ---      ---       #572
+      01003668H   LINE      ---      ---       #574
+      0100366FH   LINE      ---      ---       #575
+      0100366FH   LINE      ---      ---       #577
+      01003671H   LINE      ---      ---       #578
+      02004C9EH   SYMBOL    XDATA    VOID      B_Weight_Downing_Lock
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000FB5H   BLOCK     CODE     ---       LVL=0
+      01000FB5H   LINE      ---      ---       #621
+      01000FB5H   LINE      ---      ---       #622
+      01000FB5H   BLOCK     CODE     NEAR LAB  LVL=1
+      01000FB5H   LINE      ---      ---       #625
+      01000FB5H   LINE      ---      ---       #626
+      01000FB5H   LINE      ---      ---       #627
+      01000FB5H   LINE      ---      ---       #628
+      01000FB5H   LINE      ---      ---       #629
+      01000FB5H   LINE      ---      ---       #631
+      01000FBAH   LINE      ---      ---       #633
+      01000FBEH   LINE      ---      ---       #634
+      01000FC4H   LINE      ---      ---       #636
+      01000FC6H   LINE      ---      ---       #637
+      02004C9FH   SYMBOL    XDATA    VOID      B_Weight_LowBat
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000FF1H   BLOCK     CODE     ---       LVL=0
+      01000FF1H   LINE      ---      ---       #640
+      01000FF1H   LINE      ---      ---       #641
+      01000FF1H   BLOCK     CODE     NEAR LAB  LVL=1
+      01000FF1H   LINE      ---      ---       #645
+      01000FF5H   LINE      ---      ---       #646
+      01000FF5H   LINE      ---      ---       #647
+      01000FFAH   LINE      ---      ---       #648
+      01000FFCH   LINE      ---      ---       #649
+      01000FFEH   LINE      ---      ---       #650
+      01000FFEH   LINE      ---      ---       #652
+      0100100DH   LINE      ---      ---       #653
+      01001013H   LINE      ---      ---       #654
+      0100101CH   LINE      ---      ---       #655
+      0100101CH   LINE      ---      ---       #656
+      0100101FH   LINE      ---      ---       #657
+      01001022H   LINE      ---      ---       #658
+      01001028H   LINE      ---      ---       #659
+      0100102AH   LINE      ---      ---       #661
+      0100102FH   LINE      ---      ---       #663
+      01001033H   LINE      ---      ---       #664
+      01001039H   LINE      ---      ---       #666
+      0100103BH   LINE      ---      ---       #667
+      02004CA0H   SYMBOL    XDATA    VOID      R_Weight_OverLoadTimes
+      02004CA1H   SYMBOL    XDATA    VOID      B_Weight_OverLoad
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000BBBH   BLOCK     CODE     ---       LVL=0
+      01000BBBH   LINE      ---      ---       #672
+      01000BBBH   LINE      ---      ---       #673
+      01000BBBH   BLOCK     CODE     NEAR LAB  LVL=1
+      01000BBBH   LINE      ---      ---       #681
+      01000BBFH   LINE      ---      ---       #682
+      01000BBFH   LINE      ---      ---       #683
+      01000BC4H   LINE      ---      ---       #684
+      01000BC6H   LINE      ---      ---       #685
+      01000BC8H   LINE      ---      ---       #686
+      01000BCAH   LINE      ---      ---       #687
+      01000BCAH   LINE      ---      ---       #689
+      01000BCEH   LINE      ---      ---       #690
+      01000BD4H   LINE      ---      ---       #692
+      01000BD8H   LINE      ---      ---       #693
+      01000BDEH   LINE      ---      ---       #695
+      01000BE8H   LINE      ---      ---       #696
+      01000BE8H   LINE      ---      ---       #698
+      01000BFEH   LINE      ---      ---       #699
+      01000C0CH   LINE      ---      ---       #701
+      01000C27H   LINE      ---      ---       #703
+      01000C36H   LINE      ---      ---       #704
+      01000C36H   LINE      ---      ---       #705
+      01000C3FH   LINE      ---      ---       #706
+      01000C42H   LINE      ---      ---       #707
+      01000C44H   LINE      ---      ---       #709
+      01000C49H   LINE      ---      ---       #712
+      01000C59H   LINE      ---      ---       #714
+      01000C5EH   LINE      ---      ---       #715
+      01000C60H   LINE      ---      ---       #717
+      01000C69H   LINE      ---      ---       #718
+      01000C69H   LINE      ---      ---       #719
+      01000C71H   LINE      ---      ---       #720
+      01000C75H   LINE      ---      ---       #721
+      01000C77H   LINE      ---      ---       #723
+      01000C77H   LINE      ---      ---       #724
+      01000C80H   LINE      ---      ---       #725
+      01000C80H   LINE      ---      ---       #726
+      01000C86H   LINE      ---      ---       #727
+      01000C8CH   LINE      ---      ---       #728
+      01000C90H   LINE      ---      ---       #729
+      01000C94H   LINE      ---      ---       #730
+      01000C98H   LINE      ---      ---       #731
+      01000C98H   LINE      ---      ---       #732
+      01000C98H   LINE      ---      ---       #733
+      01000C98H   LINE      ---      ---       #734
+      01000C9AH   LINE      ---      ---       #735
+      02004E67H   SYMBOL    XDATA    VOID      weight_temp
+      02004CA2H   SYMBOL    XDATA    VOID      R_Weight_kg_old
+      02004CA4H   SYMBOL    XDATA    VOID      R_Weight_SameTimes
+      02004CA5H   SYMBOL    XDATA    VOID      B_Weight_SmallSteady
+      02004CA6H   SYMBOL    XDATA    VOID      B_Weight_HeavySteady
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000CD9H   BLOCK     CODE     ---       LVL=0
+      01000CD9H   LINE      ---      ---       #744
+      01000CD9H   LINE      ---      ---       #745
+      01000CD9H   BLOCK     CODE     NEAR LAB  LVL=1
+      01000CD9H   LINE      ---      ---       #752
+      01000CDCH   LINE      ---      ---       #753
+      01000CDCH   LINE      ---      ---       #754
+      01000CE1H   LINE      ---      ---       #756
+      01000CE1H   LINE      ---      ---       #758
+      01000CECH   LINE      ---      ---       #759
+      01000CECH   LINE      ---      ---       #760
+      01000CF7H   LINE      ---      ---       #761
+      01000CF7H   LINE      ---      ---       #762
+      01000CFBH   LINE      ---      ---       #764
+      01000D11H   LINE      ---      ---       #765
+      01000D1FH   LINE      ---      ---       #767
+      01000D3AH   LINE      ---      ---       #770
+      01000D49H   LINE      ---      ---       #771
+      01000D49H   LINE      ---      ---       #772
+      01000D57H   LINE      ---      ---       #773
+      01000D66H   LINE      ---      ---       #774
+      01000D66H   LINE      ---      ---       #776
+      01000D76H   LINE      ---      ---       #777
+      01000D7EH   LINE      ---      ---       #778
+      01000D86H   LINE      ---      ---       #779
+      01000D8BH   LINE      ---      ---       #780
+      01000D8CH   LINE      ---      ---       #782
+      01000D8CH   LINE      ---      ---       #790
+      01000D92H   LINE      ---      ---       #791
+      01000D92H   LINE      ---      ---       #793
+      01000D96H   LINE      ---      ---       #794
+      01000D96H   LINE      ---      ---       #795
+      01000D98H   LINE      ---      ---       #796
+      01000D9DH   LINE      ---      ---       #797
+      01000D9FH   LINE      ---      ---       #798
+      01000DA5H   LINE      ---      ---       #800
+      01000DA5H   LINE      ---      ---       #801
+      01000DADH   LINE      ---      ---       #802
+      01000DADH   LINE      ---      ---       #804
+      01000DB1H   LINE      ---      ---       #805
+      01000DB5H   LINE      ---      ---       #807
+      01000DBDH   LINE      ---      ---       #808
+      01000DC5H   LINE      ---      ---       #809
+      01000DCDH   LINE      ---      ---       #810
+      01000DD5H   LINE      ---      ---       #811
+      01000DEAH   LINE      ---      ---       #812
+      01000E00H   LINE      ---      ---       #813
+      01000E06H   LINE      ---      ---       #814
+      01000E0CH   LINE      ---      ---       #817
+      01000E0CH   LINE      ---      ---       #818
+      01000E0CH   LINE      ---      ---       #828
+      01000E11H   LINE      ---      ---       #829
+      01000E1AH   LINE      ---      ---       #830
+      01000E1DH   LINE      ---      ---       #831
+      01000E1FH   LINE      ---      ---       #832
+      01000E1FH   LINE      ---      ---       #833
+      01000E1FH   LINE      ---      ---       #834
+      00000006H   SYMBOL    DATA     VOID      R_AD_BUF
+      02004E03H   SYMBOL    XDATA    VOID      R_Weight_Temp
+      02004CA7H   SYMBOL    XDATA    VOID      B_Debug_Send
+      02004CA8H   SYMBOL    XDATA    VOID      ReadUTC
+      02004E05H   SYMBOL    XDATA    VOID      SendData
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000B53H   BLOCK     CODE     ---       LVL=0
+      01000B53H   LINE      ---      ---       #838
+      01000B53H   LINE      ---      ---       #839
+      01000B53H   BLOCK     CODE     NEAR LAB  LVL=1
+      01000B53H   LINE      ---      ---       #842
+      01000B69H   LINE      ---      ---       #843
+      01000B69H   LINE      ---      ---       #844
+      01000B76H   LINE      ---      ---       #845
+      01000B7EH   LINE      ---      ---       #846
+      01000B7EH   LINE      ---      ---       #847
+      01000B84H   LINE      ---      ---       #848
+      01000B88H   LINE      ---      ---       #849
+      01000B88H   LINE      ---      ---       #850
+      01000B88H   LINE      ---      ---       #852
+      01000B88H   LINE      ---      ---       #853
+      01000BA4H   LINE      ---      ---       #854
+      01000BACH   LINE      ---      ---       #855
+      01000BACH   LINE      ---      ---       #856
+      01000BB2H   LINE      ---      ---       #857
+      01000BB6H   LINE      ---      ---       #858
+      01000BBAH   LINE      ---      ---       #860
+      01000BBAH   LINE      ---      ---       #861
+      01000BBAH   LINE      ---      ---       #863
+      02004E69H   SYMBOL    XDATA    VOID      weight_temp
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01003722H   BLOCK     CODE     ---       LVL=0
+      01003722H   LINE      ---      ---       #869
+      01003722H   LINE      ---      ---       #870
+      01003722H   BLOCK     CODE     NEAR LAB  LVL=1
+      01003722H   LINE      ---      ---       #874
+      01003726H   LINE      ---      ---       #875
+      01003726H   LINE      ---      ---       #876
+      0100372BH   LINE      ---      ---       #877
+      0100372DH   LINE      ---      ---       #878
+      0100372DH   LINE      ---      ---       #880
+      01003731H   LINE      ---      ---       #881
+      01003731H   LINE      ---      ---       #882
+      0100373AH   LINE      ---      ---       #883
+      0100373DH   LINE      ---      ---       #884
+      0100373DH   LINE      ---      ---       #886
+      01003743H   LINE      ---      ---       #887
+      01003743H   LINE      ---      ---       #888
+      0100374CH   LINE      ---      ---       #889
+      0100374CH   LINE      ---      ---       #890
+      01003750H   LINE      ---      ---       #891
+      01003757H   LINE      ---      ---       #892
+      01003757H   LINE      ---      ---       #893
+      01003757H   LINE      ---      ---       #894
+      02004CA9H   SYMBOL    XDATA    VOID      timecount
+      02004CAAH   SYMBOL    XDATA    VOID      B_Timeout
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01001135H   BLOCK     CODE     ---       LVL=0
+      01001135H   LINE      ---      ---       #910
+      01001137H   LINE      ---      ---       #911
+      01001137H   BLOCK     CODE     NEAR LAB  LVL=1
+      01001137H   LINE      ---      ---       #923
+      0100113BH   LINE      ---      ---       #924
+      0100113BH   LINE      ---      ---       #925
+      01001140H   LINE      ---      ---       #926
+      01001143H   LINE      ---      ---       #927
+      01001143H   LINE      ---      ---       #928
+      0100114AH   LINE      ---      ---       #929
+      0100114AH   LINE      ---      ---       #958
+      01001157H   LINE      ---      ---       #959
+      01001169H   LINE      ---      ---       #960
+      01001176H   LINE      ---      ---       #961
+      01001188H   LINE      ---      ---       #962
+      01001195H   LINE      ---      ---       #963
+      010011A7H   LINE      ---      ---       #967
+      010011C0H   LINE      ---      ---       #968
+      010011D9H   LINE      ---      ---       #969
+      010011F2H   LINE      ---      ---       #970
+      010011F2H   LINE      ---      ---       #971
+      010011FCH   LINE      ---      ---       #972
+      01001204H   LINE      ---      ---       #973
+      0100120CH   LINE      ---      ---       #974
+      0100120CH   LINE      ---      ---       #977
+      01001223H   LINE      ---      ---       #978
+      01001227H   LINE      ---      ---       #979
+      01001227H   LINE      ---      ---       #980
+      0100122BH   LINE      ---      ---       #981
+      0100122BH   LINE      ---      ---       #982
+      01001242H   LINE      ---      ---       #983
+      01001246H   LINE      ---      ---       #984
+      01001246H   LINE      ---      ---       #986
+      0100124AH   LINE      ---      ---       #987
+      01001253H   LINE      ---      ---       #988
+      01001257H   LINE      ---      ---       #989
+      01001260H   LINE      ---      ---       #990
+      01001264H   LINE      ---      ---       #991
+      0100126DH   LINE      ---      ---       #992
+      01001271H   LINE      ---      ---       #993
+      0100127AH   LINE      ---      ---       #995
+      0100128CH   LINE      ---      ---       #996
+      0100129BH   LINE      ---      ---       #997
+      010012A8H   LINE      ---      ---       #1003
+      010012AEH   LINE      ---      ---       #1004
+      010012AEH   LINE      ---      ---       #1006
+      010012BEH   LINE      ---      ---       #1007
+      010012CDH   LINE      ---      ---       #1008
+      010012CDH   LINE      ---      ---       #1009
+      010012D2H   LINE      ---      ---       #1010
+      010012DFH   LINE      ---      ---       #1011
+      010012E4H   LINE      ---      ---       #1012
+      010012EAH   LINE      ---      ---       #1013
+      010012EAH   LINE      ---      ---       #1014
+      010012F6H   LINE      ---      ---       #1015
+      010012F6H   LINE      ---      ---       #1017
+      010012FDH   LINE      ---      ---       #1018
+      010012FDH   LINE      ---      ---       #1019
+      01001308H   LINE      ---      ---       #1020
+      0100130EH   LINE      ---      ---       #1021
+      01001315H   LINE      ---      ---       #1022
+      01001315H   LINE      ---      ---       #1024
+      0100131FH   LINE      ---      ---       #1025
+      0100131FH   LINE      ---      ---       #1026
+      0100132DH   LINE      ---      ---       #1027
+      01001341H   LINE      ---      ---       #1029
+      01001363H   LINE      ---      ---       #1030
+      01001363H   LINE      ---      ---       #1031
+      01001372H   LINE      ---      ---       #1032
+      01001372H   LINE      ---      ---       #1033
+      0100137FH   LINE      ---      ---       #1034
+      0100138CH   LINE      ---      ---       #1035
+      0100138CH   LINE      ---      ---       #1036
+      01001393H   LINE      ---      ---       #1037
+      01001395H   LINE      ---      ---       #1039
+      01001395H   LINE      ---      ---       #1040
+      010013B2H   LINE      ---      ---       #1041
+      010013B2H   LINE      ---      ---       #1042
+      010013B7H   LINE      ---      ---       #1043
+      010013C4H   LINE      ---      ---       #1044
+      010013CAH   LINE      ---      ---       #1045
+      010013CAH   LINE      ---      ---       #1046
+      010013CAH   LINE      ---      ---       #1047
+      010013D6H   LINE      ---      ---       #1049
+      010013D6H   LINE      ---      ---       #1051
+      010013DDH   LINE      ---      ---       #1052
+      010013DDH   LINE      ---      ---       #1053
+      010013E8H   LINE      ---      ---       #1054
+      010013EEH   LINE      ---      ---       #1055
+      010013F5H   LINE      ---      ---       #1056
+      010013F5H   LINE      ---      ---       #1058
+      010013FFH   LINE      ---      ---       #1059
+      010013FFH   LINE      ---      ---       #1060
+      0100140DH   LINE      ---      ---       #1061
+      01001421H   LINE      ---      ---       #1063
+      01001444H   LINE      ---      ---       #1064
+      01001444H   LINE      ---      ---       #1065
+      0100144BH   LINE      ---      ---       #1066
+      0100144DH   LINE      ---      ---       #1068
+      0100144DH   LINE      ---      ---       #1069
+      01001461H   LINE      ---      ---       #1071
+      01001477H   LINE      ---      ---       #1072
+      01001477H   LINE      ---      ---       #1073
+      01001484H   LINE      ---      ---       #1074
+      01001489H   LINE      ---      ---       #1075
+      0100148FH   LINE      ---      ---       #1076
+      0100148FH   LINE      ---      ---       #1077
+      0100148FH   LINE      ---      ---       #1078
+      0100149BH   LINE      ---      ---       #1079
+      0100149BH   LINE      ---      ---       #1081
+      010014A2H   LINE      ---      ---       #1082
+      010014A2H   LINE      ---      ---       #1083
+      010014ADH   LINE      ---      ---       #1084
+      010014B3H   LINE      ---      ---       #1085
+      010014BAH   LINE      ---      ---       #1086
+      010014BAH   LINE      ---      ---       #1088
+      010014C4H   LINE      ---      ---       #1089
+      010014C4H   LINE      ---      ---       #1090
+      010014D2H   LINE      ---      ---       #1091
+      010014E6H   LINE      ---      ---       #1093
+      01001509H   LINE      ---      ---       #1094
+      01001509H   LINE      ---      ---       #1095
+      01001510H   LINE      ---      ---       #1096
+      01001512H   LINE      ---      ---       #1098
+      01001512H   LINE      ---      ---       #1099
+      01001523H   LINE      ---      ---       #1101
+      01001531H   LINE      ---      ---       #1102
+      01001531H   LINE      ---      ---       #1103
+      01001536H   LINE      ---      ---       #1105
+      01001538H   LINE      ---      ---       #1107
+      01001538H   LINE      ---      ---       #1108
+      0100154CH   LINE      ---      ---       #1110
+      01001562H   LINE      ---      ---       #1111
+      01001562H   LINE      ---      ---       #1112
+      01001567H   LINE      ---      ---       #1113
+      0100156DH   LINE      ---      ---       #1114
+      0100156DH   LINE      ---      ---       #1115
+      0100156DH   LINE      ---      ---       #1116
+      0100156DH   LINE      ---      ---       #1117
+      01001579H   LINE      ---      ---       #1118
+      01001579H   LINE      ---      ---       #1120
+      01001580H   LINE      ---      ---       #1121
+      01001580H   LINE      ---      ---       #1122
+      0100158BH   LINE      ---      ---       #1123
+      01001591H   LINE      ---      ---       #1124
+      01001598H   LINE      ---      ---       #1125
+      01001598H   LINE      ---      ---       #1127
+      010015A0H   LINE      ---      ---       #1128
+      010015A0H   LINE      ---      ---       #1130
+      010015AEH   LINE      ---      ---       #1131
+      010015BBH   LINE      ---      ---       #1132
+      010015C1H   LINE      ---      ---       #1133
+      010015DAH   LINE      ---      ---       #1141
+      010015DFH   LINE      ---      ---       #1142
+      010015E9H   LINE      ---      ---       #1143
+      010015F6H   LINE      ---      ---       #1144
+      010015F9H   LINE      ---      ---       #1145
+      01001606H   LINE      ---      ---       #1146
+      01001609H   LINE      ---      ---       #1147
+      0100160EH   LINE      ---      ---       #1151
+      0100160EH   LINE      ---      ---       #1152
+      01001611H   LINE      ---      ---       #1154
+      02004CABH   SYMBOL    XDATA    VOID      R_AD_CaliDot1
+      02004CADH   SYMBOL    XDATA    VOID      R_AD_CaliDot2
+      02004CAFH   SYMBOL    XDATA    VOID      R_AD_CaliDot3
+      02004CB1H   SYMBOL    XDATA    VOID      R_CaliState
+      02004CB2H   SYMBOL    XDATA    VOID      R_OpenWeight_Ad
+      02004E0BH   SYMBOL    XDATA    VOID      R_AdFilTimes
+      02004E0DH   SYMBOL    XDATA    VOID      weight_temp
+      02004E0FH   SYMBOL    XDATA    VOID      R_AD_BUF
+      02004E11H   SYMBOL    XDATA    VOID      R_AD_PowerOnZero
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000AA8H   BLOCK     CODE     ---       LVL=0
+      01000AA8H   LINE      ---      ---       #1166
+      01000AA8H   LINE      ---      ---       #1167
+      01000AA8H   BLOCK     CODE     NEAR LAB  LVL=1
+      01000AA8H   LINE      ---      ---       #1171
+      01000AACH   LINE      ---      ---       #1172
+      01000AACH   LINE      ---      ---       #1173
+      01000AB1H   LINE      ---      ---       #1174
+      01000AB6H   LINE      ---      ---       #1176
+      01000AB6H   LINE      ---      ---       #1178
+      01000ABAH   LINE      ---      ---       #1179
+      01000ABAH   LINE      ---      ---       #1180
+      01000AC0H   LINE      ---      ---       #1181
+      01000AC6H   LINE      ---      ---       #1183
+      01000AC6H   LINE      ---      ---       #1185
+      01000AD0H   LINE      ---      ---       #1186
+      01000AD0H   LINE      ---      ---       #1187
+      01000AD0H   LINE      ---      ---       #1188
+      01000AD6H   LINE      ---      ---       #1189
+      01000AD6H   LINE      ---      ---       #1190
+      01000AD8H   LINE      ---      ---       #1191
+      01000ADEH   LINE      ---      ---       #1192
+      01000AE3H   LINE      ---      ---       #1193
+      01000AE5H   LINE      ---      ---       #1195
+      01000AE5H   LINE      ---      ---       #1196
+      01000AEDH   LINE      ---      ---       #1197
+      01000AEDH   LINE      ---      ---       #1198
+      01000AF1H   LINE      ---      ---       #1199
+      01000AF4H   LINE      ---      ---       #1201
+      01000AF8H   LINE      ---      ---       #1202
+      01000AFCH   LINE      ---      ---       #1203
+      01000B05H   LINE      ---      ---       #1211
+      01000B0BH   LINE      ---      ---       #1213
+      01000B0BH   LINE      ---      ---       #1214
+      01000B0CH   LINE      ---      ---       #1215
+      01000B0CH   LINE      ---      ---       #1216
+      01000B12H   LINE      ---      ---       #1217
+      01000B12H   LINE      ---      ---       #1218
+      01000B14H   LINE      ---      ---       #1219
+      01000B1AH   LINE      ---      ---       #1220
+      01000B1FH   LINE      ---      ---       #1221
+      01000B21H   LINE      ---      ---       #1222
+      01000B21H   LINE      ---      ---       #1223
+      01000B28H   LINE      ---      ---       #1224
+      01000B28H   LINE      ---      ---       #1225
+      01000B2DH   LINE      ---      ---       #1226
+      01000B2FH   LINE      ---      ---       #1227
+      01000B35H   LINE      ---      ---       #1237
+      01000B38H   LINE      ---      ---       #1238
+      01000B3CH   LINE      ---      ---       #1239
+      01000B41H   LINE      ---      ---       #1241
+      01000B46H   LINE      ---      ---       #1242
+      01000B4CH   LINE      ---      ---       #1243
+      01000B4CH   LINE      ---      ---       #1244
+      01000B4DH   LINE      ---      ---       #1245
+      01000B4DH   LINE      ---      ---       #1246
+      01000B52H   LINE      ---      ---       #1247
+      01000B52H   LINE      ---      ---       #1248
+      01000B52H   LINE      ---      ---       #1252
+      02004CB4H   SYMBOL    XDATA    VOID      comm_doing
+      02004CB5H   SYMBOL    XDATA    VOID      StandbyState
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01003758H   BLOCK     CODE     ---       LVL=0
+      01003758H   LINE      ---      ---       #1266
+      01003758H   LINE      ---      ---       #1267
+      01003758H   BLOCK     CODE     NEAR LAB  LVL=1
+      01003758H   LINE      ---      ---       #1272
+      0100375BH   LINE      ---      ---       #1273
+      0100375BH   LINE      ---      ---       #1274
+      01003760H   LINE      ---      ---       #1275
+      01003765H   LINE      ---      ---       #1277
+      01003765H   LINE      ---      ---       #1280
+      0100376BH   LINE      ---      ---       #1281
+      0100376BH   LINE      ---      ---       #1282
+      01003771H   LINE      ---      ---       #1283
+      01003771H   LINE      ---      ---       #1284
+      01003773H   LINE      ---      ---       #1285
+      01003779H   LINE      ---      ---       #1286
+      0100377BH   LINE      ---      ---       #1288
+      0100377BH   LINE      ---      ---       #1289
+      01003780H   LINE      ---      ---       #1290
+      01003783H   LINE      ---      ---       #1291
+      01003783H   LINE      ---      ---       #1292
+      01003783H   LINE      ---      ---       #1294
+      0100378AH   LINE      ---      ---       #1295
+      0100378AH   LINE      ---      ---       #1296
+      01003790H   LINE      ---      ---       #1297
+      01003790H   LINE      ---      ---       #1298
+      01003792H   LINE      ---      ---       #1299
+      01003798H   LINE      ---      ---       #1300
+      0100379DH   LINE      ---      ---       #1301
+      0100379FH   LINE      ---      ---       #1302
+      0100379FH   LINE      ---      ---       #1303
+      010037A6H   LINE      ---      ---       #1304
+      010037A6H   LINE      ---      ---       #1305
+      010037ABH   LINE      ---      ---       #1306
+      010037AFH   LINE      ---      ---       #1307
+      010037AFH   LINE      ---      ---       #1308
+      010037AFH   LINE      ---      ---       #1310
+      010037B6H   LINE      ---      ---       #1311
+      010037B6H   LINE      ---      ---       #1312
+      010037B9H   LINE      ---      ---       #1313
+      010037B9H   LINE      ---      ---       #1315
+      010037C0H   LINE      ---      ---       #1316
+      010037C0H   LINE      ---      ---       #1317
+      010037C6H   LINE      ---      ---       #1318
+      010037C6H   LINE      ---      ---       #1319
+      010037C8H   LINE      ---      ---       #1320
+      010037CEH   LINE      ---      ---       #1321
+      010037D3H   LINE      ---      ---       #1322
+      010037D5H   LINE      ---      ---       #1323
+      010037D5H   LINE      ---      ---       #1324
+      010037DCH   LINE      ---      ---       #1325
+      010037DCH   LINE      ---      ---       #1326
+      010037E1H   LINE      ---      ---       #1327
+      010037E5H   LINE      ---      ---       #1328
+      010037E5H   LINE      ---      ---       #1329
+      010037E5H   LINE      ---      ---       #1331
+      010037ECH   LINE      ---      ---       #1332
+      010037ECH   LINE      ---      ---       #1333
+      010037F2H   LINE      ---      ---       #1334
+      010037F2H   LINE      ---      ---       #1335
+      010037F4H   LINE      ---      ---       #1336
+      010037FAH   LINE      ---      ---       #1337
+      010037FFH   LINE      ---      ---       #1338
+      01003801H   LINE      ---      ---       #1339
+      01003801H   LINE      ---      ---       #1340
+      01003808H   LINE      ---      ---       #1341
+      01003808H   LINE      ---      ---       #1342
+      0100380DH   LINE      ---      ---       #1343
+      01003811H   LINE      ---      ---       #1344
+      01003811H   LINE      ---      ---       #1345
+      01003811H   LINE      ---      ---       #1347
+      01003819H   LINE      ---      ---       #1348
+      01003819H   LINE      ---      ---       #1349
+      0100381FH   LINE      ---      ---       #1350
+      0100381FH   LINE      ---      ---       #1351
+      01003821H   LINE      ---      ---       #1352
+      0100382AH   LINE      ---      ---       #1353
+      01003830H   LINE      ---      ---       #1354
+      01003835H   LINE      ---      ---       #1355
+      01003837H   LINE      ---      ---       #1357
+      01003837H   LINE      ---      ---       #1358
+      0100383EH   LINE      ---      ---       #1359
+      0100383EH   LINE      ---      ---       #1360
+      01003843H   LINE      ---      ---       #1361
+      01003847H   LINE      ---      ---       #1362
+      0100384DH   LINE      ---      ---       #1363
+      01003852H   LINE      ---      ---       #1364
+      01003852H   LINE      ---      ---       #1365
+      01003852H   LINE      ---      ---       #1367
+      01003859H   LINE      ---      ---       #1368
+      01003859H   LINE      ---      ---       #1369
+      01003864H   LINE      ---      ---       #1370
+      01003864H   LINE      ---      ---       #1371
+      0100386AH   LINE      ---      ---       #1372
+      01003870H   LINE      ---      ---       #1373
+      01003870H   LINE      ---      ---       #1374
+      01003870H   LINE      ---      ---       #1376
+      02004CB6H   SYMBOL    XDATA    VOID      comm_doing
+      02004CB7H   SYMBOL    XDATA    VOID      PowerOnState
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000C9BH   BLOCK     CODE     ---       LVL=0
+      01000C9BH   LINE      ---      ---       #1381
+      01000C9BH   LINE      ---      ---       #1382
+      01000C9BH   BLOCK     CODE     NEAR LAB  LVL=1
+      01000C9BH   LINE      ---      ---       #1386
+      01000C9FH   LINE      ---      ---       #1387
+      01000C9FH   LINE      ---      ---       #1388
+      01000CA4H   LINE      ---      ---       #1389
+      01000CA6H   LINE      ---      ---       #1390
+      01000CA6H   LINE      ---      ---       #1392
+      01000CAAH   LINE      ---      ---       #1393
+      01000CB0H   LINE      ---      ---       #1395
+      01000CB3H   LINE      ---      ---       #1396
+      01000CB3H   LINE      ---      ---       #1397
+      01000CBCH   LINE      ---      ---       #1398
+      01000CBFH   LINE      ---      ---       #1399
+      01000CBFH   LINE      ---      ---       #1402
+      01000CC8H   LINE      ---      ---       #1403
+      01000CCCH   LINE      ---      ---       #1405
+      01000CD0H   LINE      ---      ---       #1406
+      01000CD6H   LINE      ---      ---       #1408
+      01000CD8H   LINE      ---      ---       #1410
+      02004CB8H   SYMBOL    XDATA    VOID      timecount
+      02004CB9H   SYMBOL    XDATA    VOID      B_Timeout
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000983H   BLOCK     CODE     ---       LVL=0
+      01000983H   LINE      ---      ---       #1429
+      01000983H   LINE      ---      ---       #1430
+      01000983H   BLOCK     CODE     NEAR LAB  LVL=1
+      01000983H   LINE      ---      ---       #1434
+      01000987H   LINE      ---      ---       #1435
+      01000987H   LINE      ---      ---       #1436
+      0100098EH   LINE      ---      ---       #1438
+      0100098EH   LINE      ---      ---       #1440
+      01000991H   LINE      ---      ---       #1441
+      01000991H   LINE      ---      ---       #1442
+      01000994H   LINE      ---      ---       #1443
+      01000999H   LINE      ---      ---       #1444
+      0100099DH   LINE      ---      ---       #1445
+      010009A2H   LINE      ---      ---       #1446
+      010009A6H   LINE      ---      ---       #1447
+      010009ABH   LINE      ---      ---       #1448
+      010009AFH   LINE      ---      ---       #1449
+      010009B4H   LINE      ---      ---       #1450
+      010009B8H   LINE      ---      ---       #1451
+      010009BDH   LINE      ---      ---       #1452
+      010009C4H   LINE      ---      ---       #1453
+      010009C4H   LINE      ---      ---       #1454
+      010009C8H   LINE      ---      ---       #1455
+      010009CAH   LINE      ---      ---       #1456
+      010009CCH   LINE      ---      ---       #1457
+      010009CEH   LINE      ---      ---       #1458
+      010009D0H   LINE      ---      ---       #1459
+      010009D1H   LINE      ---      ---       #1461
+      010009D1H   LINE      ---      ---       #1463
+      010009DBH   LINE      ---      ---       #1464
+      010009DBH   LINE      ---      ---       #1465
+      010009DCH   LINE      ---      ---       #1468
+      010009E3H   LINE      ---      ---       #1469
+      010009E3H   LINE      ---      ---       #1470
+      010009E9H   LINE      ---      ---       #1472
+      010009F1H   LINE      ---      ---       #1473
+      010009F1H   LINE      ---      ---       #1474
+      010009F7H   LINE      ---      ---       #1475
+      010009FBH   LINE      ---      ---       #1476
+      01000A00H   LINE      ---      ---       #1477
+      01000A01H   LINE      ---      ---       #1479
+      01000A01H   LINE      ---      ---       #1482
+      01000A08H   LINE      ---      ---       #1483
+      01000A08H   LINE      ---      ---       #1484
+      01000A0EH   LINE      ---      ---       #1486
+      01000A16H   LINE      ---      ---       #1487
+      01000A16H   LINE      ---      ---       #1488
+      01000A1CH   LINE      ---      ---       #1489
+      01000A20H   LINE      ---      ---       #1490
+      01000A25H   LINE      ---      ---       #1491
+      01000A26H   LINE      ---      ---       #1494
+      01000A26H   LINE      ---      ---       #1498
+      01000A2EH   LINE      ---      ---       #1499
+      01000A2EH   LINE      ---      ---       #1501
+      01000A39H   LINE      ---      ---       #1502
+      01000A39H   LINE      ---      ---       #1503
+      01000A3FH   LINE      ---      ---       #1504
+      01000A41H   LINE      ---      ---       #1506
+      01000A41H   LINE      ---      ---       #1510
+      01000A46H   LINE      ---      ---       #1511
+      01000A46H   LINE      ---      ---       #1513
+      01000A4DH   LINE      ---      ---       #1514
+      01000A54H   LINE      ---      ---       #1516
+      01000A5AH   LINE      ---      ---       #1519
+      01000A6CH   LINE      ---      ---       #1520
+      01000A6CH   LINE      ---      ---       #1521
+      01000A72H   LINE      ---      ---       #1522
+      01000A76H   LINE      ---      ---       #1523
+      01000A7BH   LINE      ---      ---       #1524
+      01000A7FH   LINE      ---      ---       #1525
+      01000A80H   LINE      ---      ---       #1528
+      01000A80H   LINE      ---      ---       #1532
+      01000A87H   LINE      ---      ---       #1533
+      01000A87H   LINE      ---      ---       #1534
+      01000A8CH   LINE      ---      ---       #1535
+      01000A92H   LINE      ---      ---       #1537
+      01000A98H   LINE      ---      ---       #1538
+      01000A98H   LINE      ---      ---       #1539
+      01000A9EH   LINE      ---      ---       #1540
+      01000AA2H   LINE      ---      ---       #1541
+      01000AA7H   LINE      ---      ---       #1542
+      01000AA7H   LINE      ---      ---       #1544
+      01000AA7H   LINE      ---      ---       #1547
+      01000AA7H   LINE      ---      ---       #1549
+      02004CBAH   SYMBOL    XDATA    VOID      R_TimeOut
+      02004CBFH   SYMBOL    XDATA    VOID      B_TimeBase_1s
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      ---         MODULE    ---      ---       CS_COMMTO1186
+      02004D64H   PUBLIC    XDATA    BYTE      uartTimeoutCnt
+      02004D54H   PUBLIC    XDATA    ---       uartTxBuf
+      02004D50H   PUBLIC    XDATA    ---       R_Weight_Com_Coo
+      02004D40H   PUBLIC    XDATA    ---       uartRcvBuf
+      01003924H   PUBLIC    CODE     ---       _CS_CommTo1186_SendCmd
+      01003C29H   PUBLIC    CODE     ---       _CS_CommTo1186_Xor
+      01000706H   PUBLIC    CODE     ---       CS_1186Com_Reset_Proc
+      01003672H   PUBLIC    CODE     ---       CS_1186Com_ReadAdZero_Proc
+      01000720H   PUBLIC    CODE     ---       CS_1186Com_SetOpenWeight_Proc
+      01000672H   PUBLIC    CODE     ---       CS_1186Com_SetSleepMode_Proc
+      010005E7H   PUBLIC    CODE     ---       CS_1186Com_ReadTime_Proc
+      01000532H   PUBLIC    CODE     ---       CS_1186Com_SetLcd_Proc
+      01003D7AH   PUBLIC    CODE     ---       CS_1186Com_ReadAdc_Proc
+      01003871H   PUBLIC    CODE     ---       CS_1186Com_ReadMacAdress_Proc
+      010004EEH   PUBLIC    CODE     ---       CS_Scale_1186Com
+
+      010004EEH   BLOCK     CODE     ---       LVL=0
+      010004EEH   LINE      ---      ---       #19
+      010004EEH   LINE      ---      ---       #20
+      010004EEH   LINE      ---      ---       #22
+      010004F7H   LINE      ---      ---       #23
+      010004F7H   LINE      ---      ---       #25
+      01000508H   LINE      ---      ---       #26
+      01000508H   LINE      ---      ---       #27
+      01000508H   LINE      ---      ---       #28
+      0100050AH   LINE      ---      ---       #29
+      0100050DH   LINE      ---      ---       #30
+      0100050FH   LINE      ---      ---       #31
+      01000511H   LINE      ---      ---       #32
+      01000513H   LINE      ---      ---       #33
+      01000513H   LINE      ---      ---       #34
+      01000513H   LINE      ---      ---       #35
+      01000515H   LINE      ---      ---       #36
+      01000518H   LINE      ---      ---       #37
+      0100051AH   LINE      ---      ---       #38
+      0100051AH   LINE      ---      ---       #39
+      0100051AH   LINE      ---      ---       #40
+      0100051AH   LINE      ---      ---       #41
+      0100051AH   LINE      ---      ---       #42
+      0100051CH   LINE      ---      ---       #43
+      0100051FH   LINE      ---      ---       #44
+      01000521H   LINE      ---      ---       #57
+      01000521H   LINE      ---      ---       #58
+      01000521H   LINE      ---      ---       #59
+      01000521H   LINE      ---      ---       #60
+      01000521H   LINE      ---      ---       #61
+      01000522H   LINE      ---      ---       #63
+      01000522H   LINE      ---      ---       #64
+      01000524H   LINE      ---      ---       #65
+      01000529H   LINE      ---      ---       #66
+      01000531H   LINE      ---      ---       #67
+      01000531H   LINE      ---      ---       #69
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01003871H   BLOCK     CODE     ---       LVL=0
+      01003871H   LINE      ---      ---       #73
+      01003871H   LINE      ---      ---       #74
+      01003871H   BLOCK     CODE     NEAR LAB  LVL=1
+      01003871H   LINE      ---      ---       #78
+      01003876H   LINE      ---      ---       #79
+      0100387EH   LINE      ---      ---       #81
+      01003885H   LINE      ---      ---       #82
+      01003885H   LINE      ---      ---       #83
+      0100388BH   LINE      ---      ---       #84
+      0100388FH   LINE      ---      ---       #85
+      01003893H   LINE      ---      ---       #86
+      0100389DH   LINE      ---      ---       #87
+      010038A3H   LINE      ---      ---       #88
+      010038A9H   LINE      ---      ---       #89
+      010038AEH   LINE      ---      ---       #90
+      010038B1H   LINE      ---      ---       #91
+      010038B1H   LINE      ---      ---       #92
+      010038B9H   LINE      ---      ---       #93
+      010038B9H   LINE      ---      ---       #94
+      010038CBH   LINE      ---      ---       #95
+      010038CBH   LINE      ---      ---       #96
+      010038EAH   LINE      ---      ---       #99
+      010038EAH   LINE      ---      ---       #104
+      010038F2H   LINE      ---      ---       #105
+      010038F8H   LINE      ---      ---       #106
+      01003900H   LINE      ---      ---       #107
+      01003906H   LINE      ---      ---       #108
+      0100390CH   LINE      ---      ---       #109
+      01003912H   LINE      ---      ---       #122
+      01003917H   LINE      ---      ---       #123
+      0100391CH   LINE      ---      ---       #124
+      0100391DH   LINE      ---      ---       #126
+      01003923H   LINE      ---      ---       #127
+      01003923H   LINE      ---      ---       #128
+      01003923H   LINE      ---      ---       #129
+      02004E59H   SYMBOL    XDATA    VOID      i
+      02004E5AH   SYMBOL    XDATA    VOID      ptr
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01003D7AH   BLOCK     CODE     ---       LVL=0
+      01003D7AH   LINE      ---      ---       #132
+      01003D7AH   LINE      ---      ---       #133
+      01003D7AH   BLOCK     CODE     NEAR LAB  LVL=1
+      01003D7AH   LINE      ---      ---       #136
+      01003D81H   LINE      ---      ---       #137
+      01003D81H   LINE      ---      ---       #138
+      01003D8BH   LINE      ---      ---       #139
+      01003D91H   LINE      ---      ---       #140
+      01003D97H   LINE      ---      ---       #141
+      01003D9CH   LINE      ---      ---       #142
+      01003D9FH   LINE      ---      ---       #143
+      01003D9FH   LINE      ---      ---       #144
+      01003DA9H   LINE      ---      ---       #145
+      01003DA9H   LINE      ---      ---       #146
+      01003DBDH   LINE      ---      ---       #147
+      01003DBDH   LINE      ---      ---       #148
+      01003DC5H   LINE      ---      ---       #149
+      01003DC5H   LINE      ---      ---       #150
+      01003DCAH   LINE      ---      ---       #151
+      01003DD3H   LINE      ---      ---       #152
+      01003DF3H   LINE      ---      ---       #153
+      01003E13H   LINE      ---      ---       #154
+      01003E20H   LINE      ---      ---       #155
+      01003E28H   LINE      ---      ---       #157
+      01003E2EH   LINE      ---      ---       #158
+      01003E34H   LINE      ---      ---       #160
+      01003E3AH   LINE      ---      ---       #161
+      01003E40H   LINE      ---      ---       #163
+      01003E41H   LINE      ---      ---       #165
+      01003E47H   LINE      ---      ---       #166
+      01003E47H   LINE      ---      ---       #167
+      01003E47H   LINE      ---      ---       #168
+      00000004H   SYMBOL    DATA     VOID      data_rec
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000532H   BLOCK     CODE     ---       LVL=0
+      01000532H   LINE      ---      ---       #172
+      01000532H   LINE      ---      ---       #173
+      01000532H   LINE      ---      ---       #175
+      01000539H   LINE      ---      ---       #176
+      01000539H   LINE      ---      ---       #177
+      01000544H   LINE      ---      ---       #178
+      0100054AH   LINE      ---      ---       #179
+      01000550H   LINE      ---      ---       #180
+      01000555H   LINE      ---      ---       #181
+      01000557H   LINE      ---      ---       #182
+      01000557H   LINE      ---      ---       #183
+      0100055FH   LINE      ---      ---       #184
+      0100055FH   LINE      ---      ---       #185
+      01000570H   LINE      ---      ---       #186
+      01000570H   LINE      ---      ---       #187
+      01000577H   LINE      ---      ---       #188
+      01000577H   LINE      ---      ---       #189
+      0100057DH   LINE      ---      ---       #190
+      01000583H   LINE      ---      ---       #192
+      01000589H   LINE      ---      ---       #193
+      0100058FH   LINE      ---      ---       #194
+      01000590H   LINE      ---      ---       #196
+      01000596H   LINE      ---      ---       #197
+      01000596H   LINE      ---      ---       #198
+      01000596H   LINE      ---      ---       #199
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      010005E7H   BLOCK     CODE     ---       LVL=0
+      010005E7H   LINE      ---      ---       #203
+      010005E7H   LINE      ---      ---       #204
+      010005E7H   LINE      ---      ---       #206
+      010005EEH   LINE      ---      ---       #207
+      010005EEH   LINE      ---      ---       #208
+      010005F9H   LINE      ---      ---       #209
+      010005FFH   LINE      ---      ---       #210
+      01000605H   LINE      ---      ---       #211
+      0100060AH   LINE      ---      ---       #212
+      0100060CH   LINE      ---      ---       #213
+      0100060CH   LINE      ---      ---       #214
+      01000614H   LINE      ---      ---       #215
+      01000614H   LINE      ---      ---       #216
+      01000625H   LINE      ---      ---       #217
+      01000625H   LINE      ---      ---       #218
+      0100062CH   LINE      ---      ---       #219
+      0100062CH   LINE      ---      ---       #221
+      01000632H   LINE      ---      ---       #222
+      0100063AH   LINE      ---      ---       #223
+      01000642H   LINE      ---      ---       #224
+      0100064AH   LINE      ---      ---       #247
+      0100064FH   LINE      ---      ---       #248
+      01000654H   LINE      ---      ---       #249
+      01000658H   LINE      ---      ---       #251
+      01000659H   LINE      ---      ---       #253
+      0100065FH   LINE      ---      ---       #254
+      0100065FH   LINE      ---      ---       #255
+      0100065FH   LINE      ---      ---       #256
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01000672H   BLOCK     CODE     ---       LVL=0
+      01000672H   LINE      ---      ---       #260
+      01000672H   LINE      ---      ---       #261
+      01000672H   BLOCK     CODE     NEAR LAB  LVL=1
+      01000672H   LINE      ---      ---       #264
+      0100067EH   LINE      ---      ---       #266
+      01000686H   LINE      ---      ---       #267
+      01000686H   LINE      ---      ---       #269
+      0100068CH   LINE      ---      ---       #270
+      0100069AH   LINE      ---      ---       #271
+      010006AAH   LINE      ---      ---       #272
+      010006B1H   LINE      ---      ---       #273
+      010006B4H   LINE      ---      ---       #274
+      010006BFH   LINE      ---      ---       #276
+      010006C1H   LINE      ---      ---       #278
+      010006C7H   LINE      ---      ---       #279
+      010006CDH   LINE      ---      ---       #280
+      010006D2H   LINE      ---      ---       #281
+      010006D4H   LINE      ---      ---       #282
+      010006D4H   LINE      ---      ---       #283
+      010006DBH   LINE      ---      ---       #284
+      010006DBH   LINE      ---      ---       #285
+      010006EDH   LINE      ---      ---       #286
+      010006EDH   LINE      ---      ---       #287
+      010006F4H   LINE      ---      ---       #288
+      010006F4H   LINE      ---      ---       #289
+      010006F9H   LINE      ---      ---       #290
+      010006FEH   LINE      ---      ---       #291
+      010006FFH   LINE      ---      ---       #293
+      01000705H   LINE      ---      ---       #294
+      01000705H   LINE      ---      ---       #295
+      01000705H   LINE      ---      ---       #296
+      00000004H   SYMBOL    DATA     VOID      R_AD_Zero
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000720H   BLOCK     CODE     ---       LVL=0
+      01000720H   LINE      ---      ---       #301
+      01000720H   LINE      ---      ---       #302
+      01000720H   BLOCK     CODE     NEAR LAB  LVL=1
+      01000720H   LINE      ---      ---       #304
+      01000729H   LINE      ---      ---       #305
+      01000731H   LINE      ---      ---       #306
+      01000731H   LINE      ---      ---       #307
+      01000737H   LINE      ---      ---       #308
+      01000746H   LINE      ---      ---       #309
+      01000757H   LINE      ---      ---       #310
+      0100075AH   LINE      ---      ---       #311
+      0100075DH   LINE      ---      ---       #312
+      01000768H   LINE      ---      ---       #313
+      0100076EH   LINE      ---      ---       #314
+      01000774H   LINE      ---      ---       #315
+      01000779H   LINE      ---      ---       #316
+      0100077BH   LINE      ---      ---       #317
+      0100077BH   LINE      ---      ---       #318
+      01000782H   LINE      ---      ---       #319
+      01000782H   LINE      ---      ---       #320
+      01000794H   LINE      ---      ---       #321
+      01000794H   LINE      ---      ---       #322
+      0100079BH   LINE      ---      ---       #323
+      0100079BH   LINE      ---      ---       #327
+      010007A0H   LINE      ---      ---       #328
+      010007A5H   LINE      ---      ---       #331
+      010007A6H   LINE      ---      ---       #333
+      010007ACH   LINE      ---      ---       #334
+      010007ACH   LINE      ---      ---       #335
+      010007ACH   LINE      ---      ---       #336
+      00000004H   SYMBOL    DATA     VOID      R_Open_Weight
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01003672H   BLOCK     CODE     ---       LVL=0
+      01003672H   LINE      ---      ---       #340
+      01003672H   LINE      ---      ---       #341
+      01003672H   BLOCK     CODE     NEAR LAB  LVL=1
+      01003672H   LINE      ---      ---       #345
+      01003679H   LINE      ---      ---       #346
+      01003679H   LINE      ---      ---       #347
+      01003684H   LINE      ---      ---       #348
+      0100368AH   LINE      ---      ---       #349
+      01003690H   LINE      ---      ---       #350
+      01003695H   LINE      ---      ---       #351
+      01003698H   LINE      ---      ---       #352
+      01003698H   LINE      ---      ---       #353
+      010036A2H   LINE      ---      ---       #354
+      010036A2H   LINE      ---      ---       #355
+      010036B4H   LINE      ---      ---       #356
+      010036B4H   LINE      ---      ---       #357
+      010036BCH   LINE      ---      ---       #358
+      010036BCH   LINE      ---      ---       #359
+      010036C3H   LINE      ---      ---       #360
+      010036E3H   LINE      ---      ---       #361
+      01003703H   LINE      ---      ---       #362
+      01003708H   LINE      ---      ---       #363
+      01003710H   LINE      ---      ---       #365
+      01003715H   LINE      ---      ---       #366
+      0100371AH   LINE      ---      ---       #368
+      0100371BH   LINE      ---      ---       #370
+      01003721H   LINE      ---      ---       #371
+      01003721H   LINE      ---      ---       #372
+      01003721H   LINE      ---      ---       #373
+      00000004H   SYMBOL    DATA     VOID      data_rec
+      00000006H   SYMBOL    DATA     VOID      R_AD_Zero
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01000706H   BLOCK     CODE     ---       LVL=0
+      01000706H   LINE      ---      ---       #377
+      01000706H   LINE      ---      ---       #378
+      01000706H   LINE      ---      ---       #380
+      0100070DH   LINE      ---      ---       #381
+      0100070DH   LINE      ---      ---       #382
+      01000718H   LINE      ---      ---       #383
+      0100071AH   LINE      ---      ---       #384
+      0100071FH   LINE      ---      ---       #386
+      0100071FH   LINE      ---      ---       #388
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01003C29H   BLOCK     CODE     ---       LVL=0
+      01003C29H   LINE      ---      ---       #392
+      01003C34H   LINE      ---      ---       #393
+      01003C34H   BLOCK     CODE     NEAR LAB  LVL=1
+      01003C34H   LINE      ---      ---       #395
+      01003C3BH   LINE      ---      ---       #396
+      01003C3BH   LINE      ---      ---       #397
+      01003C6DH   LINE      ---      ---       #398
+      01003C70H   LINE      ---      ---       #399
+      01003C82H   LINE      ---      ---       #400
+      00000007H   SYMBOL    DATA     VOID      i
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01003924H   BLOCK     CODE     ---       LVL=0
+      01003924H   LINE      ---      ---       #402
+      01003932H   LINE      ---      ---       #403
+      01003932H   BLOCK     CODE     NEAR LAB  LVL=1
+      01003932H   LINE      ---      ---       #404
+      01003945H   LINE      ---      ---       #407
+      0100394BH   LINE      ---      ---       #408
+      0100397AH   LINE      ---      ---       #409
+      0100397AH   LINE      ---      ---       #410
+      0100397AH   LINE      ---      ---       #411
+      0100397FH   LINE      ---      ---       #412
+      01003981H   LINE      ---      ---       #413
+      01003983H   LINE      ---      ---       #414
+      01003989H   LINE      ---      ---       #415
+      0100398BH   LINE      ---      ---       #416
+      0100398BH   LINE      ---      ---       #417
+      01003991H   LINE      ---      ---       #418
+      01003995H   LINE      ---      ---       #419
+      01003999H   LINE      ---      ---       #420
+      0100399FH   LINE      ---      ---       #421
+      010039A1H   LINE      ---      ---       #422
+      010039A1H   LINE      ---      ---       #423
+      010039A7H   LINE      ---      ---       #424
+      010039ABH   LINE      ---      ---       #425
+      010039AFH   LINE      ---      ---       #426
+      010039B5H   LINE      ---      ---       #427
+      010039B7H   LINE      ---      ---       #428
+      010039B7H   LINE      ---      ---       #429
+      010039BDH   LINE      ---      ---       #430
+      010039C1H   LINE      ---      ---       #431
+      010039C5H   LINE      ---      ---       #432
+      010039CBH   LINE      ---      ---       #433
+      010039CDH   LINE      ---      ---       #434
+      010039CDH   LINE      ---      ---       #435
+      010039D3H   LINE      ---      ---       #436
+      010039D7H   LINE      ---      ---       #437
+      010039ECH   LINE      ---      ---       #438
+      010039F3H   LINE      ---      ---       #439
+      01003A02H   LINE      ---      ---       #440
+      01003A08H   LINE      ---      ---       #441
+      01003A0AH   LINE      ---      ---       #442
+      01003A0AH   LINE      ---      ---       #443
+      01003A10H   LINE      ---      ---       #444
+      01003A14H   LINE      ---      ---       #445
+      01003A29H   LINE      ---      ---       #446
+      01003A33H   LINE      ---      ---       #447
+      01003A3AH   LINE      ---      ---       #448
+      01003A49H   LINE      ---      ---       #449
+      01003A4FH   LINE      ---      ---       #450
+      01003A51H   LINE      ---      ---       #451
+      01003A51H   LINE      ---      ---       #452
+      01003A57H   LINE      ---      ---       #453
+      01003A5BH   LINE      ---      ---       #454
+      01003A5FH   LINE      ---      ---       #455
+      01003A65H   LINE      ---      ---       #456
+      01003A67H   LINE      ---      ---       #457
+      01003A67H   LINE      ---      ---       #458
+      01003A6DH   LINE      ---      ---       #459
+      01003A71H   LINE      ---      ---       #460
+      01003A86H   LINE      ---      ---       #461
+      01003A90H   LINE      ---      ---       #462
+      01003A9AH   LINE      ---      ---       #463
+      01003AA1H   LINE      ---      ---       #464
+      01003AB0H   LINE      ---      ---       #465
+      01003AB6H   LINE      ---      ---       #466
+      01003AB8H   LINE      ---      ---       #467
+      01003AB8H   LINE      ---      ---       #468
+      01003ABEH   LINE      ---      ---       #469
+      01003AC2H   LINE      ---      ---       #470
+      01003AD7H   LINE      ---      ---       #471
+      01003AE1H   LINE      ---      ---       #472
+      01003AEBH   LINE      ---      ---       #473
+      01003AF5H   LINE      ---      ---       #474
+      01003AFCH   LINE      ---      ---       #475
+      01003B0BH   LINE      ---      ---       #476
+      01003B11H   LINE      ---      ---       #477
+      01003B13H   LINE      ---      ---       #478
+      01003B13H   LINE      ---      ---       #479
+      01003B19H   LINE      ---      ---       #480
+      01003B1DH   LINE      ---      ---       #481
+      01003B32H   LINE      ---      ---       #482
+      01003B3CH   LINE      ---      ---       #483
+      01003B46H   LINE      ---      ---       #484
+      01003B4DH   LINE      ---      ---       #485
+      01003B5CH   LINE      ---      ---       #486
+      01003B62H   LINE      ---      ---       #487
+      01003B64H   LINE      ---      ---       #488
+      01003B64H   LINE      ---      ---       #489
+      01003B6AH   LINE      ---      ---       #490
+      01003B6EH   LINE      ---      ---       #491
+      01003B83H   LINE      ---      ---       #492
+      01003B8DH   LINE      ---      ---       #493
+      01003B94H   LINE      ---      ---       #494
+      01003BA3H   LINE      ---      ---       #495
+      01003BA9H   LINE      ---      ---       #496
+      01003BABH   LINE      ---      ---       #497
+      01003BABH   LINE      ---      ---       #498
+      01003BB1H   LINE      ---      ---       #499
+      01003BB5H   LINE      ---      ---       #500
+      01003BCAH   LINE      ---      ---       #501
+      01003BD4H   LINE      ---      ---       #502
+      01003BDEH   LINE      ---      ---       #503
+      01003BE8H   LINE      ---      ---       #504
+      01003BF2H   LINE      ---      ---       #505
+      01003BF9H   LINE      ---      ---       #506
+      01003C08H   LINE      ---      ---       #507
+      01003C0CH   LINE      ---      ---       #508
+      01003C0EH   LINE      ---      ---       #509
+      01003C0EH   LINE      ---      ---       #510
+      01003C13H   LINE      ---      ---       #511
+      01003C19H   LINE      ---      ---       #512
+      01003C19H   LINE      ---      ---       #513
+      01003C19H   LINE      ---      ---       #514
+      02004D82H   SYMBOL    XDATA    VOID      buf
+      02004D8CH   SYMBOL    XDATA    VOID      len
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      ---         MODULE    ---      ---       CS_SCALEDISPLAY
+      02004D29H   PUBLIC    XDATA    ---       CS_Lcd_Table
+      02004D23H   PUBLIC    XDATA    ---       CS_Lcd_Send_Data
+      02004D1DH   PUBLIC    XDATA    ---       CS_Lcd_Send_Data_BAK
+      01000E20H   PUBLIC    CODE     ---       CS_ScaleDisplay_SteadyFlash
+      01000F8CH   PUBLIC    CODE     ---       CS_ScaleDisplay_LcdRestore
+      01003E65H   PUBLIC    CODE     ---       CS_ScaleDisplay_LcdBackup
+      01003E56H   PUBLIC    CODE     ---       CS_ScaleDisplay_LcdShowAll
+      01000F71H   PUBLIC    CODE     ---       CS_ScaleDisplay_LcdShowNoDigit
+      01003E48H   PUBLIC    CODE     ---       CS_ScaleDisplay_LcdShowNull
+      010017CEH   PUBLIC    CODE     ---       _CS_ScaleDisplay_LookUpTable
+      01003D0FH   PUBLIC    CODE     ---       _CS_ScaleDisplay_HexToBcd
+      01003CD3H   PUBLIC    CODE     ---       CS_ScaleDisplay_LcdBuf_rShift4
+      01001612H   PUBLIC    CODE     ---       _CS_ScaleDisplay_FreshBuf
+      01003C83H   PUBLIC    CODE     ---       CS_ScaleDisplay_Debug
+      01000EABH   PUBLIC    CODE     ---       CS_ScaleDisplay
+
+      01000EABH   BLOCK     CODE     ---       LVL=0
+      01000EABH   LINE      ---      ---       #13
+      01000EABH   LINE      ---      ---       #14
+      01000EABH   BLOCK     CODE     NEAR LAB  LVL=1
+      01000EABH   LINE      ---      ---       #17
+      01000EB3H   LINE      ---      ---       #18
+      01000EB3H   LINE      ---      ---       #19
+      01000EBAH   LINE      ---      ---       #20
+      01000EC2H   LINE      ---      ---       #21
+      01000EC9H   LINE      ---      ---       #22
+      01000ED1H   LINE      ---      ---       #23
+      01000EE1H   LINE      ---      ---       #24
+      01000EE8H   LINE      ---      ---       #26
+      01000EE8H   LINE      ---      ---       #27
+      01000EEEH   LINE      ---      ---       #28
+      01000EEEH   LINE      ---      ---       #29
+      01000EFEH   LINE      ---      ---       #30
+      01000F03H   LINE      ---      ---       #31
+      01000F03H   LINE      ---      ---       #32
+      01000F0AH   LINE      ---      ---       #33
+      01000F0AH   LINE      ---      ---       #34
+      01000F1AH   LINE      ---      ---       #35
+      01000F1FH   LINE      ---      ---       #36
+      01000F1FH   LINE      ---      ---       #37
+      01000F26H   LINE      ---      ---       #38
+      01000F26H   LINE      ---      ---       #39
+      01000F3CH   LINE      ---      ---       #40
+      01000F41H   LINE      ---      ---       #41
+      01000F41H   LINE      ---      ---       #42
+      01000F48H   LINE      ---      ---       #43
+      01000F48H   LINE      ---      ---       #44
+      01000F57H   LINE      ---      ---       #45
+      01000F6BH   LINE      ---      ---       #46
+      01000F70H   LINE      ---      ---       #47
+      01000F70H   LINE      ---      ---       #48
+      00000004H   SYMBOL    DATA     VOID      weight_temp
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01003C83H   BLOCK     CODE     ---       LVL=0
+      01003C83H   LINE      ---      ---       #54
+      01003C83H   LINE      ---      ---       #55
+      01003C83H   BLOCK     CODE     NEAR LAB  LVL=1
+      01003C83H   LINE      ---      ---       #57
+      01003C93H   LINE      ---      ---       #59
+      01003CA0H   LINE      ---      ---       #60
+      01003CADH   LINE      ---      ---       #61
+      01003CBAH   LINE      ---      ---       #62
+      01003CC7H   LINE      ---      ---       #64
+      01003CC9H   LINE      ---      ---       #66
+      02004E3FH   SYMBOL    XDATA    VOID      buf
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01001612H   BLOCK     CODE     ---       LVL=0
+      01001612H   LINE      ---      ---       #72
+      01001617H   LINE      ---      ---       #73
+      01001617H   BLOCK     CODE     NEAR LAB  LVL=1
+      01001617H   LINE      ---      ---       #78
+      0100161AH   LINE      ---      ---       #79
+      0100161AH   LINE      ---      ---       #80
+      01001620H   LINE      ---      ---       #81
+      01001623H   LINE      ---      ---       #82
+      01001625H   LINE      ---      ---       #83
+      01001627H   LINE      ---      ---       #84
+      01001629H   LINE      ---      ---       #85
+      01001629H   LINE      ---      ---       #87
+      01001631H   LINE      ---      ---       #88
+      01001631H   LINE      ---      ---       #89
+      01001636H   LINE      ---      ---       #90
+      0100163AH   LINE      ---      ---       #91
+      0100163EH   LINE      ---      ---       #92
+      01001641H   LINE      ---      ---       #93
+      01001645H   LINE      ---      ---       #94
+      01001645H   LINE      ---      ---       #96
+      01001649H   LINE      ---      ---       #97
+      01001649H   LINE      ---      ---       #98
+      0100164FH   LINE      ---      ---       #99
+      01001651H   LINE      ---      ---       #100
+      01001655H   LINE      ---      ---       #101
+      01001659H   LINE      ---      ---       #102
+      0100165BH   LINE      ---      ---       #103
+      0100165BH   LINE      ---      ---       #105
+      0100166FH   LINE      ---      ---       #106
+      0100166FH   LINE      ---      ---       #107
+      01001674H   LINE      ---      ---       #108
+      01001678H   LINE      ---      ---       #109
+      0100167CH   LINE      ---      ---       #110
+      01001680H   LINE      ---      ---       #111
+      01001684H   LINE      ---      ---       #112
+      01001688H   LINE      ---      ---       #113
+      0100168FH   LINE      ---      ---       #114
+      01001695H   LINE      ---      ---       #115
+      0100169DH   LINE      ---      ---       #116
+      010016A3H   LINE      ---      ---       #117
+      010016A7H   LINE      ---      ---       #118
+      010016ADH   LINE      ---      ---       #119
+      010016ADH   LINE      ---      ---       #121
+      010016CAH   LINE      ---      ---       #122
+      010016CAH   LINE      ---      ---       #123
+      010016D7H   LINE      ---      ---       #125
+      010016DFH   LINE      ---      ---       #126
+      010016DFH   LINE      ---      ---       #127
+      010016E5H   LINE      ---      ---       #128
+      010016EBH   LINE      ---      ---       #129
+      010016F1H   LINE      ---      ---       #130
+      010016F7H   LINE      ---      ---       #131
+      010016FCH   LINE      ---      ---       #132
+      010016FCH   LINE      ---      ---       #134
+      01001706H   LINE      ---      ---       #135
+      01001709H   LINE      ---      ---       #136
+      01001714H   LINE      ---      ---       #137
+      01001717H   LINE      ---      ---       #139
+      0100171BH   LINE      ---      ---       #140
+      0100171BH   LINE      ---      ---       #141
+      01001726H   LINE      ---      ---       #142
+      01001729H   LINE      ---      ---       #143
+      01001729H   LINE      ---      ---       #144
+      01001729H   LINE      ---      ---       #146
+      01001735H   LINE      ---      ---       #147
+      01001741H   LINE      ---      ---       #148
+      0100174DH   LINE      ---      ---       #149
+      01001759H   LINE      ---      ---       #151
+      0100175CH   LINE      ---      ---       #156
+      01001763H   LINE      ---      ---       #157
+      0100176BH   LINE      ---      ---       #158
+      0100176BH   LINE      ---      ---       #159
+      01001771H   LINE      ---      ---       #160
+      01001778H   LINE      ---      ---       #161
+      01001778H   LINE      ---      ---       #163
+      0100177CH   LINE      ---      ---       #164
+      0100177CH   LINE      ---      ---       #165
+      01001783H   LINE      ---      ---       #166
+      01001788H   LINE      ---      ---       #167
+      01001788H   LINE      ---      ---       #169
+      0100178FH   LINE      ---      ---       #170
+      0100178FH   LINE      ---      ---       #171
+      01001796H   LINE      ---      ---       #172
+      0100179BH   LINE      ---      ---       #173
+      0100179BH   LINE      ---      ---       #174
+      010017A3H   LINE      ---      ---       #175
+      010017A3H   LINE      ---      ---       #176
+      010017AAH   LINE      ---      ---       #177
+      010017AFH   LINE      ---      ---       #178
+      010017AFH   LINE      ---      ---       #180
+      010017B3H   LINE      ---      ---       #181
+      010017B3H   LINE      ---      ---       #182
+      010017BAH   LINE      ---      ---       #183
+      010017BFH   LINE      ---      ---       #184
+      010017BFH   LINE      ---      ---       #186
+      010017C6H   LINE      ---      ---       #187
+      010017C6H   LINE      ---      ---       #188
+      010017CDH   LINE      ---      ---       #189
+      010017CDH   LINE      ---      ---       #191
+      02004D18H   SYMBOL    XDATA    VOID      data_buf
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01003CD3H   BLOCK     CODE     ---       LVL=0
+      01003CD3H   LINE      ---      ---       #195
+      01003CD3H   LINE      ---      ---       #196
+      01003CD3H   LINE      ---      ---       #197
+      01003CE0H   LINE      ---      ---       #198
+      01003CEDH   LINE      ---      ---       #199
+      01003CFAH   LINE      ---      ---       #200
+      01003D07H   LINE      ---      ---       #201
+      01003D0EH   LINE      ---      ---       #202
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01003D0FH   BLOCK     CODE     ---       LVL=0
+      01003D0FH   LINE      ---      ---       #205
+      01003D20H   LINE      ---      ---       #206
+      01003D20H   BLOCK     CODE     NEAR LAB  LVL=1
+      01003D20H   LINE      ---      ---       #208
+      01003D2DH   LINE      ---      ---       #209
+      01003D2DH   LINE      ---      ---       #210
+      01003D5AH   LINE      ---      ---       #211
+      01003D71H   LINE      ---      ---       #212
+      01003D79H   LINE      ---      ---       #213
+      02004E2DH   SYMBOL    XDATA    VOID      i
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      010017CEH   BLOCK     CODE     ---       LVL=0
+      010017CEH   LINE      ---      ---       #225
+      010017CEH   LINE      ---      ---       #226
+      010017CEH   BLOCK     CODE     NEAR LAB  LVL=1
+      010017CEH   LINE      ---      ---       #228
+      010017D4H   LINE      ---      ---       #229
+      010017DDH   LINE      ---      ---       #230
+      00000001H   SYMBOL    DATA     VOID      data_ptr
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01003E48H   BLOCK     CODE     ---       LVL=0
+      01003E48H   LINE      ---      ---       #235
+      01003E48H   LINE      ---      ---       #236
+      01003E48H   LINE      ---      ---       #237
+      01003E4DH   LINE      ---      ---       #238
+      01003E4FH   LINE      ---      ---       #239
+      01003E51H   LINE      ---      ---       #240
+      01003E53H   LINE      ---      ---       #241
+      01003E55H   LINE      ---      ---       #242
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01000F71H   BLOCK     CODE     ---       LVL=0
+      01000F71H   LINE      ---      ---       #244
+      01000F71H   LINE      ---      ---       #245
+      01000F71H   LINE      ---      ---       #246
+      01000F78H   LINE      ---      ---       #247
+      01000F7CH   LINE      ---      ---       #248
+      01000F81H   LINE      ---      ---       #249
+      01000F86H   LINE      ---      ---       #250
+      01000F8BH   LINE      ---      ---       #251
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01003E56H   BLOCK     CODE     ---       LVL=0
+      01003E56H   LINE      ---      ---       #253
+      01003E56H   LINE      ---      ---       #254
+      01003E56H   LINE      ---      ---       #255
+      01003E5CH   LINE      ---      ---       #256
+      01003E5EH   LINE      ---      ---       #257
+      01003E60H   LINE      ---      ---       #258
+      01003E62H   LINE      ---      ---       #259
+      01003E64H   LINE      ---      ---       #260
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01003E65H   BLOCK     CODE     ---       LVL=0
+      01003E65H   LINE      ---      ---       #263
+      01003E65H   LINE      ---      ---       #264
+      01003E65H   LINE      ---      ---       #265
+      01003E6DH   LINE      ---      ---       #266
+      01003E75H   LINE      ---      ---       #267
+      01003E7DH   LINE      ---      ---       #268
+      01003E85H   LINE      ---      ---       #269
+      01003E8DH   LINE      ---      ---       #270
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01000F8CH   BLOCK     CODE     ---       LVL=0
+      01000F8CH   LINE      ---      ---       #273
+      01000F8CH   LINE      ---      ---       #274
+      01000F8CH   LINE      ---      ---       #275
+      01000F94H   LINE      ---      ---       #276
+      01000F9CH   LINE      ---      ---       #277
+      01000FA4H   LINE      ---      ---       #278
+      01000FACH   LINE      ---      ---       #279
+      01000FB4H   LINE      ---      ---       #280
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01000E20H   BLOCK     CODE     ---       LVL=0
+      01000E20H   LINE      ---      ---       #283
+      01000E20H   LINE      ---      ---       #284
+      01000E20H   BLOCK     CODE     NEAR LAB  LVL=1
+      01000E20H   LINE      ---      ---       #289
+      01000E27H   LINE      ---      ---       #290
+      01000E27H   LINE      ---      ---       #291
+      01000E2BH   LINE      ---      ---       #292
+      01000E31H   LINE      ---      ---       #293
+      01000E34H   LINE      ---      ---       #294
+      01000E3AH   LINE      ---      ---       #295
+      01000E3CH   LINE      ---      ---       #296
+      01000E42H   LINE      ---      ---       #297
+      01000E44H   LINE      ---      ---       #298
+      01000E4AH   LINE      ---      ---       #299
+      01000E4CH   LINE      ---      ---       #300
+      01000E52H   LINE      ---      ---       #301
+      01000E54H   LINE      ---      ---       #302
+      01000E54H   LINE      ---      ---       #303
+      00000007H   SYMBOL    DATA     VOID      R_Weight_FlashTime
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      ---         MODULE    ---      ---       CS_SCALEKEY
+      01001064H   PUBLIC    CODE     ---       CS_KeyScan
+
+      01001064H   BLOCK     CODE     ---       LVL=0
+      01001064H   LINE      ---      ---       #17
+      01001064H   LINE      ---      ---       #18
+      01001064H   BLOCK     CODE     NEAR LAB  LVL=1
+      01001064H   LINE      ---      ---       #29
+      0100106CH   LINE      ---      ---       #31
+      01001075H   LINE      ---      ---       #32
+      01001078H   LINE      ---      ---       #34
+      0100107DH   LINE      ---      ---       #35
+      0100107DH   LINE      ---      ---       #36
+      01001082H   LINE      ---      ---       #37
+      01001085H   LINE      ---      ---       #39
+      0100108CH   LINE      ---      ---       #40
+      01001091H   LINE      ---      ---       #42
+      01001096H   LINE      ---      ---       #43
+      01001098H   LINE      ---      ---       #45
+      010010A2H   LINE      ---      ---       #46
+      010010A2H   LINE      ---      ---       #47
+      010010A3H   LINE      ---      ---       #50
+      010010ACH   LINE      ---      ---       #51
+      010010B2H   LINE      ---      ---       #53
+      010010B2H   LINE      ---      ---       #54
+      010010B7H   LINE      ---      ---       #55
+      010010BAH   LINE      ---      ---       #56
+      010010BAH   LINE      ---      ---       #57
+      010010BFH   LINE      ---      ---       #58
+      010010BFH   LINE      ---      ---       #59
+      010010C0H   LINE      ---      ---       #61
+      010010C0H   LINE      ---      ---       #62
+      010010C6H   LINE      ---      ---       #63
+      010010C6H   LINE      ---      ---       #64
+      010010CDH   LINE      ---      ---       #65
+      010010D0H   LINE      ---      ---       #66
+      010010DAH   LINE      ---      ---       #67
+      010010DAH   LINE      ---      ---       #68
+      010010E0H   LINE      ---      ---       #69
+      010010E6H   LINE      ---      ---       #70
+      010010E6H   LINE      ---      ---       #71
+      010010E8H   LINE      ---      ---       #73
+      010010F1H   LINE      ---      ---       #74
+      010010F4H   LINE      ---      ---       #75
+      010010F9H   LINE      ---      ---       #76
+      010010F9H   LINE      ---      ---       #77
+      010010F9H   LINE      ---      ---       #78
+      010010FFH   LINE      ---      ---       #79
+      010010FFH   LINE      ---      ---       #80
+      01001105H   LINE      ---      ---       #81
+      01001105H   LINE      ---      ---       #83
+      01001107H   LINE      ---      ---       #84
+      0100110EH   LINE      ---      ---       #85
+      0100110EH   LINE      ---      ---       #86
+      01001114H   LINE      ---      ---       #87
+      01001118H   LINE      ---      ---       #88
+      0100111DH   LINE      ---      ---       #89
+      01001121H   LINE      ---      ---       #90
+      01001121H   LINE      ---      ---       #91
+      01001126H   LINE      ---      ---       #92
+      0100112AH   LINE      ---      ---       #93
+      0100112AH   LINE      ---      ---       #94
+      0100112AH   LINE      ---      ---       #95
+      0100112BH   LINE      ---      ---       #97
+      0100112BH   LINE      ---      ---       #98
+      01001130H   LINE      ---      ---       #99
+      01001134H   LINE      ---      ---       #100
+      01001134H   LINE      ---      ---       #101
+      01001134H   LINE      ---      ---       #102
+      00000007H   SYMBOL    DATA     VOID      keyState
+      02004E21H   SYMBOL    XDATA    VOID      keyState_prev
+      02004E22H   SYMBOL    XDATA    VOID      keyStateCnt
+      02004E23H   SYMBOL    XDATA    VOID      KeyPressDeal
+      02004E24H   SYMBOL    XDATA    VOID      KeyLongPressDeal
+      02004E25H   SYMBOL    XDATA    VOID      ShortPressCount
+      02004E26H   SYMBOL    XDATA    VOID      PressTimesCount
+      02004E27H   SYMBOL    XDATA    VOID      Press
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      ---         MODULE    ---      ---       RETATION_VARIABLE
+      02004E6EH   PUBLIC    XDATA    BYTE      sys_state
+      02004C62H   PUBLIC    XDATA    BYTE      R_Test
+      02004C5BH   PUBLIC    XDATA    BYTE      bleConnStatus
+      02004C5DH   PUBLIC    XDATA    BYTE      handleIndicationConfirm
+      02004A02H   PUBLIC    XDATA    WORD      BT_CmdWptr
+      02004A00H   PUBLIC    XDATA    WORD      BT_CmdRptr
+      02004C5AH   PUBLIC    XDATA    BYTE      notifyValueUUIDA625
+      02004C10H   PUBLIC    XDATA    ---       historyUserData
+      02004C59H   PUBLIC    XDATA    BYTE      notifyValueUUIDA621
+      02004A06H   PUBLIC    XDATA    WORD      BT_EventWptr
+      02004A04H   PUBLIC    XDATA    WORD      BT_EventRptr
+      02004C5CH   PUBLIC    XDATA    BYTE      lxOptStatus
+      02004C00H   PUBLIC    XDATA    ---       sensor_data
+      02004C63H   PUBLIC    XDATA    ---       btCmdBuf
+      02004C06H   PUBLIC    XDATA    ---       deviceInfo
+      02004C5EH   PUBLIC    XDATA    LONG      UTCTime
+
+      ---         MODULE    ---      ---       LXPROTOCOL
+      01001F57H   PUBLIC    CODE     ---       QueueInit
+      01001D86H   PUBLIC    CODE     ---       _SpiFlashOperator
+      02004E34H   PUBLIC    XDATA    BYTE      ?sendMeasureData?BYTE
+      01002D7DH   PUBLIC    CODE     ---       sendMeasureData
+      010007ADH   PUBLIC    CODE     ---       lxOptProcess
+      01001F11H   PUBLIC    CODE     ---       _changeLxOptStatus
+      01001DCFH   PUBLIC    CODE     ---       _lxRecvDataFromApp
+
+      01002C65H   BLOCK     CODE     ---       LVL=0
+      01002C65H   LINE      ---      ---       #18
+      01002C76H   LINE      ---      ---       #19
+      01002C76H   BLOCK     CODE     NEAR LAB  LVL=1
+      01002C76H   LINE      ---      ---       #23
+      01002C83H   LINE      ---      ---       #24
+      01002CA2H   LINE      ---      ---       #25
+      01002CA2H   LINE      ---      ---       #26
+      01002CBFH   LINE      ---      ---       #27
+      01002CEAH   LINE      ---      ---       #28
+      01002D0FH   LINE      ---      ---       #29
+      01002D1FH   LINE      ---      ---       #30
+      02004DC3H   SYMBOL    XDATA    VOID      i
+      02004DC5H   SYMBOL    XDATA    VOID      size
+      02004DC7H   SYMBOL    XDATA    VOID      temp
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01001F61H   BLOCK     CODE     ---       LVL=0
+      01001F61H   LINE      ---      ---       #32
+      01001F65H   LINE      ---      ---       #33
+      01001F65H   LINE      ---      ---       #34
+      01001F6DH   LINE      ---      ---       #35
+      01001F6DH   LINE      ---      ---       #37
+      01001F6DH   LINE      ---      ---       #39
+      01001F73H   LINE      ---      ---       #40
+      01001F77H   LINE      ---      ---       #41
+      01001F7AH   LINE      ---      ---       #42
+      01001F7DH   LINE      ---      ---       #43
+      01001F80H   LINE      ---      ---       #44
+      01001F83H   LINE      ---      ---       #45
+      01001F86H   LINE      ---      ---       #47
+      01001F8FH   LINE      ---      ---       #48
+      01001F93H   LINE      ---      ---       #49
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01001DCFH   BLOCK     CODE     ---       LVL=0
+      01001DCFH   LINE      ---      ---       #51
+      01001DDAH   LINE      ---      ---       #52
+      01001DDAH   BLOCK     CODE     NEAR LAB  LVL=1
+      01001DDAH   LINE      ---      ---       #55
+      01001DEFH   LINE      ---      ---       #58
+      01001E14H   LINE      ---      ---       #59
+      01001E38H   LINE      ---      ---       #62
+      01001E42H   LINE      ---      ---       #63
+      01001E42H   LINE      ---      ---       #65
+      01001E49H   LINE      ---      ---       #68
+      01001E79H   LINE      ---      ---       #70
+      01001EA9H   LINE      ---      ---       #71
+      01001EA9H   LINE      ---      ---       #72
+      01001EA9H   LINE      ---      ---       #73
+      01001EADH   LINE      ---      ---       #74
+      01001EADH   LINE      ---      ---       #75
+      01001EADH   LINE      ---      ---       #76
+      01001EB1H   LINE      ---      ---       #77
+      01001EB1H   LINE      ---      ---       #78
+      01001EB1H   LINE      ---      ---       #79
+      01001EB5H   LINE      ---      ---       #80
+      01001EB5H   LINE      ---      ---       #81
+      01001EB5H   LINE      ---      ---       #82
+      01001EB9H   LINE      ---      ---       #83
+      01001EB9H   LINE      ---      ---       #85
+      01001EB9H   LINE      ---      ---       #86
+      01001EBDH   LINE      ---      ---       #87
+      01001EBDH   LINE      ---      ---       #88
+      01001EBDH   LINE      ---      ---       #89
+      01001EC1H   LINE      ---      ---       #90
+      01001EC1H   LINE      ---      ---       #91
+      01001EC1H   LINE      ---      ---       #92
+      01001EC5H   LINE      ---      ---       #93
+      01001EC5H   LINE      ---      ---       #95
+      01001EC5H   LINE      ---      ---       #96
+      01001EC9H   LINE      ---      ---       #97
+      01001EC9H   LINE      ---      ---       #98
+      01001EC9H   LINE      ---      ---       #100
+      01001ECAH   LINE      ---      ---       #102
+      01001ED0H   LINE      ---      ---       #103
+      01001ED0H   LINE      ---      ---       #104
+      01001EE4H   LINE      ---      ---       #105
+      01001EE4H   LINE      ---      ---       #106
+      01001EEBH   LINE      ---      ---       #107
+      01001EEBH   LINE      ---      ---       #108
+      01001EEFH   LINE      ---      ---       #109
+      01001EEFH   LINE      ---      ---       #111
+      01001EF4H   LINE      ---      ---       #112
+      01001EF5H   LINE      ---      ---       #114
+      01001EF5H   LINE      ---      ---       #115
+      01001EFCH   LINE      ---      ---       #116
+      01001EFCH   LINE      ---      ---       #117
+      01001F06H   LINE      ---      ---       #119
+      01001F0BH   LINE      ---      ---       #120
+      01001F0BH   LINE      ---      ---       #121
+      01001F10H   LINE      ---      ---       #122
+      01001F10H   LINE      ---      ---       #123
+      01001F10H   LINE      ---      ---       #124
+      02004E31H   SYMBOL    XDATA    VOID      frameControl
+      02004E32H   SYMBOL    XDATA    VOID      cmd
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01001F11H   BLOCK     CODE     ---       LVL=0
+      01001F11H   LINE      ---      ---       #126
+      01001F11H   LINE      ---      ---       #127
+      01001F11H   LINE      ---      ---       #128
+      01001F17H   LINE      ---      ---       #129
+      01001F17H   LINE      ---      ---       #130
+      01001F19H   LINE      ---      ---       #131
+      01001F19H   LINE      ---      ---       #132
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      010007ADH   BLOCK     CODE     ---       LVL=0
+      010007ADH   LINE      ---      ---       #134
+      010007ADH   LINE      ---      ---       #135
+      010007ADH   LINE      ---      ---       #138
+      010007B3H   LINE      ---      ---       #139
+      010007B7H   LINE      ---      ---       #140
+      010007BAH   LINE      ---      ---       #141
+      010007C5H   LINE      ---      ---       #142
+      010007C5H   LINE      ---      ---       #327
+      010007C5H   LINE      ---      ---       #329
+      010007CBH   LINE      ---      ---       #330
+      010007CBH   LINE      ---      ---       #331
+      010007CFH   LINE      ---      ---       #332
+      010007D0H   LINE      ---      ---       #334
+      010007D0H   LINE      ---      ---       #335
+      010007D6H   LINE      ---      ---       #336
+      010007D6H   LINE      ---      ---       #337
+      010007D7H   LINE      ---      ---       #338
+      010007D7H   LINE      ---      ---       #340
+      010007DAH   LINE      ---      ---       #341
+      010007E0H   LINE      ---      ---       #342
+      010007E0H   LINE      ---      ---       #349
+      010007E0H   LINE      ---      ---       #350
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01002D85H   BLOCK     CODE     ---       LVL=0
+      01002D85H   LINE      ---      ---       #352
+      01002D89H   LINE      ---      ---       #353
+      01002D89H   LINE      ---      ---       #354
+      01002D8FH   LINE      ---      ---       #355
+      01002D93H   LINE      ---      ---       #356
+      01002D97H   LINE      ---      ---       #357
+      01002D9AH   LINE      ---      ---       #358
+      01002D9EH   LINE      ---      ---       #359
+      01002DA2H   LINE      ---      ---       #360
+      01002DA5H   LINE      ---      ---       #361
+      01002DA9H   LINE      ---      ---       #362
+      01002DACH   LINE      ---      ---       #363
+      01002DAFH   LINE      ---      ---       #364
+      01002DB2H   LINE      ---      ---       #366
+      01002DBEH   LINE      ---      ---       #367
+      01002DC7H   LINE      ---      ---       #368
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01001F38H   BLOCK     CODE     ---       LVL=0
+      01001F38H   LINE      ---      ---       #371
+      01001F38H   LINE      ---      ---       #372
+      01001F38H   LINE      ---      ---       #375
+      01001F42H   LINE      ---      ---       #376
+      01001F44H   LINE      ---      ---       #377
+      01001F49H   LINE      ---      ---       #378
+      01001F53H   LINE      ---      ---       #379
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01002D7DH   BLOCK     CODE     ---       LVL=0
+      01002D7DH   LINE      ---      ---       #382
+      01002D7DH   LINE      ---      ---       #383
+      01002D7DH   LINE      ---      ---       #384
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      010029B8H   BLOCK     CODE     ---       LVL=0
+      010029B8H   LINE      ---      ---       #389
+      010029B8H   LINE      ---      ---       #390
+      010029B8H   BLOCK     CODE     NEAR LAB  LVL=1
+      010029B8H   LINE      ---      ---       #392
+      010029C1H   LINE      ---      ---       #394
+      010029C5H   LINE      ---      ---       #408
+      010029CDH   LINE      ---      ---       #409
+      01002A0CH   LINE      ---      ---       #410
+      01002A17H   LINE      ---      ---       #412
+      01002A1DH   LINE      ---      ---       #413
+      01002A21H   LINE      ---      ---       #414
+      01002A24H   LINE      ---      ---       #416
+      01002A2AH   LINE      ---      ---       #417
+      01002A2EH   LINE      ---      ---       #418
+      01002A38H   LINE      ---      ---       #419
+      01002A3BH   LINE      ---      ---       #420
+      01002A3FH   LINE      ---      ---       #421
+      01002A42H   LINE      ---      ---       #422
+      01002A44H   LINE      ---      ---       #423
+      01002A46H   LINE      ---      ---       #424
+      01002A4EH   LINE      ---      ---       #425
+      01002A4EH   LINE      ---      ---       #426
+      01002A60H   LINE      ---      ---       #427
+      01002A60H   LINE      ---      ---       #428
+      01002A6DH   LINE      ---      ---       #429
+      01002A9EH   LINE      ---      ---       #430
+      01002AA6H   LINE      ---      ---       #431
+      01002AD0H   LINE      ---      ---       #432
+      01002AF5H   LINE      ---      ---       #433
+      01002B04H   LINE      ---      ---       #435
+      01002B19H   LINE      ---      ---       #436
+      01002B19H   LINE      ---      ---       #437
+      01002B26H   LINE      ---      ---       #438
+      01002B2BH   LINE      ---      ---       #439
+      01002B2BH   LINE      ---      ---       #440
+      01002B33H   LINE      ---      ---       #441
+      01002B35H   LINE      ---      ---       #443
+      01002B35H   LINE      ---      ---       #444
+      01002B3BH   LINE      ---      ---       #445
+      01002B42H   LINE      ---      ---       #447
+      01002B42H   LINE      ---      ---       #448
+      01002B50H   LINE      ---      ---       #449
+      01002B5AH   LINE      ---      ---       #450
+      01002B7DH   LINE      ---      ---       #451
+      01002B86H   LINE      ---      ---       #452
+      01002B8BH   LINE      ---      ---       #453
+      01002B93H   LINE      ---      ---       #454
+      01002B93H   LINE      ---      ---       #456
+      01002B93H   LINE      ---      ---       #457
+      01002B99H   LINE      ---      ---       #458
+      01002B9FH   LINE      ---      ---       #459
+      01002BA3H   LINE      ---      ---       #460
+      01002BB0H   LINE      ---      ---       #461
+      01002BB3H   LINE      ---      ---       #462
+      01002BB3H   LINE      ---      ---       #463
+      01002BCEH   LINE      ---      ---       #464
+      01002BD0H   LINE      ---      ---       #466
+      01002BD0H   LINE      ---      ---       #467
+      01002BDBH   LINE      ---      ---       #468
+      01002BDBH   LINE      ---      ---       #469
+      01002BF2H   LINE      ---      ---       #470
+      01002C01H   LINE      ---      ---       #471
+      01002C0AH   LINE      ---      ---       #472
+      01002C0AH   LINE      ---      ---       #473
+      02004E6FH   SYMBOL    XDATA    VOID      total_len
+      02004DC8H   SYMBOL    XDATA    VOID      temp
+      02004DCBH   SYMBOL    XDATA    VOID      crc32
+      02004DCFH   SYMBOL    XDATA    VOID      i
+      02004DD0H   SYMBOL    XDATA    VOID      pkgCnt
+      02004DD1H   SYMBOL    XDATA    VOID      size
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01001D86H   BLOCK     CODE     ---       LVL=0
+      01001D86H   LINE      ---      ---       #475
+      01001D8BH   LINE      ---      ---       #476
+      01001D8BH   LINE      ---      ---       #478
+      01001D8EH   LINE      ---      ---       #479
+      01001D8EH   LINE      ---      ---       #480
+      01001DA5H   LINE      ---      ---       #481
+      01001DA5H   LINE      ---      ---       #482
+      01001DACH   LINE      ---      ---       #483
+      01001DACH   LINE      ---      ---       #484
+      01001DB7H   LINE      ---      ---       #485
+      01001DCEH   LINE      ---      ---       #486
+      01001DCEH   LINE      ---      ---       #493
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01001F57H   BLOCK     CODE     ---       LVL=0
+      01001F57H   LINE      ---      ---       #502
+      01001F57H   LINE      ---      ---       #503
+      01001F57H   LINE      ---      ---       #504
+      01001F5CH   LINE      ---      ---       #505
+      01001F5EH   LINE      ---      ---       #506
+      01001F60H   LINE      ---      ---       #507
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      01002C0BH   BLOCK     CODE     ---       LVL=0
+      01002C0BH   LINE      ---      ---       #509
+      01002C0BH   LINE      ---      ---       #510
+      01002C0BH   BLOCK     CODE     NEAR LAB  LVL=1
+      01002C0BH   LINE      ---      ---       #511
+      01002C14H   LINE      ---      ---       #513
+      01002C1DH   LINE      ---      ---       #514
+      01002C24H   LINE      ---      ---       #516
+      01002C40H   LINE      ---      ---       #517
+      01002C53H   LINE      ---      ---       #518
+      01002C59H   LINE      ---      ---       #520
+      01002C64H   LINE      ---      ---       #521
+      02004E5FH   SYMBOL    XDATA    VOID      temp
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      01002D20H   BLOCK     CODE     ---       LVL=0
+      01002D20H   LINE      ---      ---       #523
+      01002D2BH   LINE      ---      ---       #524
+      01002D2BH   LINE      ---      ---       #525
+      01002D34H   LINE      ---      ---       #526
+      01002D36H   LINE      ---      ---       #528
+      01002D65H   LINE      ---      ---       #529
+      01002D78H   LINE      ---      ---       #530
+      01002D7CH   LINE      ---      ---       #531
+      ---         BLOCKEND  ---      ---       LVL=0
+
+      ---         MODULE    ---      ---       CRC32
+      02004D8DH   PUBLIC    XDATA    BYTE      ?_cal_crc32_multiple?BYTE
+      01002DCCH   PUBLIC    CODE     ---       _cal_crc32_multiple
+
+      01002DCCH   BLOCK     CODE     ---       LVL=0
+      01002DCCH   LINE      ---      ---       #80
+      01002DDDH   LINE      ---      ---       #81
+      01002DDDH   BLOCK     CODE     NEAR LAB  LVL=1
+      01002DDDH   LINE      ---      ---       #83
+      01002E09H   LINE      ---      ---       #84
+      01002E09H   LINE      ---      ---       #85
+      01002E67H   LINE      ---      ---       #86
+      01002E98H   LINE      ---      ---       #87
+      01002EB9H   LINE      ---      ---       #89
+      01002EC7H   LINE      ---      ---       #90
+      02004D98H   SYMBOL    XDATA    VOID      i
+      ---         BLOCKEND  CODE     ---       LVL=1
+      ---         BLOCKEND  CODE     ---       LVL=0
+
+      ---         MODULE    ---      ---       ?C_STARTUP
+      01000000H   PUBLIC    CODE     ---       ?C_STARTUP
+
+      ---         MODULE    ---      ---       ?C?COPY
+      010000D3H   PUBLIC    CODE     ---       ?C?COPY
+
+      ---         MODULE    ---      ---       ?C?CLDPTR
+      010000F9H   PUBLIC    CODE     ---       ?C?CLDPTR
+
+      ---         MODULE    ---      ---       ?C?CLDOPTR
+      01000112H   PUBLIC    CODE     ---       ?C?CLDOPTR
+
+      ---         MODULE    ---      ---       ?C?CSTPTR
+      0100013FH   PUBLIC    CODE     ---       ?C?CSTPTR
+
+      ---         MODULE    ---      ---       ?C?CSTOPTR
+      01000151H   PUBLIC    CODE     ---       ?C?CSTOPTR
+
+      ---         MODULE    ---      ---       ?C?UIDIV
+      01000173H   PUBLIC    CODE     ---       ?C?UIDIV
+
+      ---         MODULE    ---      ---       ?C?ILDIX
+      010001C8H   PUBLIC    CODE     ---       ?C?ILDIX
+
+      ---         MODULE    ---      ---       ?C?LMUL
+      010001DEH   PUBLIC    CODE     ---       ?C?LMUL
+
+      ---         MODULE    ---      ---       ?C?ULDIV
+      01000269H   PUBLIC    CODE     ---       ?C?ULDIV
+
+      ---         MODULE    ---      ---       ?C?ULCMP
+      010002FBH   PUBLIC    CODE     ---       ?C?ULCMP
+
+      ---         MODULE    ---      ---       ?C?ULSHR
+      0100030CH   PUBLIC    CODE     ---       ?C?ULSHR
+
+      ---         MODULE    ---      ---       ?C?LSHL
+      0100031FH   PUBLIC    CODE     ---       ?C?LSHL
+
+      ---         MODULE    ---      ---       ?C?LSTXDATA
+      01000332H   PUBLIC    CODE     ---       ?C?LSTXDATA
+
+      ---         MODULE    ---      ---       ?C?LSTKXDATA
+      0100033EH   PUBLIC    CODE     ---       ?C?LSTKXDATA
+
+      ---         MODULE    ---      ---       ?C?CCASE
+      0100036FH   PUBLIC    CODE     ---       ?C?CCASE
+
+      ---         MODULE    ---      ---       ?C?ICASE
+      01000395H   PUBLIC    CODE     ---       ?C?ICASE
+
+      ---         MODULE    ---      ---       ?C?ICALL
+      010003C2H   PUBLIC    CODE     ---       ?C?ICALL
+      010003C6H   PUBLIC    CODE     ---       ?C?ICALL2
+
+      ---         MODULE    ---      ---       ?C?LIMUL
+      010003C8H   PUBLIC    CODE     ---       ?C?LIMUL
+
+      ---         MODULE    ---      ---       ?C_INIT
+      0100043CH   PUBLIC    CODE     ---       ?C_START
+
+Program Size: data=31.2 xdata=619 const=20 code=15994
+LX51 RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

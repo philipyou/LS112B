@@ -1,0 +1,4004 @@
+
+	width = 32
+	const length = 12000
+
+	/* ========= memory ============== */
+memalloc(
+/* 00-0f most frequently used area  */
+1 mem_le_adv_transmit
+1 mem_le_adv_waitcnt
+1 mem_le_adv_rcv
+1 mem_le_req_rcv
+1 mem_le_scanrsp_rcv
+1 mem_le_conn_rcv
+
+1 mem_inquiryscan_waitcnt
+1 mem_inquiryscan_rcvcnt
+1 mem_pagescan_waitcnt
+1 mem_pagescan_rcvcnt
+1 mem_pagescan_rcvfhscnt
+1 mem_slave_rcvcnt
+1 mem_page_transmit
+1 mem_page_rcv
+1 mem_page_rcv_fhs
+1 mem_master_rcvcnt
+
+/* 10-1f debug area */
+1 mem_fhs_wait_counter
+1 mem_newconnto_counter
+1 mem_inquiry_transmit
+1 mem_inquiry_rcv
+1 mem_fw_ver
+1 mem_current_context
+1 mem_le_ch_mapped
+1 mem_last_freq
+1 mem_rssi
+1 mem_rx_type
+2 mem_rx_hec_err
+2 mem_rx_crc_err
+2 mem_context_ptr
+8 mem_display
+8 mem_bcd
+
+16 mem_area_01
+0 mem_plap
+64 mem_area_0
+
+3 mem_hci_version
+2 mem_acl_pktlen
+1 mem_sco_pktlen
+2 mem_acl_pktcnt
+2 mem_sco_pktcnt
+
+1 mem_current_sniff_attempt
+1 mem_current_sniff_timeout
+1 mem_nfreq_index_inq
+1 mem_nfreq_index_page
+1 mem_ninqy_index
+1 mem_fhs_misc
+1 mem_tx_lch
+2 mem_tx_len
+
+
+
+
+/* lpo related */
+4 mem_subsniff_instant
+1 mem_subsniff_rate
+2 mem_subsniff_tcmax
+1 mem_subsniff_tsniff
+1 mem_lpm_adjust
+6 mem_sync_clke
+1 mem_lpm_current_mult
+4 mem_gpio_wakeup_low
+4 mem_gpio_wakeup_high
+	
+
+/* sco & esco */
+1 mem_air_mode
+1 mem_sco_asso_handle
+2 mem_sco_handle
+1 mem_esco_desco
+1 mem_esco_type
+1 mem_neogotiation_state
+1 mem_saved_amaddr
+1 mem_esco_arq
+1 mem_esco_saved_arq
+30 mem_sco_obuf
+30 mem_sco_ibuf
+1 mem_sco_poll
+
+
+
+//page
+1 mem_npage_index
+1 mem_page_mode
+4 mem_page_clk
+
+
+/* test related */
+2 mem_tst_pktcnt_sync
+2 mem_tst_pktcnt_hec
+2 mem_tst_pktcnt_crc
+2 mem_tst_pktcnt_dmh
+3 mem_tmp_buffer_head
+80 mem_tmp_buffer
+
+
+1 mem_tester_emulate
+0 mem_temp_payload
+1 test_mode_scenario
+1 test_mode_hopping_mode
+1 test_mode_tx_freq
+1 test_mode_rx_freq
+1 test_mode_power_mode
+1 test_mode_poll_period
+1 test_mode_packet_type
+2 test_mode_data_length
+1 mem_test_mode_old_debug_config
+1 mem_tester_cnt
+
+
+/*temp mem*/
+1 mem_temp_am_addr
+1 mem_temp_arq
+8 mem_pdatatemp
+
+
+//
+2 mem_len
+4 mem_clkn_bt
+4 mem_clke_bt
+4 mem_dpll_clkn
+1 mem_connection_options
+
+1 mem_nameres_cnt
+2 mem_txptr
+2 mem_slot_offset
+
+//extm
+1 extm_fhs_misc
+1 extm_newconn_am_addr
+3 extm_class
+3 extm_lap
+1 extm_uap
+3 extm_nap
+
+
+//debug
+1 mem_debug_config
+1 mem_lch_code
+1 mem_fhs_am_addr
+2 mem_dpll_error
+36 mem_bdaddr_list_buff
+1 mem_select_list_item
+0 mem_temp_reconn_record
+1 mem_record_bt_mode
+6 mem_temp_lap
+2 mem_list_item_ptr
+
+100 mem_eir
+)
+
+
+xmemalloc(
+/* patch enable 0x4000-0x403f  */
+
+1 mem_patch00
+1 mem_patch01
+1 mem_patch02
+1 mem_patch03
+1 mem_patch04
+1 mem_patch05
+1 mem_patch06
+1 mem_patch07
+1 mem_patch08
+1 mem_patch09
+1 mem_patch0a
+1 mem_patch0b
+1 mem_patch0c
+1 mem_patch0d
+1 mem_patch0e
+1 mem_patch0f
+1 mem_patch10
+1 mem_patch11
+1 mem_patch12
+1 mem_patch13
+1 mem_patch14
+1 mem_patch15
+1 mem_patch16
+1 mem_patch17
+1 mem_patch18
+1 mem_patch19
+1 mem_patch1a
+1 mem_patch1b
+1 mem_patch1c
+1 mem_patch1d
+1 mem_patch1e
+1 mem_patch1f
+1 mem_patch20
+1 mem_patch21
+1 mem_patch22
+1 mem_patch23
+1 mem_patch24
+1 mem_patch25
+1 mem_patch26
+1 mem_patch27
+1 mem_patch28
+1 mem_patch29
+1 mem_patch2a
+1 mem_patch2b
+1 mem_patch2c
+1 mem_patch2d
+1 mem_patch2e
+1 mem_patch2f
+1 mem_patch30
+1 mem_patch31
+1 mem_patch32
+1 mem_patch33
+1 mem_patch34
+1 mem_patch35
+1 mem_patch36
+1 mem_patch37
+1 mem_patch38
+1 mem_patch39
+1 mem_patch3a
+1 mem_patch3b
+1 mem_patch3c
+1 mem_patch3d
+1 mem_patch3e
+1 mem_patch3f
+
+	/* 3 device contexts  */
+240 mem_context
+1 mem_current_amaddr
+1 mem_lpm_mode
+1 mem_device_option
+1 mem_scan_mode
+4 mem_last_clkn
+
+	/* parameters */
+8 mem_features
+3 mem_lap
+1 mem_uap
+2 mem_nap
+1 mem_npage
+3 mem_glap
+3 mem_class
+2 mem_iscan_window
+2 mem_iscan_interval
+2 mem_pscan_window
+2 mem_pscan_interval
+2 mem_page_interval
+2 mem_page_window
+2 mem_page_to
+2 mem_inq_window
+1 mem_fcomp_mul
+1 mem_fcomp_div
+2 mem_rx_window_init
+2 mem_rx_window_sniff
+2 mem_rf_init_ptr
+
+	/* connection related */
+1 mem_last_type
+1 mem_last_type_esco
+1 mem_last_type_saved
+2 mem_retransmission_cnt
+4 mem_next_btclk
+
+1 mem_seqi
+1 mem_rf_rccal
+1 mem_handle_num
+1 mem_max_slot
+1 mem_eir_enable
+
+/* AFH related */
+4 mem_afh_instant
+2 mem_afh_error_total
+1 mem_afh_cfg
+1 mem_afh_new_mod
+5 mem_afh_map_lo
+5 mem_afh_map_hi
+1 mem_afh_used
+2 mem_afh_index
+11 mem_afh_map_new
+80 mem_afh_map
+4 mem_afh_timer
+10 mem_afh_classify_channel_map
+
+
+	/* lpm related */
+2 mem_chip_functions
+2 mem_lpm_wake_lock
+2 mem_lpm_interval
+1 mem_lpm_overhead
+1 mem_lpm_hibernate_switch
+1 mem_esco_addr
+1 mem_sniff_unint_lost
+1 mem_ptt
+4 mem_sleep_counter   //should be 0x41fc in REVC
+4 mem_sleep_counter_all
+6 mem_sleep_clkn
+3 mem_sniff_rcv
+3 mem_sniff_lost
+3 mem_clks_per_lpo
+
+1 mem_lpm_mult
+1 mem_lpm_mult_timeout
+1 mem_lpm_mult_cnt
+3 mem_lpm_config
+1 mem_lpm_xtalcnt
+1 mem_lpm_buckcnt
+1 mem_lpm_ldocnt
+1 mem_lpm_isogate
+1 mem_lpm_isogate_final
+32 mem_area_3
+
+32 mem_timers
+
+/*LINK KEY*/
+1 mem_link_key_exists
+3 mem_link_key_eeprom_head
+16 mem_link_key
+
+
+/* HCI */
+2 mem_area_40
+0 mem_hci_plap
+6 mem_area_41
+
+/*Peripherals*/
+1 mem_uartd_rxitems_got_data
+1 mem_uartd_rxitems_threshold
+2 mem_uartd_rx_timeout
+
+)
+
+0x4c00 mem_savelist
+0x0223 mem_spid_tbuf		//4 bytes
+
+0x4b17 rom_lpm_sleep
+0x4b1d rom_lpm_enter_sleep
+0x4b16 rom_lpm_write_ctrl
+0x6b1a rom_otpd_read_data
+0x6ada rom_otp_write
+0x029f mem_ucode_id_local
+
+
+/* ========== flag[6] =============== */
+(
+0        always        /* always 1 */
+1        true          /* set/rstn by verify,compare,icompare (true) */
+2        positive      /* set/rstn by all alu operations (opcode = 0x03,0x13,0x0f,0x1f), if alu output >= 0 */
+5        zero          /* set/rstn by all alu operations (opcode = 0x03,0x13,0x0f,0x1f), if alu output == 0 */
+24       sync          /* sync found as a result of correlation,set/rstn by correlate opcode */
+39 	 auxcnt
+40       user         /* user0 */
+41       master        /* user1 */
+43       wake           /* user3 */
+45       match         /* user5 */
+52       blank         /* C0 only, means pdata == 0 */
+63       never         /* read only, always 0 */
+)
+
+default flag = always
+
+/* ========== reg[6] =============== */
+(
+1        type 
+2        temp   /* general purpose register, 64 bits */
+3        contru  /* contr uart */
+5        contw        /* last mem_addr during write */
+6        contr        /* last mem_addr during read */
+7        queue    /* the index of qset*,qisolate* commands, ie, if queue = 3, qset/qisolate operate on bit3 */
+8        debug    /* can be wired out for observation */
+10       contwu   /* contw uart */
+11       timeup        /* when does certain counter expire */
+16       swfine	
+17       rega          /* general purpose register, 32 bits */
+18       regb          /* general purpose register, 32 bits */
+19       regc          /* general purpose register, 17 bits */
+20       regab         /* concat of {rega,regb}, thus 64 bits */
+25       clkn              /* {clkn_bt, clkn_rt} */
+26       clke              /* {clke_bt, clke_rt} */
+34       clkn_bt  /* read only, native bluetooth clock, free running 3.2KHz  or controlled by RTHALFSLOT register */
+35       clkn_rt  /* read only, native realtime clock, free running 12MHz, count from 0-3749, or controlled by RTHALFSLOT register */
+40       clke_bt  /* r/w,  external bluetooth clock , free running 3.2KHz or controlled by RTHALFSLOT register */
+41       clke_rt  /* r/w,  external realtime clock, , free running 12MHz, count from 0-3749, or controlled by RTHALFSLOT register */
+57	     loopcnt
+62       null              /* to nowhere */
+63       pdata /* the shift register */
+)
+default reg = pdata
+37 mark_ext_patch
+
+
+/* ============== soft timers ============== */
+(
+0 h5_reinit_timer
+1 hci_retransmit_timer
+1 le_adv_interval_timer
+2 inquiry_length_timer
+3 le_scan_interval_timer
+4 page_length_timer
+5 iscan_interval_timer
+6 pscan_interval_timer
+7 lpo_delay_timer
+8 ui_hundred_millisecond_timer
+9 ui_led_blink
+10 switch_wait_timer
+11 enpt_delay_timer
+12 temp_timer
+13 page_interval_timer
+14 uart_rx_timer
+)
+(
+0 ui_led_stop
+1 ui_led_start
+2 ui_led_dark_time
+3 ui_led_light_time
+)
+
+/* LLID CODE */
+(	
+1 LLID_L2CAP_CONT
+2 LLID_L2CAP_START
+3 LLID_LMP
+)
+
+/*************mem_pincode_state****************/
+(
+0 pincode_state_ilde
+1 pincode_state_wait_pincode
+2 pincode_state_pincode_ready
+)
+
+
+
+//mem_lpm_wake_lock
+(
+
+2 wake_lock_hci_host
+3 wake_link_key_exists
+4 wake_lock_delay
+5 wake_lock_uart_tx
+6 wake_lock_uart_rx
+7 wake_lock_button
+8 wake_lock_cmd
+9 wake_lock_app
+10 wake_lock_lmp_tx
+11 wake_lock_lmp_rx
+12 wake_lock_l2cap_tx
+13 wake_lock_l2cap_rx
+14 wake_lock_ipc_c512bt
+15 wake_lock_ipc_bt2c51
+
+)
+
+(
+0x33  REC_3_MODE
+0x34  REC_4_MODE
+)
+
+
+//sniff UART_TX UART_RX
+(
+6 UART_WAKEUP_TX
+7 UART_WAKEUP_RX
+)
+
+
+
+memalloc(
+
+54 mem_area_5
+
+1 mem_sensor_id
+1 mem_reconnect_flag
+1 mem_switch_fail_master_count
+1 mem_app_evt_timer_count
+
+)
+
+xmemalloc(
+1 mem_app_state
+1 mem_app_handshake_flag
+2 mem_sniff_param_interval
+2 mem_sniff_param_attempt
+2 mem_sniff_param_timeout
+
+/*App Callback Functons*/
+2 mem_cb_check_wakelock
+2 mem_cb_before_hibernate
+2 mem_cb_before_lpm
+2 mem_cb_le_process
+2 mem_cb_bt_process
+2 mem_cb_idle_process
+2 mem_cb_bb_event_process
+2 mem_cb_discovry_timeout
+2 mem_cb_att_write
+2 mem_cb_update_notify_value
+1 mem_device_nums
+
+
+
+
+
+2 mem_eeprom_base
+
+1 mem_unsniff2sniff_timer_count
+//lpm mode
+1 mem_wake_up_delay_timer
+
+1 mem_app_connection_options
+
+//
+2 mem_app_disconn_reason
+2 mem_app_disconn_reason_flag
+1 mem_at_using_flag
+4 mem_lpm_delay_after_sniff
+1 mem_xrecord_mode
+
+2 mem_eeprom_block_size
+
+)
+
+/* ir */
+omemalloc(
+2 mem_ir_ptr
+1 mem_ir_type
+1 mem_ir_cmd
+1 mem_ir_play_count
+2 mem_ir_report_len
+1 mem_ir_pulse_zero
+1 mem_ir_pulse_one
+28 mem_ir_pulses
+1 mem_ir_sequence_len
+128 mem_ir_sequence
+)
+
+0x0000 otp_ucode_flag
+0x07f0 otp_ucode_aeskey
+
+
+/* data stored in eeprom */
+(
+0	eeprom_bdaddr_list
+28	eeprom_last_record
+29	eeprom_le_reconn_local_addr
+35	eeprom_linkkey_list//64
+
+99	eeprom_module_bt_adss//6
+105	eeprom_module_le_adss//6
+111	eeprom_module_pincode_length//1
+112	eeprom_module_pincode//15
+127	eeprom_module_bt_name_length//1
+128	eeprom_module_bt_name//32
+160	eeprom_module_ble_name_length//1
+161	eeprom_module_ble_name//31
+192	eeprom_module_trans_baud//3
+195	eeprom_module_init_flag//2
+197	eeprom_module_end
+
+//dpi eeprom addr
+198 eeprom_mouse_dpi
+)
+
+/*mem_app_handshake_flag*/
+(
+0 APP_HANDSHAKE_NULL
+1 APP_HANDSHAKE_DONE
+
+)
+/*mem_device_option*/
+(
+1 dvc_op_hci
+3 dvc_op_kb
+
+9 dvc_op_shutter
+10 dvc_op_module
+6 dvc_op_mouse
+
+(
+0 MODE_3_MOUSE
+1 MODE_4_MOUSE
+)
+)
+
+(
+3 twspi_sclk
+4 twspi_sdio
+)
+
+(
+4 pan_clk_bit
+5 pan_dat_bit
+6 pan_mov_bit
+)
+
+(
+7 otp_uflag_aes
+6 otp_uflag_skip_eep
+5 otp_uflag_skip_flash
+4 otp_uflag_hci
+)
+
+/* ir command */
+(
+1 ircmd_record
+2 ircmd_play
+3 ircmd_write_pulse
+4 ircmd_write_seq
+5 ircmd_write_next
+
+8 ircmd_test_play
+9 ircmd_test_rec
+
+10 ircmd_report_pulse
+11 ircmd_report_seq
+12 ircmd_report_raw
+
+20 ircmd_screen_on
+21 ircmd_screen_off
+)
+
+(
+7 gpio_active_bit
+)
+(
+2 HID_HANDSHAKE_TIMEOUT
+
+)
+
+(
+1 APP_FLAG_RECONNECT
+)
+(
+5 LPM_WAKE_UP_DELAY_TIMER
+)
+
+
+//mem_app_disconn_reason
+//mem_app_disconn_reason_flag
+//bit map
+(
+2 APP_DISC_RSN_SIZE
+)
+(
+0 APP_DISC_BY_BUTTON
+1 APP_DISC_AFTER_PAIRING
+2 APP_DISC_AFTER_RECONN
+3 APP_DISC_AFTER_SNIFF
+4 APP_DISC_AFTER_SETUP_DONE
+5 APP_DISC_AFTER_HANDSHAKE
+6 APP_DISC_BT
+7 APP_DISC_BLE
+8 APP_DISC_L2CAP_REFUSED
+9 APP_DISC_SWITCH_FAIL
+)
+//eeprom init flag
+(
+	0xaa55 EEPROM_INIT_FLAG
+)
+
+memalloc(
+
+	
+)
+
+omemalloc(
+
+)
+
+
+	(
+	0x2b UI_PLUS
+	0x3A UI_COLON
+	0x454c42 UI_BLE
+	0x3d AT_EQU
+	0x3f AT_QUES
+	0 AT_NULL
+	44 AT_COMMA
+	)
+	(
+	0x1A0 AT_baud_115200
+	0x4e2 AT_baud_38400
+	0x1388 AT_baud_9600
+	)
+	(
+		0 AT_FLAG_INQ
+		1 AT_FLAG_LEINQ
+		2 AT_FLAG_NAME
+	)
+	(
+		0 AT_STATE_SET30
+		1 AT_STATE_SET40
+		2 AT_STATE_CMODE
+		3 AT_STATE_ISCONN
+		4 AT_STATE_ROLE
+		5 AT_STATE_SNIFF
+		6 AT_STATE_LE
+	)
+	(
+		0 AT_TASK_UNSINFF
+		1 AT_TASK_SNIFF
+		2 AT_TASK_RECONN
+		3 AT_TASK_INQ
+		4 AT_TASK_SWITCH
+		7 AT_TASK_CMD_FLAG
+	)
+	
+	(
+		0x0A0D AT_CMD_END
+	)
+
+
+memalloc(
+1 mem_dongle_count
+6 mem_le_addr_slave1
+6 mem_le_addr_slave2
+1 mem_le_peer_state
+6 mem_app_peer_addr
+
+1 mem_dongle_peers
+1 mem_dongle_pairing_cnt
+2 mem_dongle_signature
+)
+160 context_3
+
+
+memalloc(
+46 mem_area_6
+8 mem_temp //8 bytes
+4 mem_timeup // 4 bytes
+4 mem_rega //4 bytes
+4 mem_regb //4 bytes
+3 mem_regc //3 bytes
+2 mem_contr //2 bytes
+2 mem_contw //2 bytes
+1 mem_ucode_id_remote
+1 mem_check_sum
+1 mem_ucode_temp
+1 mem_ucode_temp1
+1 mem_lock_in_enc//boolean
+
+1 mem_hci_disconn_reason
+
+1 mem_hci_curr_len
+2 mem_hci_curr_target 
+) 
+
+xmemalloc(
+
+2 mem_baud
+1 mem_hci_lt_rx_state
+)
+
+omemalloc(
+
+2 mem_acl_credits
+1 mem_allow_switch
+4 mem_hci_acl_queue_start	/*param_acl_pktcnt+2 byte*/
+4 mem_hci_wake_clk
+
+)
+
+
+(
+/*HID TYPE*/
+0x01 HID_TYPE_CONTROL
+0x04 HID_TYPE_GET_REPORT
+0x05 HID_TYPE_SET_REPORT
+0x07 HID_TYPE_SET_PROTOCOL
+0x09 HID_TYPE_SET_IDLE
+0x0a HID_TYPE_DATA
+/*HID REPORT ID*/
+0x01 HID_REPORT_ID_KB
+
+0x00 HID_CONTROL_P_NOOPERATION
+0x01 HID_CONTROL_P_HARDRESET
+0x02 HID_CONTROL_P_SOFTRESET
+0x03 HID_CONTROL_P_SUSPEND
+0x04 HID_CONTROL_P_EXITSUSPEND
+0x05 HID_CONTROL_P_VIRTUALCABLEUNPLUG
+)
+
+
+
+omemalloc(
+//Keyboard Work Area
+2 mem_kb_state
+6 mem_kb_report_data
+1 mem_kb_keys
+1 mem_kb_rcv_led_data
+4 mem_kb_fast_wake_last
+//Keyboard Config Area
+1 mem_led_cap_gpio
+1 mem_led_num_gpio
+1 mem_led_scl_gpio
+158 mem_kb_map
+650 mem_keyboard_uuid_list
+)
+
+
+8 KB_KSCAN_ROW 
+7 KB_KSCAN_ROW_1
+20 KB_KSCAN_COL
+19 KB_KSCAN_COL_1
+
+/* ks_ctrl */
+(
+0x01 KB_KSCAN_CTRL_ENABLE					
+0x02 KB_KSCAN_CTRL_FREEZE					
+0x04 KB_KSCAN_CTRL_GHOST					
+0x08 KB_KSCAN_CTRL_INT						
+0x10 KB_KSCAN_CTRL_CLKON					
+0x20 KB_KSCAN_CTRL_FIFO_CLR				
+                  
+0 KB_KSCAN_STAT_EMPTY
+1 KB_KSCAN_STAT_FULL 					
+2 KB_KSCAN_STAT_OVERFLOW				
+6 KB_KSCAN_STAT_GHOST 
+
+0 KB_KSCAN_KEY_EVENT_STAT
+0 KB_KSCAN_KEY_PRESS	
+1 KB_KSCAN_KEY_RELEASE
+
+)
+
+
+/* special key codes */
+(
+0x1d KB_KCODE_1_M1
+0x27 KB_KCODE_0
+0x28 KB_KCODE_ENTER
+0x2a KB_KCODE_BKSP
+)
+
+/*DATA OUTPUT report id = 1*/
+0 KB_NUM_LOCK_SELECTED
+1 KB_CAPS_LOCK_SELECTED
+2 KB_SCROLL_LOCK_SELECTED
+
+
+0x1f  KB_UI_BUTTON_GPIO
+
+
+
+
+memalloc(
+0 mem_l2cap_mem_start
+// L2CAP RX 
+2 mem_l2cap_rxbuff1_len
+2 mem_l2cap_rxbuff2_len
+2 mem_l2cap_rxbuff_new
+1 mem_l2cap_rxbuff_inuse
+2 mem_l2cap_payload_ptr
+2 mem_l2cap_rx_pkt_length
+2 mem_l2cap_rx_cid
+1 mem_l2cap_rx_done
+
+
+
+// L2CAP TX Signal channel
+2 mem_l2cap_signal_tx_buff_ptr
+2 mem_l2cap_signal_tx_payload_ptr
+2 mem_l2cap_signal_tx_length
+// L2CAP TX SDP channel
+2 mem_sdp_tx_buff_ptr
+2 mem_sdp_tx_payload_ptr
+2 mem_sdp_tx_pkt_length
+// L2CAP TX RFCOMM channel
+2 mem_rfcomm_tx_buff_ptr
+2 mem_rfcomm_tx_payload_ptr
+2 mem_rfcomm_tx_pkt_length
+
+
+
+//L2CAP Util
+
+2 memL2CAP_T1
+
+1 mem_CONTROL_tasks
+1 mem_send_config_req
+
+
+1 mem_config_identifier
+2 mem_config_req_dest_CID
+1 mem_rfcomm_malloc_fail_flag
+
+//L2CAP STATE MACHINE
+1 mem_message_to_uppersm
+1 mem_upper_sm_remote_page
+1 mem_upper_sm_reconn
+1 mem_upper_sm_ss
+
+
+64 mem_tx_malloc_log
+0 mem_l2cap_mem_end
+
+
+2 mem_scid
+2 mem_cmd_length
+2 mem_tt2
+2 mem_tt3
+2 mem_id
+2 mem_psm
+
+
+4 mem_l2cap_sdpres_delay_time
+)
+
+xmemalloc(
+0 mem_l2cap_xmem_start
+//*******************L2CAP TX MULTI-PACKET*********************//
+2 mem_l2cap_tx_multi_offset //0 means single packet
+
+//*******************CHANNEL ID*********************//
+2 mem_sdp_remote_cid
+2 mem_rfcomm_remote_cid
+2 mem_hid_ctrl_remote_cid
+2 mem_hid_int_remote_cid
+//*******************CHANNEL STATE*********************//
+1 mem_sdp_state
+1 mem_rfcomm_state
+1 mem_hid_control_state
+1 mem_hid_interrupt_state
+1 mem_spp_state
+1 mem_ML2CAP_comm_id
+
+//*******************L2CAP malloc********************//
+1 mem_used_map
+0 mem_tx_fifo0
+1 mem_tx_fifo0_map
+2 mem_tx_fifo0_ptr
+0 mem_tx_fifo1
+1 mem_tx_fifo1_map
+2 mem_tx_fifo1_ptr
+0 mem_tx_fifo2
+1 mem_tx_fifo2_map
+2 mem_tx_fifo2_ptr
+0 mem_tx_fifo3
+1 mem_tx_fifo3_map
+2 mem_tx_fifo3_ptr
+0 mem_tx_fifo_end
+256 mem_l2cap_lpm_txbuf
+//*******************MISC*********************//
+1 mem_l2cap_flow_ctrl_flag
+1 mem_l2cap_pending_item
+0 mem_l2cap_xmem_end
+
+)
+
+
+//mem_l2cap_lpm_txbuf
+(
+256 l2cap_lpm_txbuf_len
+)
+
+(
+4 L2CAP_TX_FIFO_SIZE
+8 L2CAP_TX_BUFF_CNT
+
+)
+
+(
+0 HS_IDLE
+1 AG_INIT_CALL
+2 HS_INIT_CALL
+)
+(
+0 M_ACL_LINK_ABSENT
+1 M_ACL_LINK_EXIST
+)
+
+(
+0 L2CAP_INUSE_BUFF1
+1 L2CAP_INUSE_BUFF2
+)
+/* upper layer interface w/ lower layer */
+(
+1 MAX_NUM_LINKS_ALLOWED
+1 MAX_NUM_SCO_ALLOWED
+1 ACL_LINK_PRESENT
+0 ACL_LINK_ABSENT
+)
+(
+1 L2CAP_RX_DONE 
+0 L2CAP_RX_CLEAR
+)
+/* Scheduler */
+(
+0 L2CAP_DISCONNECT_INTERRUPT
+1 RFCOMM_wants_service
+2 L2CAP_sig_Tx_buff_full
+3 RFCOMM_Tx_buff_full
+4 SDP_Tx_buff_full
+5 got_complete_L2CAP_pkt	
+6 L2CAP_init_Config_Req
+7 L2CAP_DISCONNECT_CONTROL
+)
+
+/* mem_CONTROL_tasks2 */
+(
+0 UI_NEED_SERVICE
+)
+/* L2CAP logic channel identifiers (2 bytes) p.261 */
+(
+0x0001 L2CAP_signal_channel
+0x0050 L2CAP_SDP_channel
+0x0051 L2CAP_RFCOMM_channel
+0x0052 L2CAP_HID_Control_channel   
+0x0053 L2CAP_HID_Interrupt_channel
+0x0077 L2CAP_AVDTP_signal_channel		//------avdtp
+0x0078 L2CAP_AVDTP_media_channel
+0x0079 L2CAP_AVDTP_report_channel
+0x0080 L2CAP_AVDTP_recovery_channel
+0x00dd L2CAP_AVCTP_Control_channel
+)
+/* L2CAP signalling command codes (1 byte) p.284 */
+(
+0x00 reserved
+0x01 signal_cmd_reject
+0x02 signal_connect_req
+0x03 signal_connect_rsp
+0x04 signal_config_req
+0x05 signal_config_rsp
+0x06 signal_disconnect_req
+0x07 signal_disconnect_rsp
+0x08 signal_echo_req
+0x09 signal_echo_rsp
+0x0a signal_info_req
+0x0b signal_info_rsp
+)
+/* L2CAP signal_command_reject reason code (2 bytes), p.285 */
+(
+0x0000 cmd_not_understood
+0x0001 signalling_MTU_exceeded
+0x0002 invalid_CID_in_req
+)
+/* L2CAP PSM values used in signal_connect_req (2 bytes), p.286 */
+(
+0x0001 PSM_SDP
+0x0003 PSM_RFCOMM
+0x0005 PSM_TCS
+0x0011 PSM_HID_control
+0x0013 PSM_HID_interrupt
+0x0017 PSM_AVCTP
+0x0019 PSM_AVDTP
+)
+/* L2CAP connection response result code (2 bytes), p.288 */
+(
+0x0000 L2CAP_connect_successful
+0x0001 L2CAP_connect_pending
+0x0002 L2CAP_connect_refused_PSM_unsupported
+0x0003 L2CAP_connect_refused_security_block
+0x0004 L2CAP_connect_refused_no_resources
+)
+/* L2CAP connection status values (2 bytes), p.288 */
+(
+0x0000 L2CAP_no_info_available
+0x0001 L2CAP_authentication_pending
+0x0002 L2CAP_authorization_pending
+)
+/* L2CAP configuration response result code (2 bytes), p.292 */
+(
+0x0000 L2CAP_config_success
+0x0001 L2CAP_config_failure_bad_parameters
+0x0002 L2CAP_config_failure_no_reason
+0x0003 L2CAP_config_failure_unknown_options
+)
+/* L2CAP constant definitions */
+(
+128 L2CAP_Rx_buff_size
+48  L2CAP_signal_Tx_buff_size
+128 SDP_Tx_buff_size
+128 RFCOMM_Tx_buff_size
+1 AM_ADDRESS
+3 DM1TYPE
+4 DH1TYPE
+11 DH3TYPE
+8 DVTYPE
+0 channel_state_closed
+1 channel_state_config
+2 channel_state_open
+0x0030 L2CAP_config_MTU_SDP
+0xffff L2CAP_config_ftimeout_SDP
+0x03e3 L2CAP_config_MTU_RFCOMM
+0xffff L2CAP_config_ftimeout_RFCOMM
+260 l2cap_max_pkt_len
+)
+
+(
+0 FAILURE
+1 SUCCESS
+2 IN_PROGRESS
+)
+(
+0x00	IDLE
+0x01	WAIT_4_BB_PAGE
+0x02	WAIT_4_LMP_CONN
+0x03	WAIT_4_SCO_CONN
+0x04	WAIT_4_SCO_KILLED
+)
+
+/*mem_master_mss*/
+(
+0 STOP_ENC
+1 SEND_SWITCH_REQ
+)
+(
+0 HF_HS_READY
+1 HF_AG_READY
+)
+/* mem_hf_state */
+(
+0 HF_STATE_WAITING_RFCOMM_CONN
+1 HF_STATE_HF_SEND_FEATURE
+2 HF_STATE_WAITING_AG_FEATURE_OK
+3 HF_STATE_HF_SEND_INDICATORS
+4 HF_STATE_WAITING_AG_INDICATORS_OK
+5 HF_STATE_HF_SEND_CURR_STATUS
+6 HF_STATE_WAITING_AG_STATUS_OK
+7 HF_STATE_HF_SEND_UPDATE_STATUS
+8 HF_STATE_WAITING_AG_UPDATE_STATUS_OK
+9 HF_STATE_CONNECTED
+0x0a HF_STATE_HF_SEND_RECEIVE_INFO
+0x0b HF_STATE_WAITING_AG_INFO
+0x0c HF_STATE_HF_SEND_AT_CLIP
+0x0d HF_STATE_WAITING_AT_CLIP
+0x0e HF_STATE_HF_SEND_AT_CCWA
+0x0f HF_STATE_WAITING_AT_CCWA
+)
+/*mem_hf_call_state*/
+(
+0 HF_CALL_STATE_INACTIVE
+1 HF_CALL_STATE_SETUP
+2 HF_CALL_STATE_ACTIVE 
+)
+/* mem_pairing_state bit definition */
+(
+0 PAIR_INQUIRY_START
+1 PAIR_INQUIRY_TIME_OUT
+2 PAIR_INQUIRY_FAILED
+3 PAIR_INQUIRY_SUCCESS
+4 PAIR_READY_CONN
+5 PAIR_WAIT_CANCEL_RESPONSE
+6 PAIR_CONN_SUCCESS
+7 PAIR_WAIT_DETACH
+)  
+
+/* mem_pairing_mode bit definition */
+(
+0 FORCE_AUTHENTICATION
+)
+/* mem_hid_protecol_type */
+(
+0 PROTECOL_BOOT /*default*/
+1 PROTECOL_REPORT
+)
+
+/* mem_upper_sm_reconn */
+(
+1 UPPERSM_SEND_SDP_CONN_REQ
+2 UPPERSM_SEND_SDP_CFG_REQ
+3 UPPERSM_SEND_SDP_HF_SS
+4 UPPERSM_SEND_SDP_DISC_REQ
+5 UPPERSM_SEND_RFCOMM_CONN_REQ
+6 UPPERSM_SEND_RFCOMM_CFG_REQ
+7 UPPERSM_SEND_SABM_CMD
+8 UPPERSM_SEND_DISC
+9 UPPERSM_SEND_WAIT
+10 UPPERSM_SEND_HID_CONTROL_CONN_REQ
+11 UPPERSM_SEND_HID_CONTROL_CFG_REQ
+12 UPPERSM_SEND_HID_INTERRUPT_CONN_REQ
+13 UPPERSM_SEND_HID_INTERRUPT_CFG_REQ
+14 UPPERSM_SEND_SDP_HS_SS
+15 UPPERSM_SEND_SDP_PBAP_SS
+16 UPPERSM_SEND_SDP_AVTARG_SS
+)
+/* mem_upper_sm_remote_page */
+(
+1 UPPERSM_RP_SEND_SDP_CONN_REQ
+2 UPPERSM_RP_SEND_SDP_CFG_REQ
+3 UPPERSM_RP_SEND_SDP_HF_SS
+4 UPPERSM_RP_SEND_SDP_HS_SS
+5 UPPERSM_RP_SEND_SDP_PBAP_SS
+6 UPPERSM_RP_SEND_SDP_AVTARG_SS
+7 UPPERSM_RP_SEND_SDP_DISC_REQ
+8 UPPERSM_RP_SEND_AVCTP_CONN_REQ
+9 UPPERSM_RP_SEND_AVCTP_CFG_REQ
+)
+
+/* mem_ML2CAP_flag */
+(
+0 MSCHEDULER_HID_CONTROL_CONN_DONE
+1 MSCHEDULER_HID_INTERRUPT_CONN_DONE
+2 MSCHEDULER_HID_CONTROL_CFG_REQ_DONE
+3 MSCHEDULER_HID_CONTROL_CFG_RSP_DONE
+4 MSCHEDULER_HID_INTERRUPT_CFG_REQ_DONE
+5 MSCHEDULER_HID_INTERRUPT_CFG_RSP_DONE
+6 MSCHEDULER_HID_CONTROL_DISC_DONE
+7 MSCHEDULER_HID_INTERRUPT_DISC_DONE
+)
+/*    ui event    --add by lj*/
+(
+0x00 UI_DATA_EVNET_NONE
+0x01 UI_DATA_EVNET_HID
+0x02 UI_DATA_EVNET_AVDTP_S
+0x03 UI_DATA_EVNET_AVDTP_M
+0x04 UI_DATA_EVNET_AVCTP
+0x05 UI_DATA_EVNET_HS
+0x06 UI_DATA_EVNET_HF
+0x07 UI_DATA_EVNET_SPP
+0x08 UI_DATA_EVNET_OBEX
+)
+/*    ui ack --add by lj*/
+(
+0x00 UI_DATA_TX_NONE
+0x01 UI_DATA_TX_HID
+0x02 UI_DATA_TX_AVDTP_S
+0x03 UI_DATA_TX_AVDTP_M
+0x04 UI_DATA_TX_AVCTP
+0x05 UI_DATA_TX_HS
+0x06 UI_DATA_TX_HF
+0x07 UI_DATA_TX_SPP
+0x08 UI_DATA_TX_OBEX
+0x10 ACL_TX_L2CAP_SIGNAL
+0x11 ACL_TX_SDP
+0x12 ACL_TX_RFCOMM
+
+)
+
+(
+0 L2CAP_SDP_interface_conn
+1 L2CAP_SDP_interface_cfg
+)
+
+(                                   
+0 L2CAP_CHANNEL_STATE_CONN_REQ      
+1 L2CAP_CHANNEL_STATE_CONN_RES      
+2 L2CAP_CHANNEL_STATE_SND_CFG_REQ   
+3 L2CAP_CHANNEL_STATE_SND_CFG_RES   
+4 L2CAP_CHANNEL_STATE_RCV_CFG_REQ   
+5 L2CAP_CHANNEL_STATE_RCV_CFG_RES
+6 L2CAP_CHANNEL_RFCOMM_ONLY_SABM
+7 L2CAP_CHANNEL_RFCOMM_ONLY_UA
+6 L2CAP_CHANNEL_AVDTP_SIGNAL_INIT //set avdtp init complete
+6 L2CAP_CHANNEL_HID_HANDSHAKE_DONE
+0x3f L2CAP_CHANNEL_SETUP_COMPLETE
+0x7f L2CAP_CHANNEL_AVDTP_SIGNAL_COMPLETE
+0xff L2CAP_CHANNEL_RFCOMM_DLCI0_OPENED
+)                                     
+
+/*  AVDTP---lj*/
+(
+0 L2CAP_AVDTP_SIGNAL_CONNECT
+1 L2CAP_AVDTP_SIGNAL_CONFIG
+2 L2CAP_AVDTP_MEDIA_CONNECT
+3 L2CAP_AVDTP_MEDIA_CONFIG
+4 L2CAP_AVDTP_REPORT_CONNECT
+5 L2CAP_AVDTP_REPORT_CONFIG
+6 L2CAP_AVDTP_RECOVERY_CONNECT
+7 L2CAP_AVDTP_RECOVERY_CONFIG
+)
+/*  AVCTP---lj*/
+(
+0 L2CAP_AVCTP_SIGNAL_CONNECT
+1 L2CAP_AVCTP_SIGNAL_CONFIG
+)
+
+127 L2CAP_SIGNAL_MALLOC_SIZE
+
+//1 mem_rfcomm_malloc_fail_flag
+(
+0 RFCOMM_MALLOC_SUCCEED
+1 RFCOMM_MALLOC_FAIL
+)
+
+//mem_l2cap_flow_ctrl_flag
+(
+0 L2CAP_FLOW_CTRL_DISABLE
+1 L2CAP_FLOW_CTRL_ENABLE
+)
+
+
+memalloc(
+56 mem_le_rxbuf
+
+
+/* security temp */
+72 mem_area_7
+
+
+/* ========= le context =========== */
+1 mem_le_state
+1 mem_le_mode
+2 mem_le_tsniff
+4 mem_le_anchor
+6 mem_le_clk_offset
+2 mem_le_receive_window
+6 mem_le_plap
+1 mem_le_conn_handle
+1 mem_le_arq
+1 mem_le_ch
+1 mem_le_hop
+2 mem_le_event_count
+4 mem_le_supervision_timer
+2 mem_le_instant
+1 mem_le_channels
+1 mem_le_conn_sm
+1 mem_le_op
+
+	/* these 3 should NOT be seperated */
+4 mem_le_access
+3 mem_le_crcinit
+1 mem_le_window_size
+
+	/* these 3 should NOT be seperated */
+2 mem_le_slave_latency
+2 mem_le_superto
+5 mem_le_channel_map
+
+2 mem_le_no_using
+1 mem_le_peer_sca
+
+/* should be together */
+1 mem_le_att_opcode
+2 mem_le_att_handle
+
+1 mem_le_err_code
+
+16 mem_le_sk
+
+
+/* test */
+1 mem_le_testtype
+2 mem_le_test_sync
+2 mem_le_test_pcnt
+
+6 mem_le_rxon_ts
+
+1 mem_le_rx_ll_opcode
+
+2 mem_le_notify_attr_start
+1 mem_le_notify_len
+
+1 mem_cmd_le_create_conn
+20 mem_le_adv_temp
+1 mem_24g_id
+)
+
+
+xmemalloc(
+2 mem_le_dsniff
+
+// parameters
+2 mem_le_conn_interval
+1 mem_le_scan_enable
+2 mem_le_scan_interval
+2 mem_le_scan_window
+
+1 mem_le_adv_led
+1 mem_le_adv_enable
+1 mem_le_adv_data_len
+31 mem_le_adv_data
+1 mem_le_scan_data_len
+31 mem_le_scan_data
+
+//modified name
+1 mem_le_name_len
+20 mem_le_name
+
+1 mem_le_led_on_time
+//37 mem_le_chmap
+
+
+5 mem_le_new_map
+9 mem_le_new_param
+1 mem_le_temp
+
+1 mem_le_txheader
+1 mem_le_txlen
+2 mem_le_txpayload
+2 mem_le_txcid
+1 mem_le_l2cap
+1 mem_le_l2cap_response
+31 mem_le_txbdy
+
+/* smp related */
+5 mem_le_pcnt_tx
+5 mem_le_pcnt_rx
+4 mem_le_last_mic
+4 mem_le_ivm
+4 mem_le_ivs
+16 mem_le_ltk
+1 mem_ltk_exists
+16 mem_le_rconfirm
+16 mem_le_srand
+1 mem_le_iat
+1 mem_le_rat
+7 mem_le_preq
+7 mem_le_pres
+
+/* att related */
+2 mem_le_search_handle_start
+2 mem_le_search_handle_end
+0 mem_le_att_offset
+2 mem_le_search_att_type
+2 mem_le_notify_handle
+2 mem_le_uuid
+
+1 mem_le_handle_data_len
+16 mem_le_handle_data
+
+
+//START of LE adv parameter structure
+0 mem_le_adv_param
+2 mem_le_adv_interval_min
+2 mem_le_adv_interval_max
+1 mem_le_adv_type
+1 mem_le_adv_own_addr_type
+1 mem_le_adv_direct_addr_type
+6 mem_le_adv_direct_addr
+1 mem_le_adv_channel_map
+1 mem_le_adv_filter_policy
+//END of LE adv parameter structure
+
+//START of LE conn parameter structure
+0 mem_le_conn_param
+1 mem_le_conn_peer_addr_type
+6 mem_le_conn_peer_addr
+1 mem_le_conn_own_addr_type
+2 mem_le_conn_interval_min
+2 mem_le_conn_interval_max
+2 mem_le_conn_latency
+2 mem_le_conn_superto
+//START of LE conn parameter structure
+
+//START of LE scan parameter structure
+0 mem_le_scan_params
+1 mem_le_scan_type
+1 mem_le_scan_own_addr_type
+1 mem_le_scan_filter_policy
+//END of LE scan parameter structure
+
+3 mem_le_lap
+1 mem_le_uap
+2 mem_le_nap
+5 mem_le_xtype_fifo
+
+
+//LE attribute list
+500 mem_le_att_list
+1 mem_le_switch_send_data
+4 mem_le_transmit_window
+
+)
+
+(
+20 notify_handle
+2 param_max_slaves
+1636 param_sifs
+0x000a06 param_le_version
+0x1d87 param_le_subversion
+0x000001 param_le_features
+23 param_le_mtu
+16 param_le_scan_interval
+16 param_le_scan_window
+0x1e0 param_clke_cal_le
+0x1000302 param_smp_paring_response		/* for mouse, noinputnooutput */
+0x010410 param_smp_key_dist	
+0xa0 param_le_sca
+)
+
+
+
+/* mem_le_conn_sm */
+( 
+  0x21 CONN_SM_SEND_WRITE_REQ                      
+  0x25 CONN_SM_WAIT_WRITE_RES
+  0x26 CONN_SM_WAIT_WRITE_RES1
+) 
+/*LE MOUSE-KB*/
+(
+1 LE_CONTEXT_STATE_KB
+2 LE_CONTEXT_STATE_MOUSE
+
+3 USB_MOUSE_DATA_CMD
+
+1 SEND_MOUSE_DATA_CMD
+2 SEND_KB_DATA_CMD
+)
+
+
+  (
+  	0 LE_M_STATE_SLAVE1_STANDBY
+  	1 LE_M_STATE_SLAVE1_ADVERTISING
+  	2 LE_M_STATE_SLAVE1_SCANNING
+  	3 LE_M_STATE_SLAVE1_INITIATING
+  	4 LE_M_STATE_SLAVE1_CONNECTED
+  	5 LE_M_STATE_SLAVE1_RFU_1
+  	6 LE_M_STATE_SLAVE1_RFU_2
+  	7 LE_M_STATE_SLAVE1_RFU_3
+  )
+
+  (
+  	0 LE_M_STATE_SLAVE2_STANDBY
+  	1 LE_M_STATE_SLAVE2_ADVERTISING
+  	2 LE_M_STATE_SLAVE2_SCANNING
+  	3 LE_M_STATE_SLAVE2_INITIATING
+  	4 LE_M_STATE_SLAVE2_CONNECTED
+  	5 LE_M_STATE_SLAVE2_CONNECT_INIT
+  	6 LE_M_STATE_SLAVE2_RFU_2
+  	7 LE_M_STATE_SLAVE2_RFU_3
+  )
+
+  	(
+	0 LE_SM_IDLE
+	1 LE_SM_FBTV_1800
+	2 LE_SM_FBTV_1800_WAIT
+	3 LE_SM_RBT_DEVICE_NAME
+	4 LE_SM_RBT_DEVICE_NAME_WAIT
+	5 LE_SM_FBTV_1801
+	6 LE_SM_FBTV_1801_WAIT
+	7 LE_SM_RBT_DEVICE_CHARACTER
+	8 LE_SM_RBT_DEVICE_CHARACTER_WAIT
+	
+  	)
+
+/* advertising channel PDU type */
+(
+0 ADV_IND
+1 ADV_DIRECT_IND
+2 ADV_NONCONN_IND
+3 SCAN_REQ
+4 SCAN_RSP
+5 CONNECT_REQ
+6 ADV_SCAN_IND
+)
+
+	/* tx packet type */
+	(
+	0x20 XT_LL_CONNECTION_UPDATE_REQ
+	0x21 XT_LL_CHANNEL_MAP_REQ
+	0x22 XT_LL_TERMINATE_IND
+	0x23 XT_LL_ENC_REQ
+	0x24 XT_LL_ENC_RSP
+	0x25 XT_LL_START_ENC_REQ
+	0x26 XT_LL_START_ENC_RSP
+	0x27 XT_LL_UNKNOWN_RSP
+	0x28 XT_LL_FEATURE_REQ
+	0x29 XT_LL_FEATURE_RSP
+	0x2A XT_LL_PAUSE_ENC_REQ
+	0x2B XT_LL_PAUSE_ENC_RSP
+	0x2C XT_LL_VERSION_IND
+	0x2D XT_LL_REJECT_IND
+	0x2E XT_LL_SLAVE_FEATURE_REQ
+	0x2F XT_LL_CONNECTION_PARAM_REQ
+	0x30 XT_LL_CONNECTION_PARAM_RSP
+	0x31 XT_LL_REJECT_IND_EXT
+	0x32 XT_LL_PING_REQ
+	0x33 XT_LL_PING_RSP
+	0x41 XT_SMP_PAIRING_REQUEST
+	0x42 XT_SMP_PAIRING_RESPONSE
+	0x43 XT_SMP_PAIRING_CONFIRM
+	0x44 XT_SMP_PAIRING_RANDOM
+	0x45 XT_SMP_PAIRING_FAILED
+	0x46 XT_SMP_ENCRYPTION_INFORMATION
+	0x47 XT_SMP_MASTER_IDENTIFICATION
+	0x48 XT_SMP_IDENTITY_INFORMATION
+	0x49 XT_SMP_IDENTITY_ADDRESS_INFORMATION
+	0x4A XT_SMP_SIGNING_INFORMATION
+	0x4B XT_SMP_SECURITY_REQUEST
+	)
+
+
+	/* LE control packet type */
+	(
+	0x00 LL_CONNECTION_UPDATE_REQ
+	0x01 LL_CHANNEL_MAP_REQ
+	0x02 LL_TERMINATE_IND
+	0x03 LL_ENC_REQ
+	0x04 LL_ENC_RSP
+	0x05 LL_START_ENC_REQ
+	0x06 LL_START_ENC_RSP
+	0x07 LL_UNKNOWN_RSP
+	0x08 LL_FEATURE_REQ
+	0x09 LL_FEATURE_RSP
+	0x0A LL_PAUSE_ENC_REQ
+	0x0B LL_PAUSE_ENC_RSP
+	0x0C LL_VERSION_IND
+	0x0D LL_REJECT_IND
+	0x0E LL_SLAVE_FEATURE_REQ
+	0x0F LL_CONNECTION_PARAM_REQ
+	0x10 LL_CONNECTION_PARAM_RSP
+	0x11 LL_REJECT_IND_EXT
+	0x12 LL_PING_REQ
+	0x13 LL_PING_RSP
+	)
+
+	/* Security Manager Protocol Code */
+	(
+	0x01 SMP_PAIRING_REQUEST
+	0x02 SMP_PAIRING_RESPONSE
+	0x03 SMP_PAIRING_CONFIRM
+	0x04 SMP_PAIRING_RANDOM
+	0x05 SMP_PAIRING_FAILED
+	0x06 SMP_ENCRYPTION_INFORMATION
+	0x07 SMP_MASTER_IDENTIFICATION
+	0x08 SMP_IDENTITY_INFORMATION
+	0x09 SMP_IDENTITY_ADDRESS_INFORMATION
+	0x0A SMP_SIGNING_INFORMATION
+	0x0B SMP_SECURITY_REQUEST
+	)
+
+	/* ATT OPCODE */
+	(
+	0x01 ATTOP_ERROR_RESPONSE
+	0x02 ATTOP_EXCHANGE_MTU_REQUEST
+	0x03 ATTOP_EXCHANGE_MTU_RESPONSE
+	0x04 ATTOP_FIND_INFORMATION_REQUEST
+	0x05 ATTOP_FIND_INFORMATION_RESPONSE
+	0x06 ATTOP_FIND_BY_TYPE_VALUE_REQUEST
+	0x07 ATTOP_FIND_BY_TYPE_VALUE_RESPONSE
+	0x08 ATTOP_READ_BY_TYPE_REQUEST
+	0x09 ATTOP_READ_BY_TYPE_RESPONSE
+	0x0A ATTOP_READ_REQUEST
+	0x0B ATTOP_READ_RESPONSE
+	0x0C ATTOP_READ_BLOB_REQUEST
+	0x0D ATTOP_READ_BLOB_RESPONSE
+	0x0E ATTOP_READ_MULTIPLE_REQUEST
+	0x0F ATTOP_READ_MULTIPLE_RESPONSE
+	0x10 ATTOP_READ_BY_GROUP_TYPE_REQUEST
+	0x11 ATTOP_READ_BY_GROUP_TYPE_RESPONSE
+	0x12 ATTOP_WRITE_REQUEST
+	0x13 ATTOP_WRITE_RESPONSE
+	0x16 ATTOP_PREPARE_WRITE_REQUEST
+	0x17 ATTOP_PREPARE_WRITE_RESPONSE
+	0x18 ATTOP_EXECUTE_WRITE_REQUEST
+	0x19 ATTOP_EXECUTE_WRITE_RESPONSE
+	0x1B ATTOP_HANDLE_VALUE_NOTIFICATION
+	0x1D ATTOP_HANDLE_VALUE_INDICATION
+	0x1E ATTOP_HANDLE_VALUE_CONFIRMATION
+	0x52 ATTOP_WRITE_COMMAND
+	0xD2 ATTOP_SIGNED_WRITE_COMMAND
+	0x9e EMPTY_LE_DATA_PRE
+	0x9f EMPTY_LE_DATA
+	)
+
+	/* ATT error code */
+	(
+	0x01 ATT_ERR_INVALID_HANDLE
+	0x02 ATT_ERR_READ_NOT_PERMITTED
+	0x03 ATT_ERR_WRITE_NOT_PERMITTED
+	0x04 ATT_ERR_INVALID_PDU
+	0x05 ATT_ERR_INSUFFICIENT_AUTHENTICATION
+	0x06 ATT_ERR_REQUEST_NOT_SUPPORTED
+	0x07 ATT_ERR_INVALID_OFFSET
+	0x08 ATT_ERR_INSUFFICIENT_AUTHORIZATION
+	0x09 ATT_ERR_PREPARE_QUEUE_FULL
+	0x0A ATT_ERR_ATTRIBUTE_NOT_FOUND
+	0x0B ATT_ERR_ATTRIBUTE_NOT_LONG
+	0x0C ATT_ERR_INSUFFICIENT_ENCRYPTION_KEY_SIZE
+	0x0D ATT_ERR_INVALID_ATTRIBUTE_VALUE_LENGTH
+	0x0E ATT_ERR_UNLIKELY_ERROR
+	0x0F ATT_ERR_INSUFFICIENT_ENCRYPTION
+	0x10 ATT_ERR_UNSUPPORTED_GROUP_TYPE
+	0x11 ATT_ERR_INSUFFICIENT_RESOURCES
+	)
+	/*	SERVICE UUID	*/
+	(
+	0x1800 UUID_SERVICE_GENERIC_ACC
+	0x1801 UUID_SERVICE_GENERIC_ATT
+	0x180a UUID_SERVICE_DEVICE_INFO
+	0x180f UUID_SERVICE_BATTERY
+	0x1812 UUID_SERVICE_HIDS
+	0x2800 UUID_GATT_PRIMARY_SERVICE
+	0x2801 UUID_GATT_SECONDARY_SERVICE
+	0X2802 UUID_GATT_INCLUDE
+	0X2803 UUID_GATT_CHARACTERISTIC
+	0X2A00 UUID_CHRCTR_DEVICE_NAME
+	0X2A19 UUID_CHRCTR_BATTERY_LEVEL
+	0X2A22 UUID_CHRCTR_KEYBOARD_INPUT
+	0X2A23 UUID_CHRCTR_SYSTEM_ID 
+	0X2A25 UUID_CHRCTR_SERIAL_NUMBER
+	0X2A26 UUID_CHRCTR_FIRMWARE
+	0X2A32 UUID_CHRCTR_KEYBOARD_OUTPUT
+	0X2A33 UUID_CHRCTR_MOUSE_INPUT
+	0X2A4A UUID_CHRCTR_HID_INFO
+	0X2A4B UUID_CHRCTR_REPORT_MAP
+	0X2A4C UUID_CHRCTR_HID_CTRL_POINT
+	0X2A4D UUID_CHRCTR_REPORT
+	0X2A4E UUID_CHRCTR_PROTOCOL_MODE
+	)
+
+	//modified_name
+	(
+	0x14 MAX_NAME_LEN
+	0x16 ADV_DATA_NAME_LEN
+	0X20 SPACE
+	
+	)
+	/* GATT Specifications*/
+	(
+	0X2900 CHARACTERTIC_EXTENDED_PROPERTIES
+	0X2901 CHARACTERTIC_USER_DESCRIPTION
+	0X2902 CLIENT_CHARACTERTIC_CONFIGURATION
+	0X2903 SERVER_CHARACTERTIC_CONFIGURATION
+	0X2904 CHARACTERTIC_PRESENTATION_FORMAT
+	0X2905 CHARACTERTIC_AGGREGATE
+	0X2906 VALID_RANGE
+	0X2907 EXTERNAL_REPORT_REFERENCE
+	0X2908 REPORT_REFERENCE
+	0X290B ENVIR_SENSING_CONFIGURATION
+	0X290C ENVIR_SENSING_MEASUREMENT
+	0X290D ENVIR_SENSING_TRIGGER_SETTING
+	)
+	/* LE L2CAP CID */
+	(
+	0x04 LE_L2CAP_CID_ATT
+	0x05 LE_L2CAP_CID_SIGNAL
+	0x06 LE_L2CAP_CID_SMP
+	)
+
+	//LE address type
+	(
+	0 LE_ADDR_TYPE_PUBLIC
+	1 LE_ADDR_TYPE_RANDOM
+	)
+	//LE address type bitmap
+	(
+	7 LE_RECEIVER_ADDR_BIT
+	6 LE_SENDER_ADDR_BIT
+	)
+	//LE SCAN TYPE
+	(
+	0x00 LE_SCAN_TYPE_PASSIVE //no SCAN_REQ shall be sent
+	0x01 LE_SCAN_TYPE_ACTIVE
+	)
+
+	//LE SCAN ENABLE
+	(
+	0x00 LE_SCAN_DISABLE
+	0x01 LE_SCAN_ENABLE
+	0x0101 LE_ACTIVE_SCAN_ENABLE
+	)
+
+
+//	le_state_map 0-2 is reserved for state_inconn,state_insniff and state_sco
+(
+3 lestate_got_first_packet
+4 lestate_encryption
+5 lestate_update_param
+6 lestate_update_map
+)
+
+// 	le mode
+(
+0 lemode_idle
+1 lemode_slave
+3 lemode_master
+)
+
+
+memalloc(
+
+19 mem_area_8
+36 mem_area_10
+)
+
+xmemalloc(
+5 mem_area_9
+1 mem_local_name_length
+3 mem_local_name
+64 mem_local_name2
+1 mem_local_name_end
+1 mem_unsniff2sniff_timer
+1 mem_area_11
+)
+	11 LMP_AU_RAND 
+
+
+	/* test mode scenarios */
+	(
+	0 PAUSE_TEST_MODE
+	1 ZERO_PATTERN
+	2 ONE_PATTERN
+	3 ALT_PATTERN
+	4 PSEUDORANDOM
+	5 CLOSED_LOOP_BACK_ACL
+	6 CLOSED_LOOP_BACK_SCO
+	7 ACL_WITHOUT_WHITENING
+	8 SCO_WITHOUT_WHITENING
+	9 ALT2_PATTERN
+	255 EXIT_TEST_MODE
+	)
+	/* test mode hoppig modes */
+	(
+	0 FIXED_FREQ
+	1 NORMAL_HOP
+	)
+
+	/* mem_lmp_tid indicates which type of LMP will be sent */
+	(
+	0 TID_NORM_REPLY
+	1 TID_NORM_SEND
+	2 TID_ONE
+	3 TID_ZERO
+	4 TID_PAIRING
+	5 TID_ENCRYPTION
+	6 TID_VARIABLE
+	7 TID_RX
+	)
+
+	/* ============== lmp status ==========*/
+	(
+	0 lmp_incoming
+	1 lmp_outgoing
+	2 lmp_reject_msg
+	3 lmp_clear_msg
+	4 upper_reject_msg
+	5 upper_clear_msg
+	)
+
+(
+0x2ee00 TIMER_ONE_MINUTE //96000*2
+80 TIMER_SWITCH_WAITE
+12 TIMER_ENPT_WAITE
+)
+
+(
+0 SWITCH_FLAG_INIT
+1 SWITCH_FLAG_ACCEPT
+2 SWITCH_FLAG_NOT_ACCEPT
+)
+(
+0 NULL_ENCRYP
+1 DONE_ENCRYP
+)
+
+//
+//
+//Large memory blocks defined in this file.
+//Blocks Shall be defined with absolute address.
+//Blocks' length Shall be specified in comment following Blocks' names.
+//Different blocks MAY be overlap.
+//Blocks defined in this file Shall NOT be overlap with variable in memmap.format.
+
+// USB C51 exchange area
+(
+0xff0 mem_mcmd
+0xff1 mem_mouse_data
+)
+
+(
+0x4a00 mem_module_rx_buf//0x400
+0x4fff mem_module_rx_buf_end
+0x1c00 mem_module_tx_buf
+0x1fff mem_module_tx_buf_end
+)
+
+(
+0x1800 mem_ir_record
+0x1c      mem_ir_record_max
+)
+
+(
+0x4b00 memk
+)
+
+
+
+memalloc(
+	2 mem_module_temp_len
+
+)
+omemalloc(	
+	1 mem_at_gpio
+	1 mem_module_wake_up_gpio
+	1 mem_module_state_gpio
+	1 mem_module_connect_state_gpio
+	6 mem_module_version
+
+	4 mem_last_uart_clock
+	2 mem_current_packet_length
+	2 mem_module_prepare_tx_len
+	1 mem_module_state
+	1 mem_module_task
+	6 mem_cmode_addr
+	2 mem_at_scan_time
+	4 mem_prarm_pswd
+	4 mem_prarm_uart
+	3 mem_prarm_blename
+	4 mem_prarm_name
+	3 mem_prarm_bleadss
+	4 mem_prarm_adss
+	4 mem_prarm_vers
+	5 mem_prarm_class
+	6 mem_prarm_clrflg
+	6 mem_prarm_reconn
+	2 mem_prarm_bledis
+	3 mem_prarm_dis
+	4 mem_prarm_stsn
+	3 mem_prarm_atp
+	4 mem_prarm_list
+	4 mem_prarm_role
+	5 mem_prarm_sniff
+	4 mem_prarm_ldev
+	4 mem_prarm_rssi
+	4 mem_prarm_cdev
+	3 mem_prarm_bleinqr
+	4 mem_prarm_inqr
+	5 mem_prarm_cmode
+	4 mem_prarm_mode	
+	7 mem_prarm_dmstate
+	6 mem_prarm_discov
+	3 mem_prarm_ota
+	2 mem_prarm_bleconn
+	4 mem_prarm_conn
+	7 mem_prarm_pageout
+	7 mem_prarm_recfail
+
+
+
+	//2 mem_rx_count
+	300 mem_module_uuid_list
+
+	1 mem_scale_tx_length
+
+	1 mem_scale_payload_len
+
+	1 mem_txdb
+	2 mem_conn_min_interv
+	2 mem_conn_max_interv
+	1 mem_conn_latency
+	2 mem_conn_timeout
+
+
+	12 mem_swap
+	2 mem_adv_lap_ptr
+
+	2 mem_att_send_handle
+	1 mem_att_send_option
+	
+	1 mem_le_ll_unknow_type
+
+	1 mem_le_disc_reson
+	2 mem_le_readHandle
+	1 mem_le_readReq_timeout
+	16 mem_le_readReqHandleFlag
+	1 mem_poweron_flag
+	1 mem_le_sleep_flag
+	1 mem_lpm_lock
+	1 mem_reserved
+	2 mem_cmd_rptr           
+	2 mem_cmd_wptr                
+	2 mem_event_rptr         
+	2 mem_event_wptr            
+)
+	(
+		110  DM_REFCOM_BUFF_LEN
+		20 DM_LE_BUFF_LEN
+	)
+	(
+		0x200 UART_AIR_CONTROL_THRESHOLD
+		0x150 UART_RX_CONTROL_THRESHOLD
+	)
+
+
+
+
+memalloc(
+2 mem_init_cnt
+)
+//dpi eeprom addr
+198 mouse_dpi_eeprom_addr
+
+omemalloc(
+// Mouse Work Area
+2 mem_mouse_x
+2 mem_mouse_y
+1 mem_mouse_z
+1 mem_mouse_key
+1 mem_mouse_z_last
+1 mem_mouse_z_before
+1 mem_mouse_z_now
+1 mem_mouse_z_data
+1 mem_mouse_move_flag
+1 mem_reconnect_timeout
+2 mem_mouse_direct_timeout
+2 mem_mouse_no_data_timeout
+2 mem_mouse_blank_data_timeout
+2 mem_mouse_discovery_timer
+2 mem_mouse_direct_timer
+2 mem_mouse_no_data_timer
+2 mem_mouse_blank_data_timer
+1 mem_mouse_send_blank_timer
+1 mem_mouse_dpi
+1 mem_mouse_dpi_button_state
+1 mem_mouse_test_cnt
+2 mem_le_hibernate_timer
+1 mem_mouse_mode_state
+
+// Mouse Config Area
+1 mem_sensor_type
+1 mem_lbutton_gpio
+1 mem_rbutton_gpio
+1 mem_mbutton_gpio
+1 mem_dpi_button_gpio
+1 mem_sensor_data_gpio
+1 mem_whee_a_data_gpio
+1 mem_whee_b_data_gpio
+1 mem_conn_cnt
+650 mem_mouse_uuid_list
+)
+(
+0x00 DPI_BUTTON_STATE_DOWN
+0x01 DPI_BUTTON_STATE_UP
+
+)
+
+(
+1 ONE_TRADITION_MOUSE
+2 ONE_BLE_MOUSE
+)
+
+
+(
+1 SENSOR_TYPE_A7530
+2 SENSOR_TYPE_P3204
+)
+0x30 P3204_ID
+
+0x00 PAN_REG_PID_L
+0x01 PAN_REG_PID_H
+0x02 PAN_REG_MOTION_STAUS
+0x03 PAN_REG_DELTA_X
+0x04 PAN_REG_DELTA_Y
+0x05 PAN_REG_OPRATION_MODE
+0x06 PAN_REG_CONFIG
+0x07 PAN_REG_IMAGE_QUALITY
+0x08 PAN_REG_OPRATION_STATE
+0x09 PAN_REG_WRITE_PROTECT
+0x0A PAN_REG_SLEEP_1
+0x0B PAN_REG_ENTER_TIME
+0x0C PAN_REG_SLEEP_2
+0x0D PAN_REG_IMAGE_THRESHOLD
+0x0E PAN_REG_IMAGE_RECGNITION
+
+7 pan_bit_motion
+
+(
+1000      MOUSE_LPM_CLR_LOCK_TIME
+0x06      MOUSE_DPI_ADDRESS
+       2       MOUSE_DPI_MAX_DECR
+)
+(
+80 MOUSE_SEND_BLANK_TIMER
+)
+
+
+//mem_mouse_mode_state
+(
+0x00 MOUSE_MODE_STATE_IDLE
+0x01 MOUSE_MODE_STATE_BT
+0x02 MOUSE_MODE_STATE_BLE
+)
+
+
+(
+	  0 patch00_0
+	  1 patch00_1
+	  2 patch00_2
+	  3 patch00_3
+	  4 patch00_4
+	  5 patch00_5
+	  6 patch00_6
+	  7 patch00_7
+	  8 patch01_0
+	  9 patch01_1
+	 10 patch01_2
+	 11 patch01_3
+	 12 patch01_4
+	 13 patch01_5
+	 14 patch01_6
+	 15 patch01_7
+	 16 patch02_0
+	 17 patch02_1
+	 18 patch02_2
+	 19 patch02_3
+	 20 patch02_4
+	 21 patch02_5
+	 22 patch02_6
+	 23 patch02_7
+	 24 patch03_0
+	 25 patch03_1
+	 26 patch03_2
+	 27 patch03_3
+	 28 patch03_4
+	 29 patch03_5
+	 30 patch03_6
+	 31 patch03_7
+	 32 patch04_0
+	 33 patch04_1
+	 34 patch04_2
+	 35 patch04_3
+	 36 patch04_4
+	 37 patch04_5
+	 38 patch04_6
+	 39 patch04_7
+	 40 patch05_0
+	 41 patch05_1
+	 42 patch05_2
+	 43 patch05_3
+	 44 patch05_4
+	 45 patch05_5
+	 46 patch05_6
+	 47 patch05_7
+	 48 patch06_0
+	 49 patch06_1
+	 50 patch06_2
+	 51 patch06_3
+	 52 patch06_4
+	 53 patch06_5
+	 54 patch06_6
+	 55 patch06_7
+	 56 patch07_0
+	 57 patch07_1
+	 58 patch07_2
+	 59 patch07_3
+	 60 patch07_4
+	 61 patch07_5
+	 62 patch07_6
+	 63 patch07_7
+	 64 patch08_0
+	 65 patch08_1
+	 66 patch08_2
+	 67 patch08_3
+	 68 patch08_4
+	 69 patch08_5
+	 70 patch08_6
+	 71 patch08_7
+	 72 patch09_0
+	 73 patch09_1
+	 74 patch09_2
+	 75 patch09_3
+	 76 patch09_4
+	 77 patch09_5
+	 78 patch09_6
+	 79 patch09_7
+	 80 patch0a_0
+	 81 patch0a_1
+	 82 patch0a_2
+	 83 patch0a_3
+	 84 patch0a_4
+	 85 patch0a_5
+	 86 patch0a_6
+	 87 patch0a_7
+	 88 patch0b_0
+	 89 patch0b_1
+	 90 patch0b_2
+	 91 patch0b_3
+	 92 patch0b_4
+	 93 patch0b_5
+	 94 patch0b_6
+	 95 patch0b_7
+	 96 patch0c_0
+	 97 patch0c_1
+	 98 patch0c_2
+	 99 patch0c_3
+	100 patch0c_4
+	101 patch0c_5
+	102 patch0c_6
+	103 patch0c_7
+	104 patch0d_0
+	105 patch0d_1
+	106 patch0d_2
+	107 patch0d_3
+	108 patch0d_4
+	109 patch0d_5
+	110 patch0d_6
+	111 patch0d_7
+	112 patch0e_0
+	113 patch0e_1
+	114 patch0e_2
+	115 patch0e_3
+	116 patch0e_4
+	117 patch0e_5
+	118 patch0e_6
+	119 patch0e_7
+	120 patch0f_0
+	121 patch0f_1
+	122 patch0f_2
+	123 patch0f_3
+	124 patch0f_4
+	125 patch0f_5
+	126 patch0f_6
+	127 patch0f_7
+	128 patch10_0
+	129 patch10_1
+	130 patch10_2
+	131 patch10_3
+	132 patch10_4
+	133 patch10_5
+	134 patch10_6
+	135 patch10_7
+	136 patch11_0
+	137 patch11_1
+	138 patch11_2
+	139 patch11_3
+	140 patch11_4
+	141 patch11_5
+	142 patch11_6
+	143 patch11_7
+	144 patch12_0
+	145 patch12_1
+	146 patch12_2
+	147 patch12_3
+	148 patch12_4
+	149 patch12_5
+	150 patch12_6
+	151 patch12_7
+	152 patch13_0
+	153 patch13_1
+	154 patch13_2
+	155 patch13_3
+	156 patch13_4
+	157 patch13_5
+	158 patch13_6
+	159 patch13_7
+	160 patch14_0
+	161 patch14_1
+	162 patch14_2
+	163 patch14_3
+	164 patch14_4
+	165 patch14_5
+	166 patch14_6
+	167 patch14_7
+	168 patch15_0
+	169 patch15_1
+	170 patch15_2
+	171 patch15_3
+	172 patch15_4
+	173 patch15_5
+	174 patch15_6
+	175 patch15_7
+	176 patch16_0
+	177 patch16_1
+	178 patch16_2
+	179 patch16_3
+	180 patch16_4
+	181 patch16_5
+	182 patch16_6
+	183 patch16_7
+	184 patch17_0
+	185 patch17_1
+	186 patch17_2
+	187 patch17_3
+	188 patch17_4
+	189 patch17_5
+	190 patch17_6
+	191 patch17_7
+	192 patch18_0
+	193 patch18_1
+	194 patch18_2
+	195 patch18_3
+	196 patch18_4
+	197 patch18_5
+	198 patch18_6
+	199 patch18_7
+	200 patch19_0
+	201 patch19_1
+	202 patch19_2
+	203 patch19_3
+	204 patch19_4
+	205 patch19_5
+	206 patch19_6
+	207 patch19_7
+	208 patch1a_0
+	209 patch1a_1
+	210 patch1a_2
+	211 patch1a_3
+	212 patch1a_4
+	213 patch1a_5
+	214 patch1a_6
+	215 patch1a_7
+	216 patch1b_0
+	217 patch1b_1
+	218 patch1b_2
+	219 patch1b_3
+	220 patch1b_4
+	221 patch1b_5
+	222 patch1b_6
+	223 patch1b_7
+	224 patch1c_0
+	225 patch1c_1
+	226 patch1c_2
+	227 patch1c_3
+	228 patch1c_4
+	229 patch1c_5
+	230 patch1c_6
+	231 patch1c_7
+	232 patch1d_0
+	233 patch1d_1
+	234 patch1d_2
+	235 patch1d_3
+	236 patch1d_4
+	237 patch1d_5
+	238 patch1d_6
+	239 patch1d_7
+	240 patch1e_0
+	241 patch1e_1
+	242 patch1e_2
+	243 patch1e_3
+	244 patch1e_4
+	245 patch1e_5
+	246 patch1e_6
+	247 patch1e_7
+	248 patch1f_0
+	249 patch1f_1
+	250 patch1f_2
+	251 patch1f_3
+	252 patch1f_4
+	253 patch1f_5
+	254 patch1f_6
+	255 patch1f_7
+	  0 patch20_0
+	  1 patch20_1
+	  2 patch20_2
+	  3 patch20_3
+	  4 patch20_4
+	  5 patch20_5
+	  6 patch20_6
+	  7 patch20_7
+	  8 patch21_0
+	  9 patch21_1
+	 10 patch21_2
+	 11 patch21_3
+	 12 patch21_4
+	 13 patch21_5
+	 14 patch21_6
+	 15 patch21_7
+	 16 patch22_0
+	 17 patch22_1
+	 18 patch22_2
+	 19 patch22_3
+	 20 patch22_4
+	 21 patch22_5
+	 22 patch22_6
+	 23 patch22_7
+	 24 patch23_0
+	 25 patch23_1
+	 26 patch23_2
+	 27 patch23_3
+	 28 patch23_4
+	 29 patch23_5
+	 30 patch23_6
+	 31 patch23_7
+	 32 patch24_0
+	 33 patch24_1
+	 34 patch24_2
+	 35 patch24_3
+	 36 patch24_4
+	 37 patch24_5
+	 38 patch24_6
+	 39 patch24_7
+	 40 patch25_0
+	 41 patch25_1
+	 42 patch25_2
+	 43 patch25_3
+	 44 patch25_4
+	 45 patch25_5
+	 46 patch25_6
+	 47 patch25_7
+	 48 patch26_0
+	 49 patch26_1
+	 50 patch26_2
+	 51 patch26_3
+	 52 patch26_4
+	 53 patch26_5
+	 54 patch26_6
+	 55 patch26_7
+	 56 patch27_0
+	 57 patch27_1
+	 58 patch27_2
+	 59 patch27_3
+	 60 patch27_4
+	 61 patch27_5
+	 62 patch27_6
+	 63 patch27_7
+	 64 patch28_0
+	 65 patch28_1
+	 66 patch28_2
+	 67 patch28_3
+	 68 patch28_4
+	 69 patch28_5
+	 70 patch28_6
+	 71 patch28_7
+	 72 patch29_0
+	 73 patch29_1
+	 74 patch29_2
+	 75 patch29_3
+	 76 patch29_4
+	 77 patch29_5
+	 78 patch29_6
+	 79 patch29_7
+	 80 patch2a_0
+	 81 patch2a_1
+	 82 patch2a_2
+	 83 patch2a_3
+	 84 patch2a_4
+	 85 patch2a_5
+	 86 patch2a_6
+	 87 patch2a_7
+	 88 patch2b_0
+	 89 patch2b_1
+	 90 patch2b_2
+	 91 patch2b_3
+	 92 patch2b_4
+	 93 patch2b_5
+	 94 patch2b_6
+	 95 patch2b_7
+	 96 patch2c_0
+	 97 patch2c_1
+	 98 patch2c_2
+	 99 patch2c_3
+	100 patch2c_4
+	101 patch2c_5
+	102 patch2c_6
+	103 patch2c_7
+	104 patch2d_0
+	105 patch2d_1
+	106 patch2d_2
+	107 patch2d_3
+	108 patch2d_4
+	109 patch2d_5
+	110 patch2d_6
+	111 patch2d_7
+	112 patch2e_0
+	113 patch2e_1
+	114 patch2e_2
+	115 patch2e_3
+	116 patch2e_4
+	117 patch2e_5
+	118 patch2e_6
+	119 patch2e_7
+	120 patch2f_0
+	121 patch2f_1
+	122 patch2f_2
+	123 patch2f_3
+	124 patch2f_4
+	125 patch2f_5
+	126 patch2f_6
+	127 patch2f_7
+	128 patch30_0
+	129 patch30_1
+	130 patch30_2
+	131 patch30_3
+	132 patch30_4
+	133 patch30_5
+	134 patch30_6
+	135 patch30_7
+	136 patch31_0
+	137 patch31_1
+	138 patch31_2
+	139 patch31_3
+	140 patch31_4
+	141 patch31_5
+	142 patch31_6
+	143 patch31_7
+	144 patch32_0
+	145 patch32_1
+	146 patch32_2
+	147 patch32_3
+	148 patch32_4
+	149 patch32_5
+	150 patch32_6
+	151 patch32_7
+	152 patch33_0
+	153 patch33_1
+	154 patch33_2
+	155 patch33_3
+	156 patch33_4
+	157 patch33_5
+	158 patch33_6
+	159 patch33_7
+	160 patch34_0
+	161 patch34_1
+	162 patch34_2
+	163 patch34_3
+	164 patch34_4
+	165 patch34_5
+	166 patch34_6
+	167 patch34_7
+	168 patch35_0
+	169 patch35_1
+	170 patch35_2
+	171 patch35_3
+	172 patch35_4
+	173 patch35_5
+	174 patch35_6
+	175 patch35_7
+	176 patch36_0
+	177 patch36_1
+	178 patch36_2
+	179 patch36_3
+	180 patch36_4
+	181 patch36_5
+	182 patch36_6
+	183 patch36_7
+	184 patch37_0
+	185 patch37_1
+	186 patch37_2
+	187 patch37_3
+	188 patch37_4
+	189 patch37_5
+	190 patch37_6
+	191 patch37_7
+	192 patch38_0
+	193 patch38_1
+	194 patch38_2
+	195 patch38_3
+	196 patch38_4
+	197 patch38_5
+	198 patch38_6
+	199 patch38_7
+	200 patch39_0
+	201 patch39_1
+	202 patch39_2
+	203 patch39_3
+	204 patch39_4
+	205 patch39_5
+	206 patch39_6
+	207 patch39_7
+	208 patch3a_0
+	209 patch3a_1
+	210 patch3a_2
+	211 patch3a_3
+	212 patch3a_4
+	213 patch3a_5
+	214 patch3a_6
+	215 patch3a_7
+	216 patch3b_0
+	217 patch3b_1
+	218 patch3b_2
+	219 patch3b_3
+	220 patch3b_4
+	221 patch3b_5
+	222 patch3b_6
+	223 patch3b_7
+	224 patch3c_0
+	225 patch3c_1
+	226 patch3c_2
+	227 patch3c_3
+	228 patch3c_4
+	229 patch3c_5
+	230 patch3c_6
+	231 patch3c_7
+	232 patch3d_0
+	233 patch3d_1
+	234 patch3d_2
+	235 patch3d_3
+	236 patch3d_4
+	237 patch3d_5
+	238 patch3d_6
+	239 patch3d_7
+	240 patch3e_0
+	241 patch3e_1
+	242 patch3e_2
+	243 patch3e_3
+	244 patch3e_4
+	245 patch3e_5
+	246 patch3e_6
+	247 patch3e_7
+	248 patch3f_0
+	249 patch3f_1
+	250 patch3f_2
+	251 patch3f_3
+	252 patch3f_4
+	253 patch3f_5
+	254 patch3f_6
+	255 patch3f_7
+
+)
+
+//prcp opcode
+(
+
+0x00 COMMON_RES
+0x01 READ_REGISTERS_REQ
+0x02 READ_REGISTERS_RES
+0x03 WRITE_REGISTERS_REQ
+0x04 I2C_CONFIG_REQ
+0x05 I2C_READ_REQ
+0x06 I2C_READ_RES
+0x07 I2C_WRITE_REQ
+0x08 SPI_CONFIG_REQ
+0x09 SPI_READ_REQ
+0x0a SPI_READ_RES
+0x0b SPI_WRITE_REQ
+0x0c PWM_CONFIG_REQ
+0x0d PWM_WRITE_REQ
+0x0e GPIO_CONFIG_REQ
+0x0f GPIO_READ_REQ
+0x10 GPIO_READ_RES
+0x11 GPIO_WRITE_REQ
+0x12 OTA_WRITE_REQ
+0X13 OTA_END_CMD
+
+)
+(
+1 PRCP_LE
+2 PRCP_SSP
+0x14 PRCP_TX_LE 
+0x17 PRCP_RX_LE
+20 PRCP_TX_DATA_LEN
+)
+memalloc(
+20 mem_prcp_data
+1 mem_prcp
+1 mem_prcp_tx_len
+//ota
+2 rx_buf_data_ptr
+)
+xmemalloc(
+//ota
+2 mem_eeprom_ota_base_addr  /*the start- writing addr in eeprom  */
+)
+
+(
+  0x8000 core_chipid
+  0x8003 core_kick
+  0x8006 core_misc_ctrl
+  0x8009 core_pcmoutfifo
+  0x8010 core_reset
+  0x8015 core_uart_txd
+  0x8040 core_halfslot
+  0x8042 core_clksel
+  0x8043 core_uart_clksel
+  0x8043 core_config 
+  0x8044 core_xtal_stable_time
+  0x8050 core_clkoff
+  0x8052 core_uart_baud
+  0x8054 core_uart_rsaddr
+  0x8056 core_uart_readdr
+  0x8058 core_uart_rrptr
+  0x805a core_uart_tsaddr
+  0x805c core_uart_teaddr
+  0x805e core_uart_twptr
+  0x8060 core_uart_trptrp
+  0x8062 core_uart_ctrl
+  0x8063 core_kscn_ksctrl
+  0x8064 core_kscn_rctc
+  0x8065 core_kscn_scancycle_timer_l
+  0x8066 core_kscn_scancycle_timer_h
+  0x8067 core_kscn_m_debounce          
+  0x8068 core_kscn_modkey
+  0x806f core_kscn_rowmask
+  0x8070 core_gpio_oe0
+  0x8071 core_gpio_oe1
+  0x8072 core_gpio_oe2
+  0x8073 core_gpio_oe3
+  0x8074 core_gpio_out0
+  0x8075 core_gpio_out1
+  0x8076 core_gpio_out2
+  0x8077 core_gpio_out3
+  0x8078 core_gpio_pu0
+  0x8079 core_gpio_pu1
+  0x807a core_gpio_pu2
+  0x807b core_gpio_pu3
+  0x807c core_gpio_pd0
+  0x807d core_gpio_pd1
+  0x807e core_gpio_pd2
+  0x807f core_gpio_pd3
+  0x8080 core_gpio_sel
+  0x8081 core_gpio_sel1
+  0x8082 core_gpio_sel2
+  0x8083 core_gpio_key0
+  0x8084 core_gpio_key1
+  0x8085 core_gpio_key2
+  0x8086 core_spid_ctrl
+  0x8087 core_spid_delay
+  0x8088 core_spid_txlen
+  0x808a core_spid_txaddr
+  0x808c core_spid_rxaddr
+  0x808e core_spid_rxlen
+  0x8090 core_iicd_ctrl
+  0x8091 core_iicd_scl_low
+  0x8092 core_iicd_scl_high
+  0x8093 core_iicd_start_setup
+  0x8094 core_iicd_start_hold
+  0x8095 core_iicd_stop_setup
+  0x8096 core_iicd_data_setup
+  0x8097 core_iicd_data_hold
+  0x8098 core_iicd_txlen
+  0x809a core_iicd_txaddr
+  0x809c core_iicd_rxaddr
+  0x809e core_iicd_rxlen
+  0x80a0 core_pwm_pcnt0
+  0x80a2 core_pwm_ncnt0
+  0x80a4 core_pwm_pcnt1
+  0x80a6 core_pwm_ncnt1
+  0x80b0 core_enc_ctrl
+  0x80b1 core_cvsd_ctrl
+  0x80b2 core_codec_ctrl
+  0x80b3 core_dec_ctrl
+  0x80b4 core_bist_ctrl
+
+
+
+  
+  0x8108 core_misc_status
+  0x8109 core_qdec_cntx
+  0x810a core_qdec_cnty
+  0x810b core_qdec_cntz
+  0x810c core_uart_status
+  0x810d core_uart_rbaud
+  0x810e core_uart_txitems
+  0x8110 core_uart_trptr
+  0x8112 core_uart_rxitems
+  0x8114 core_uart_rdptr
+  0x8116 core_uart_rwptr
+  0x8119 core_kscn_kstat
+  0x811a core_kscn_event
+  0x811b core_kscn_event_num
+  0x811c core_gpio_in
+  0x811d core_gpio_in1
+  0x8124 core_current_otp_addr
+  0x8128 core_spid_remain
+  0x812a core_iicd_remain
+  0x812c core_dma_status
+  0x812d core_perf_status
+  0x812e core_adc_in
+  0x8140 core_gpio_wakeup_low
+  0x8144 core_gpio_wakeup_high
+  0x8149 core_clk_counter
+// dummy regs  
+
+  
+  0x8280 core_docd_ctrl
+  0x8288 core_docd_paddr
+  0x828a core_docd_pdata
+
+  0x8300 iic_prer_low		
+  0x8301 iic_slave_addr	
+  0x8302 iic_ctr					
+  0x8303 iic_cr					
+  0x8304 iic_rxr					
+  0x8305 iic_txr					
+  0x8306 iic_sr					
+  0x8307 iic_fifo				
+
+  0x8400   mem_b_box          /* entire bank */
+  0x8500   mem_e_box          /* entire bank */
+  0x8600   mem_l_box          /* entire bank */
+
+
+
+4 rx_freq_offset
+2 tx_freq_offset
+
+
+
+(
+  7 cold_wake
+  3 gpio_latch
+  4 enable_retmem
+  0xef isogate_mask
+  0xe0 cs_mask
+)
+
+
+// dma status bit
+(
+  2 spid_crcok
+  3 spid_done
+  4 iicd_crcok
+  5 iicd_done
+)
+
+0x8b uart_ctrl_default //BCSP
+0x81 uart_ctrl_h4 //H4
+0x81 uart_ctrl_normal
+0x81 uart_ctrl_57600
+2 uart_baud_len
+0x01 uartclk_dpll
+0x1a0 uart_baud_115200
+0x0d0 uart0_baud_115200
+0xbb uart_baud_256000
+0x340 uart_baud_57600
+0x9c4 uart_baud_9600
+0x2dc6c00 uart_clk
+
+
+
+
+
+
+memalloc(
+1 memRemoteRPNBitRate
+1 memRemotePRNDataBits
+1 memRemotePRNStopBit
+1 memRemotePRNParity
+1 memRemotePRNFlowControl
+1 memRemotePRNXon
+1 memRemotePRNXoff
+
+
+3 mem_mod2div_temp
+2 mem_contw_temp
+2 mem_attrib_list
+
+//rfcomm head
+1 mem_current_adss
+1 mem_current_channel
+1 mem_current_frame_type
+1 mem_current_fcs
+2 mem_current_length
+2 mem_rfcomm_uih_payload_ptr
+
+//rfcomm uih
+1 mem_uih_cmd_type
+2 mem_uih_length
+2 mem_param_payload_ptr
+
+
+//rfcomm modem status
+1 mem_ms_param
+
+//rfcomm pn
+1 mem_pn_credit_flow_type_info
+1 mem_pn_priority
+1 mem_pn_acknowledg_timer
+1 mem_pn_max_retrans
+
+1 mem_rfcomm_send_adss
+1 mem_rfcomm_send_frame_type
+1 mem_rfcomm_send_fcs
+1 mem_rfcomm_send_offset
+
+)
+
+xmemalloc(
+1 mem_pn_dlci
+2 mem_pn_max_frame_size
+
+1 memFCStemp1
+1 memFCStemp2
+1 memFCStemp3
+
+1 mem_rfcomm_initiator
+
+1 mem_remote_spp_channel
+
+1 mem_HIUfcs_SPP
+1 mem_HIUfcs_SPP_WCredits
+
+1 mem_rfcomm_send_more_pkt
+
+1 mem_remote_credits
+1 mem_credit_given
+
+//rfcomm modem status
+1 mem_ms_channel
+
+)
+
+memalloc(
+0 mem_sdp_mem_start
+4 mem_uuid_search_pat
+2 mem_sdp_continue_byte
+1 mem_sdp_pduid
+2 mem_sdp_transactionid
+2 mem_sdp_attribute_maxbyte
+2 mem_sdp_record_maxcnt
+8 mem_sdp_error_code
+4 mem_sdp_record_handle
+1 mem_sdp_search_failed
+1 mem_sdp_LACAP_found
+1 mem_sdp_RFCOMM_found
+24 mem_handle_list
+1 mem_handle_humber
+0 mem_sdp_mem_end
+)
+xmemalloc(
+2 memui_uuid_table
+22 mem_all_uuid_16bits
+34 mem_all_uuid_128bits
+)
+
+memalloc(
+/* moved from bt.format for 3dh5 1021bytes packet buffer */
+17 mem_area_12
+
+16 mem_random_number
+16 mem_round_key
+16 mem_kinit
+
+16 mem_input_store
+16 mem_x
+15 mem_y
+1 mem_y15
+1 mem_pin_length
+16 mem_pin
+17 mem_key_store
+1 mem_key_store_end
+2 memp_ar_key
+2 memp_ar_input
+10 mem_ar_hround
+
+
+1 mem_ec_infinite
+1 mem_ec_loopc
+
+0 memdat
+/* ecc calculation */
+
+
+24 mem_ax
+24 mem_ay
+24 mem_az
+24 mem_bx
+24 mem_by
+24 mem_bz
+24 mem_cx
+23 mem_cy
+1 mem_cy5
+24 mem_cz
+24 mem_k
+16 mem_align
+
+0 mem_tmp1
+24 memahbak
+8 mem_tmp5
+16 memahsave
+16  mem_tmp2
+0  memahsave_end 
+1  mem_addr_padding 
+7   mem_addr_value         /* 12 bytes     */ 
+0 mem_tmp3
+5 mem_t1
+3  mem_addr_value_end   
+16 mem_addr_iocap_end
+0 mem_tmp0
+8 mem_t0
+16 mem_tmp0a
+24 mem_t2
+24 mem_t3
+24 mem_t7
+24 mem_p		
+24 mem_a
+24 mem_b
+24 mem_gx
+24 mem_gy
+32 memh0
+
+
+
+)
+
+
+
+
+omemalloc(
+4 mem_shutter_send_data
+1 mem_shutter_key_temp
+1 mem_shutter_send_length
+4 mem_shutter_clkn_bt_last
+1 mem_shutter_key
+1 mem_shutter_flag
+1 mem_shutter_cable_unplug_conut
+1 mem_shutter_hid_disconn_count
+1 mem_shutter_1key_send_sm
+
+1 mem_shutter_iphonekey_gpio
+1 mem_shutter_androidkey_gpio
+1 mem_shutter_key_number
+650 mem_shutter_uuid_list
+
+
+)
+
+(
+0 FLAG_SHUTTER_DEFAULT
+1 FLAG_SHUTTER_IPHONEKEY_SEND
+2 FLAG_SHUTTER_ANDROIDKEY_SEND
+)
+
+(
+0 FLAG_SHUTTER_IPHONEKEY_PRESS
+1 FLAG_SHUTTER_ANDROIDKEY_PRESS
+)
+
+(
+1  FLAG_SHUTTER_HID_DISCONN_TIMEOUT
+5 FLAG_SHUTTER_CABLE_UNPLUG_TIMEOUT
+)
+
+(
+1 FLAG_SHUTTER_1KEY
+2 FLAG_SHUTTER_2KEY
+)
+
+(
+0 FLAG_SHUTTER_1KEY_SEND_NULL
+1 FLAG_SHUTTER_1KEY_SEND_STEP1
+2 FLAG_SHUTTER_1KEY_SEND_STEP2
+3 FLAG_SHUTTER_1KEY_SEND_STEP3
+4 FLAG_SHUTTER_1KEY_SEND_STEP4
+)
+
+/* simple pairing page */
+
+memalloc(
+
+//4 mem_hci_ssp_mode
+0 mem_sp_state_start
+1 mem_sp_state
+1 mem_master_sp_state
+1 mem_sp_flag
+1 mem_master_sp_flag
+1 mem_sp_calc
+1 mem_sp_dh_ready
+1 mem_sp_localsm
+1 mem_pairing_auth
+
+0 mem_sp_flag_start
+1 mem_sp_local_key_send_count
+1 mem_sp_remote_key_recv_count
+1 mem_sp_remote_key_invalid
+1 mem_sp_dhkey_invalid
+
+3 mem_sp_iocap_local
+3 mem_sp_iocap_remote
+
+4 mem_sp_gkey
+
+0 mem_sp_pubkey_remote
+24 mem_sp_pubkey_remote_x
+0 mem_sp_pubkey_remote_x_end
+24 mem_sp_pubkey_remote_y
+24 mem_sp_dhkey
+0 mem_sp_dhkey_end
+16 mem_sp_random_local
+0 mem_sp_random_local_end
+16 mem_sp_random_remote
+0 mem_sp_random_remote_end
+0 memresult
+0 mem_sp_calc_result
+4 memh
+4 memg
+4 memf
+4 meme
+0 mem_sp_calc_result_high
+4 memd
+4 memc
+4 memb
+4 mema
+16 mem_sp_check_result
+16 mem_sp_confirm_remote
+16 mem_sp_prarm_stack
+)
+
+xmemalloc(
+73 mem_area_14
+1 mem_ssp_enable
+)
+
+	/* ========= memory ============== */
+memalloc(
+2 mem_UI_data_txbuff_length
+
+1 mem_ipc_skip_continue_proc
+0 mem_ui_timer_temp  //length 4
+4 mem_ipc_rega_temp
+) 
+
+xmemalloc(
+//UI Work area
+1 mem_ipc_lock_bt
+1 mem_ipc_lock_c51
+5 mem_ipc_fifo_bt2c51
+5 mem_ipc_fifo_c512bt
+1 mem_led_switch
+1 mem_ui_button_timer
+1 mem_ui_button_last_state
+4 mem_ui_timer_last_btclk
+2 mem_discovery_timeout_timer_count
+1 mem_hid_handshake_timer_count
+1 memui_reconnect_mode
+2 mem_ui_state_map
+
+//UI Config area
+1 mem_ui_profile_supported
+1 mem_led_gpio
+2 mem_led_dark_time
+2 mem_led_light_time
+1 mem_ui_button_timeout
+1 mem_ui_button_gpio
+2 mem_discovery_timeout
+
+)
+/************/
+/* constant */
+/************/
+
+//mem_ui_state_map
+(
+0 UI_STATE_BT_CONNECTED
+1 UI_STATE_BT_SETUP_COMPLETE
+2 UI_STATE_BT_HID_CONN
+3 UI_STATE_BT_HID_HANDSHAKE
+4 UI_STATE_BT_SPP_CONN
+5 UI_STATE_BT_SNIFF
+6 UI_STATE_BT_DISCOVERY
+7 UI_STATE_BT_RECONNECT
+8 UI_STATE_BT_SLAVE_ROLE
+9 UI_STATE_BLE_CONNECTED
+10 UI_STATE_BLE_WRITE_RCV
+11 UI_STATE_BLE_ADV
+12 UI_STATE_BTN_DOWN
+13 UI_STATE_LED_BLINK
+14 UI_STATE_LED_ON
+)
+
+/* UI state for Headset (memui_HS_State) */ 
+   (
+    0 UI_HEADSET_DISCONNECT
+    1 UI_HEADSET_IDLE                   /* before the responsor HS receive SABM      */
+    2 UI_HEADSET_W4CONNECT
+    3 UI_HEADSET_RINGING
+    4 UI_HEADSET_CONNECTED
+    5 UI_HEADSET_PARING
+  )
+/* memui_BB_State */
+(
+  0 UI_BB_OFF
+  1 UI_BB_IDLE
+  2 UI_BB_DISCOVERY
+  3 UI_BB_CONNECTED_ACTIVE_NO_SCO
+  4 UI_BB_CONNECTED_ACTIVE_WITH_SCO
+  5 UI_BB_CONNECTED_ACTIVE_WAIT_SNIFF
+  6 UI_BB_CONNECTED_SNIFF
+  7 UI_BB_RECONNECT
+  8 UI_BB_CONNECTED_SNIFF_WITH_SCO
+)
+
+/************/
+/* flags    */
+/************/
+  
+/* memui_Misc_Flags */
+  (
+    5 NO_IDLE_TURN_OFF
+    7 ANSWER_RING_FLAG               /* 1 Answer,0 no*/
+  )
+
+/* mem_UI_SCH_Interface */
+  (
+    0  UI_HS_PAIRING 
+    2  UI_REQ_CLOSE_RFCOMM
+    3  UI_LINK_LOST
+    4  UI_REQ_OPEN_SCO
+    6  UI_REQ_CLOSE_SCO
+  )
+  
+/* memui_PassOverKey */
+  (
+    0  ANSWER_RING_BIT
+    0  AG_SEND_RING_BIT
+    1  VOL_UP_BIT
+    2  VOL_DOWN_BIT
+    3  INI_CALL_BIT
+    4  DAIL_LAST_CALL
+    5  END_CALL_BIT
+    6  NOKIA_VOICE_ACTIVE 
+    7  REJECT_CALL_BIT
+  )
+  
+/* memui_reconnect_mode */
+(
+  0 NO_RECONNECTION
+  1 RECONNECT_HID
+  2 RECONNECT_HF
+  3 RECONNECT_HS
+  4 RECONNECT_HID_HF
+  5 RECONNECT_HID_HS
+)
+/* memui_Commands */
+(
+0 BT_CMD_STANDBY
+1 BT_CMD_START_DISCOVERY
+2 BT_CMD_STOP_DISCOVERY
+3 BT_CMD_RECONNECT
+4 BT_CMD_DISCONNECT
+5 BT_CMD_ENTER_SNIFF
+6 BT_CMD_EXIT_SNIFF
+7 BT_CMD_ENTER_SNIFF_SUBRATING
+8 BT_CMD_EXIT_SNIFF_SUBRATING
+9 BT_CMD_SNIFF_TEST
+10 BT_CMD_SET_PIN_CODE
+11 BT_CMD_START_INQUIRY
+12 BT_CMD_STOP_INQUIRY
+13 BT_CMD_START_ADV
+14 BT_CMD_STOP_ADV
+15 BT_CMD_START_DIRECT_ADV
+16 BT_CMD_STOP_DIRECT_ADV
+17 BT_CMD_LE_DISCONNECT
+18 BT_CMD_LE_UPDATE_CONN
+19 BT_CMD_LED_OFF
+20 BT_CMD_LED_ON
+21 BT_CMD_LED_BLINK
+22 BT_CMD_LE_START_CONN
+23 BT_CMD_LE_START_SCAN
+24 BT_CMD_LE_STOP_SCAN
+25 BT_CMD_ENTER_HIBERNATE
+27 BT_CMD_LE_SMP_SECURITY_REQUEST
+28 BT_CMD_LE_START_WRITE
+29 BT_CMD_ROLE_SWITCH
+30 BT_CMD_BB_RECONN_CANCEL
+31 BT_CMD_STORE_RECONN_INFO_LE
+32 BT_CMD_STORE_RECONN_INFO_BT
+)
+
+(
+0x00 BT_EVT_NULL
+0x01 BT_EVT_BB_CONNECTED
+0x02 BT_EVT_BB_DISCONNECTED
+0x03 BT_EVT_RECONN_STARTED
+0x04 BT_EVT_RECONN_FAILED
+0x05 BT_EVT_SETUP_COMPLETE
+0x06 BT_EVT_HID_CONNECTED
+0x07 BT_EVT_HID_DISCONNECTED
+0x08 BT_EVT_SPP_CONNECTED
+0x09 BT_EVT_SPP_DISCONNECTED
+0x0A BT_EVT_PINCODE_REQ
+0x0B BT_EVT_ENTER_SNIFF
+0x0C BT_EVT_EXIT_SNIFF
+0x0D BT_EVT_ENTER_SNIFF_SUB
+0x0E BT_EVT_EXIT_SNIFF_SUB
+0x0F BT_EVT_DISCOVERY_STOPED
+0x10 BT_EVT_BUTTON_LONG_PRESSED
+0x12 BT_EVT_HID_HANDSHAKE
+0X13 BT_EVT_RECONN_PAGE_TIMEOUT
+0x14 BT_EVT_LE_CONNECTED
+0X15 BT_EVT_LE_DISCONNECTED
+0x16 BT_EVT_ML2CAP_CONN_REFUSED
+0x17 BT_EVT_BUTTON_ENTER_HIBERNATE
+0x18 BT_EVT_LINKKEY_GENERATE
+0x19 BT_EVT_SWITCH_NOT_ACCEPT
+0x20 BT_EVT_SWITCH_ACCEPT
+0x21 BT_EVT_SNIFF_NOT_ACCEPT
+0x22 BT_EVT_SNIFF_ACCEPT
+0x23 BT_EVT_UNSNIFF_ACCEPT
+0x24 BT_EVT_UNSNIFF_NOT_ACCEPT
+0x25 BT_EVT_BUTTON_ADJUST_DPI
+0x26 BT_EVT_SEND_UNSNIFF_ACCEPT
+0x27 BT_EVT_VIRTUAL_CABLE_UNPLUG
+0x28 BT_EVT_LE_WRITE_REQUEST
+0x29 BT_EVT_LE_ENC_INFO
+0x2a BT_EVT_SWITCH_FAIL_MASTER
+0x2b BT_EVT_SWITCH_SUCCESS_MASTER
+0x2c BT_EVT_BUTTON_DOWN
+0x2d BT_EVT_BUTTON_UP
+0x2e BT_EVT_REMOTE_UNSNIFF
+0x50 BT_EVT_TIMER_INIT
+0xF0 BT_EVT_TIMER_MASK
+0x51 BT_EVT_TIMER_100MS
+0x52 BT_EVT_TIMER_200MS
+0x53 BT_EVT_TIMER_300MS
+0x54 BT_EVT_TIMER_400MS
+0x55 BT_EVT_TIMER_500MS
+0x56 BT_EVT_TIMER_600MS
+0x57 BT_EVT_TIMER_700MS
+0x58 BT_EVT_TIMER_800MS
+0x59 BT_EVT_TIMER_900MS
+0x5A BT_EVT_TIMER_1KMS
+0x5B BT_EVT_TIMER_1K1MS
+0x5C BT_EVT_TIMER_1K2MS
+0x5D BT_EVT_TIMER_1K3MS
+0x5E BT_EVT_TIMER_1K4MS
+0x5F BT_EVT_TIMER_1K5MS
+)
+//switch
+(
+0 OFF
+1 ON
+)
+/* memui_mem_lock */
+(
+    0 MEM_UNLOCK
+    1 MEM_LOCK
+)
+/* memui_flag0 */
+(
+    0 UI_USER_DATA_FLAG
+    1 UI_WII_WAITING_SLEEP
+    2 UI_KEYBOARD_SNIFF_SKIP
+)
+/* mem_master_type */
+(
+    0 MTYPE_HID_DEFAULT
+    1 MTYPE_HID_SSP
+    2 MTYPE_SPP
+)
+
+	(	
+	0x01 RECIEVE_SDP_CONN_RES
+	0x02 RECIEVE_SDP_CFG_REQ
+	0x03 RECIEVE_SDP_CFG_RES
+	0x04 RECIEVE_RFCOMM_CONN_RES
+	0x05 RECIEVE_RFCOMM_CFG_REQ
+	0x06 RECIEVE_RFCOMM_CFG_RES
+	0x07 RECIEVE_HID_CTRL_CONN_RES
+	0x08 RECIEVE_HID_CTRL_CFG_REQ
+	0x09 RECIEVE_HID_CTRL_CFG_RES
+	0x0A RECIEVE_HID_INT_CONN_RES
+	0x0B RECIEVE_HID_INT_CFG_REQ
+	0x0C RECIEVE_HID_INT_CFG_RES
+	0x0D RECIEVE_AVCTP_CONN_RES
+	0x0E RECIEVE_AVCTP_CFG_REQ
+	0x0F RECIEVE_AVCTP_CFG_RES
+	0x10 RECIEVE_AVDTP_SIGNAL_CONN_RES
+	0x11 RECIEVE_AVDTP_SIGNAL_CFG_REQ
+	0x12 RECIEVE_AVDTP_SIGNAL_CFG_RES
+	0x13 RECIEVE_AVDTP_MEDIA_CONN_RES
+	0x14 RECIEVE_AVDTP_MEDIA_CFG_REQ
+	0x15 RECIEVE_AVDTP_MEDIA_CFG_RES
+	0x16 RECIEVE_SS_REASULT_HS                  
+	0x17 RECIEVE_SS_REASULT_HF                  
+	0x18 RECIEVE_SS_REASULT_AVTARG		          
+	0x19 RECIEVE_SS_REASULT_OBEX		            
+	0x1A RECIEVE_DLCI0_UA
+	0x1B RECIEVE_HS_PARAM_NEG_RES
+	0x1C RECIEVE_HS_UA
+	0x1D RECIEVE_HS_MODEM_STATUS_RES
+	0x1E RECIEVE_HS_MODEm_STATUS_CMD
+	0x1F RECIEVE_HF_PARAM_NEG_RES   
+	0x20 RECIEVE_HF_UA              
+	0x21 RECIEVE_HF_MODEM_STATUS_RES
+	0x22 RECIEVE_HF_MODEm_STATUS_CMD 
+	0x23 RECIEVE_OBEX_PARAM_NEG_RES     
+	0x24 RECIEVE_OBEX_UA              
+	0x25 RECIEVE_OBEX_MODEM_STATUS_RES
+	0x26 RECIEVE_OBEX_MODEm_STATUS_CMD    
+	0x27 RECIEVE_SPP_PARAM_NEG_RES   
+	0x28 RECIEVE_SPP_UA              
+	0x29 RECIEVE_SPP_MODEM_STATUS_RES
+	0x2A RECIEVE_SPP_MODEm_STATUS_CMD
+	0x2b RECIEVE_SDP_DISCONN_RES
+	)
+
+
+
+	(
+	0 UPPERSM_RP_IDLE
+	1 UPPERSM_RP_SDP_CONN
+	2 UPPERSM_RP_SDP_CONN_WAIT
+	3 UPPERSM_RP_SDP_CFG
+	4 UPPERSM_RP_SDP_CFG_WAIT
+	5 UPPERSM_RP_SS_AVTARG
+	6 UPPERSM_RP_SS_AVTARG_WAIT
+	7 UPPERSM_RP_SS_OBEX
+	8 UPPERSM_RP_SS_OBEX_WAIT
+	9 UPPERSM_RP_SDP_DISCONN
+	10 UPPERSM_RP_SDP_DISCONN_WAIT
+	11 UPPERSM_RP_AVDTP_CONN_WAIT
+	12 UPPERSM_RP_AVCTP_CONN
+	13 UPPERSM_RP_AVCTP_CONN_WAIT
+	14 UPPERSM_RP_AVCTP_CFG
+	15 UPPERSM_RP_AVCTP_CFG_WAIT
+	16 UPPERSM_RP_OBEX_CMD_PN
+	17 UPPERSM_RP_OBEX_CMD_PN_WAIT
+	18 UPPERSM_RP_OBEX_SABM
+	19 UPPERSM_RP_OBEX_SABM_WAIT
+	20 UPPERSM_RP_OBEX_CMD_MS
+	21 UPPERSM_RP_OBEX_CMD_MS_WAIT
+	)
+	(		/*mem_upper_sm_reconn*/
+	0 UPPERSM_RECONN_IDLE		
+	1 UPPERSM_RECONN_SDP_CONN		
+	2 UPPERSM_RECONN_SDP_CONN_WAIT		
+	3 UPPERSM_RECONN_SDP_CFG		
+	4 UPPERSM_RECONN_SDP_CFG_WAIT		
+	5 UPPERSM_RECONN_SS_HS
+	6 UPPERSM_RECONN_SS_HS_WAIT
+	7 UPPERSM_RECONN_SS_HF
+	8 UPPERSM_RECONN_SS_HF_WAIT
+	9 UPPERSM_RECONN_SS_AVTARG		
+	10 UPPERSM_RECONN_SS_AVTARG_WAIT		    
+	11 UPPERSM_RECONN_SS_OBEX		            
+	12 UPPERSM_RECONN_SS_OBEX_WAIT		      
+	13 UPPERSM_RECONN_SDP_DISCONN		        
+	14 UPPERSM_RECONN_SDP_DISCONN_WAIT      
+	15 UPPERSM_RECONN_HID_CTRL_CONN		      
+	16 UPPERSM_RECONN_HID_CTRL_CONN_WAIT		
+	17 UPPERSM_RECONN_HID_CTRL_CFG		      
+	18 UPPERSM_RECONN_HID_CTRL_CFG_WAIT     
+	19 UPPERSM_RECONN_HID_INT_CONN		      
+	20 UPPERSM_RECONN_HID_INT_CONN_WAIT		  
+	21 UPPERSM_RECONN_HID_INT_CFG		        
+	22 UPPERSM_RECONN_HID_INT_CFG_WAIT      
+	23 UPPERSM_RECONN_RFCOMM_CONN		        
+	24 UPPERSM_RECONN_RFCOMM_CONN_WAIT		  
+	25 UPPERSM_RECONN_RFCOMM_CFG		        
+	26 UPPERSM_RECONN_RFCOMM_CFG_WAIT       
+	27 UPPERSM_RECONN_RFCOMM_SABM		        
+	28 UPPERSM_RECONN_RFCOMM_SABM_WAIT		  
+	29 UPPERSM_RECONN_SPP_CMD_PN		        
+	30 UPPERSM_RECONN_SPP_CMD_PN_WAIT		    
+	31 UPPERSM_RECONN_SPP_SABM		          
+	32 UPPERSM_RECONN_SPP_SABM_WAIT		      
+	33 UPPERSM_RECONN_SPP_CMD_MS		        
+	34 UPPERSM_RECONN_SPP_CMD_MS_WAIT       
+	35 UPPERSM_RECONN_HF_CMD_PN		          
+	36 UPPERSM_RECONN_HF_CMD_PN_WAIT		    
+	37 UPPERSM_RECONN_HF_SABM		            
+	38 UPPERSM_RECONN_HF_SABM_WAIT		      
+	39 UPPERSM_RECONN_HF_CMD_MS		          
+	40 UPPERSM_RECONN_HF_CMD_MS_WAIT        
+	41 UPPERSM_RECONN_AVDTPs_CONN		        
+	42 UPPERSM_RECONN_AVDTPs_CONN_WAIT		  
+	43 UPPERSM_RECONN_AVDTPs_CFG		        
+	44 UPPERSM_RECONN_AVDTPs_CFG_WAIT       
+	45 UPPERSM_RECONN_AVDTPm_CONN		        
+	46 UPPERSM_RECONN_AVDTPm_CONN_WAIT		  
+	47 UPPERSM_RECONN_AVDTPm_CFG		        
+	48 UPPERSM_RECONN_AVDTPm_CFG_WAIT       
+	49 UPPERSM_RECONN_AVCTP_CONN		        
+	50 UPPERSM_RECONN_AVCTP_CONN_WAIT		    
+	51 UPPERSM_RECONN_AVCTP_CFG		          
+	52 UPPERSM_RECONN_AVCTP_CFG_WAIT		    
+	53 UPPERSM_RECONN_OBEX_CMD_PN		        
+	54 UPPERSM_RECONN_OBEX_CMD_PN_WAIT		  
+	55 UPPERSM_RECONN_OBEX_SABM		          
+	56 UPPERSM_RECONN_OBEX_SABM_WAIT		    
+	57 UPPERSM_RECONN_OBEX_CMD_MS		        
+	58 UPPERSM_RECONN_OBEX_CMD_MS_WAIT     
+	59 UPPERSM_RECONN_SS_SPP
+	60 UPPERSM_RECONN_SS_SPP_WAIT
+	)
+	(/*mem_UI_profile_supported*/
+	0 support_HID
+	1 support_A2DP
+	2 support_AVRCP
+	3 support_HF
+	4 support_HS
+	5 support_PBAP
+	6 support_SPP
+	)
+	/*mem_upper_sm_ss*/
+	(
+	0 UPPERSM_SS_HS
+	1 UPPERSM_SS_HF
+	2 UPPERSM_SS_AVTARG
+	3 UPPERSM_SS_OBEX
+	)
+
+	(
+	160 UI_HUNDRED_MILLISECOND_TIME
+	0XFF UI_BUTTON_GPIO_DISABLE
+	)
+	(
+	0x01 UI_BB_INCONNECT
+	0x10 UI_BB_DISCONNECT
+	)
+(
+0x00 UI_BUTTON_STATE_DOWN
+0x01 UI_BUTTON_STATE_UP
+)
+
+//mem_ipc_skip_continue_proc
+(
+	0 IPC_CONTINUE_PROCESS
+	1 IPC_SKIP_CONTINUE_PROCESS
+)
+
+
+memalloc(
+1 mem_usb_status
+1 mem_usb_fifo_empty
+1 mem_usb_read_len
+64 mem_usb_rxbuf
+2 mem_usb_cnt
+1 mem_usb_tx_enable
+1 mem_usb_tx_count
+1 mem_usb_set_protocol_count
+1 mem_usb_desc
+1 mem_usb_state
+2 mem_usb_idle_cnt
+2 mem_usb_idle_timeout
+2 mem_usb_trig_timeout
+
+0 mem_usb_setup
+1 mem_usb_setup_bmRequestType
+1 mem_usb_setup_bRequest
+1 mem_usb_setup_bValue
+1 mem_usb_setup_bValueH
+2 mem_usb_setup_wIndex
+1 mem_usb_setup_bLength
+1 mem_usb_setup_bLengthH
+
+
+8 mem_usb0_setup
+2 mem_bufptr
+1 mem_remain
+20 mem_devicedesc
+200 mem_hidreportdesc_kb
+200 mem_hidreportdesc_m
+100 mem_confdesc
+5 mem_string0
+30 mem_string1
+30 mem_string2
+30 mem_string3
+)
+
+
+memalloc(
+
+/*
+    temp parameter
+*/
+2 mem_hold_contr
+2 mem_hold_contw
+1 mem_fifo_temp
+
+2 mem_le_cur_handle_start
+2 mem_le_cur_handle_end
+2 mem_le_cur_att_type
+1 mem_le_search_res
+1 mem_le_search_len
+
+)
+
+
+(
+/*mem_util_timer_flag0_7*/
+    0   UTIL_TIMER_0_USED
+    1   UTIL_TIMER_1_USED
+    2   UTIL_TIMER_2_USED
+    3   UTIL_TIMER_3_USED
+    4   UTIL_TIMER_4_USED
+    5   UTIL_TIMER_5_USED
+    6   UTIL_TIMER_6_USED
+    7   UTIL_TIMER_7_USED
+/*mem_util_timer_flag8_15*/
+    0   UTIL_TIMER_8_USED
+    1   UTIL_TIMER_9_USED
+    2   UTIL_TIMER_10_USED
+    3   UTIL_TIMER_11_USED
+    4   UTIL_TIMER_12_USED
+    5   UTIL_TIMER_13_USED
+    6   UTIL_TIMER_14_USED
+    7   UTIL_TIMER_15_USED
+)
+
+//util fifo param
+(
+
+5 UTIL_FIFO_LEN
+-1 UTIL_FIFO_OFFSET
+)
+
+/************************************************************************/
+/* RCS HEADER -- DO NOT ERASE                                           */
+/* $Author: Administrator $                                                     */
+/* $Id: bt_var.osi,v 1.1 2009-09-28 04:06:18 Administrator Exp $   */
+/* Orisil Technology                                                 */
+/************************************************************************/
+
+
+/* packet types */
+(
+  0x02 FHS_PACKET 
+  0x03 DM1_PACKET 
+  0x03 DM1_LMP_PACKET 
+  0x04 DH1_PACKET 
+  0x05 HV1_PACKET 
+  0x06 HV2_PACKET 
+  0x07 HV3_PACKET 
+  0x08 DV_PACKET 
+  0x09 AUX1_PACKET 
+  0x0a DM3_PACKET 
+  0x0b DH3_PACKET 
+  0x0e DM5_PACKET 
+  0x0f DH5_PACKET 
+)
+
+
+/* mem_lmp_respond */
+(
+  0 RESPOND_TO_ALL
+  1 PASS_EVERYTHING
+  2 PASS_ONLY_UNKNOWNS
+  3 RESPOND_TO_LMPS
+)
+/* SCO algorithm defines */
+(
+  0 ULAW
+  1 ALAW
+  2 CVSD
+)
+/* encryption modes */
+(
+  0 NO_ENCRYPTION
+  1 PT_PT_ENCRYPTION
+  2 PT_BROADCAST_ENCRYPTION
+)
+
+/* bits used in mem_lmp_state1 variable */
+(
+  0 LMP_STATE_DETACH
+  1 LMP_STATE_HOLD
+  2 LMP_STATE_SNIFF
+  3 LMP_STATE_PARK
+  4 LMP_STATE_WAIT_SCO_CREATE
+  5 LMP_STATE_WAIT_SCO_KILL
+  6 LMP_STATE_SCO3
+  7 LMP_STATE_WAIT_SCO_START
+)
+/* mem_lmp_state2 */
+(
+  0 LMP_WAIT_FOR_SNIFF_ACCEPT
+  1 LMP_WAIT_FOR_PARK_ACCEPT
+  2 LMP_SEND_UNPARK_ACCEPTED
+  3 LMP_SEND_ENCRYPTION_START
+  4 LMP_SEND_ENCRYPTION_STOP
+  5 MESSAGE_QUEUE
+  7 LMP_STATE_WAIT_BEACON
+)
+/* mem_lmp_state3 */
+(
+ 0 INQUIRY_STATE_CHECK
+ 1 HOST_DELAY_MESSAGE
+ 2 VARIABLE_DELAY
+ 3 TEST_MODE_START_LOOPBACK
+ 4 TEST_MODE_START_PATTERN
+ 5 PARSE_TEST_CONTROL_MESSAGE
+ 6 H_AUTH_SEND_COMB_KEY
+)
+/* mem_rx_status */
+(
+  0 FROM_MASTER
+)
+/* mem_ms_flag */
+(
+  0 MS_RECEIVE_SWITCH_REQ
+  1 MS_SEND_SETUP_COMPLATE
+)
+/* mem_conn_sm */
+(
+  0 CONN_SM_STANDBY
+  1 CONN_SM_WAIT_PAGE
+  2 CONN_SM_SEND_FEATURES
+  3 CONN_SM_WAIT_FEATURES_RES
+  4 CONN_SM_SEND_CONN_REQ
+  5 CONN_SM_WAIT_CONN_ACCEPT
+  6 CONN_SM_AUTH_PAIR
+  7 CONN_SM_AUTH_PAIR_WAIT
+  8 CONN_SM_WAIT_MUTAL_AUTH
+  9 CONN_SM_ENCRYPT
+  0xa CONN_SM_ENCRYPT_WAIT
+  0xb CONN_SM_ENCRYPT_WAIT_CLEAR
+  0xc CONN_SM_SEND_SETUP_COMPLETE
+  0xd CONN_SM_WAIT_SETUP_COMPLETE 
+  0xe CONN_SM_SEND_SWITCH
+  0xf CONN_SM_DETACH_DELAY
+  0x10 CONN_SM_WAIT_SWITCH_AFTER_HOST_CONNECTION
+  0x11 CONN_SM_DELAY_RESTART_CONNECTION
+  0x12 CONN_SM_SEND_VERSION
+  0X13 CONN_SM_WAIT_VERSION
+  0x14 CONN_SM_SEND_FEATURES_EXT
+  0x15 CONN_SM_WAIT_FEATURES_EXT
+  0x16 CONN_SM_PAIRING
+  0x17 CONN_SM_AUTH
+  0x18 CONN_SM_PAIRING_WAIT
+  0x19 CONN_SM_AUTH_WAIT
+  0x1a CONN_SM_DONE
+  0x1b CONN_SM_WAIT_DONE
+)
+
+/* btStateConn1 */
+(
+  0 CONN_STANDBY
+  1 CONN_MASTER_SEND_CONN_REQ
+  2 CONN_MASTER_WAIT_FOR_CONN_ACCEPTED
+  3 CONN_MASTER_AUTH
+  4 CONN_MASTER_WAIT_FOR_FEATURES
+  5 CONN_MASTER_WAIT_FOR_SETUP_COMPLETE
+  6 CONN_MASTER_WAIT_FOR_MAX_SLOT
+  7 CONN_SLAVE_CONN_REQUESTED
+  8 CONN_SLAVE_WAIT_FOR_SETUP_COMPLETE
+  9 CONN_SLAVE_AUTH
+  10 CONN_USING_HOST_OPCODE
+  11 CONN_SLAVE_AUTH_WAIT
+  12 CONN_SLAVE_ENCRYPT_WAIT
+)
+
+/* mem_lmp_conn_state */
+(
+  0 RECEIVED_CONN_REQ
+  1 SENT_CONN_REQ
+  2 RECEIVED_SETUP_COMPLETE
+  3 SENT_SETUP_COMPLETE
+  4 HOST_CONNECTION_MADE
+  6 INIT_COMPLETE
+  7 SNIFF_NEGOTIATE
+)
+/* btStateAuth1 */
+(
+  0 WAIT_FOR_KINIT
+  1 WAIT_FOR_LKA
+  2 WAIT_FOR_LKB
+  3 WAIT_FOR_SRES
+  4 EXAMINE_RECEIVED_SRES
+  5 SEND_AU_RAND
+  6 WAIT_FOR_KC
+  7 DELAYED_ENCRYPT_RESPONSE
+)
+/* btStateAuth2 */
+(
+  0 SENT_SRES
+  1 RECEIVED_IN_RAND
+  2 SENT_AU_RAND
+  3 AUTHENTICATION_FAILED
+  4 AUTHENTICATION_PASSED
+  5 STARTED_AUTH
+  6 SENT_COMB_KEY
+  7 SENT_IN_RAND
+)
+/* btStateAuth3 */
+(
+  0 RECEIVED_AU_RAND
+  1 RECEIVED_SRES
+  2 MUTUALLY_AUTHENTICATE
+)
+/* btStateHost */
+(
+  0 H_AUTH_STARTED
+  2 H_ENCRYPTION_MODE_REQ_PT
+  3 H_ENCRYPTION_KEY_SIZE
+  4 H_ENCRYPTION_START
+  5 H_ENCRYPTION_STOP
+  6 H_AUTH_SECOND_TRY
+)
+/* btStateEncrypt2 */
+(
+  0 RECEIVED_ENCRYPT_MODE_REQ_PT
+  1 RECEIVED_ENCRYPT_KEY_SIZE
+  2 RECEIVED_ENCRYPT_START
+  3 RECEIVED_ENCRYPT_STOP
+  4 STARTED_ENCRYPT_START
+)
+/* mem_ms_state */
+(
+  0x00 MS_STANDBY
+  0x11 M_MINIT_1
+  0x12 M_MINIT_2
+  0x20 M_SINIT_0
+  0x30 S_MINIT_0
+  0x31 S_MINIT_1
+  0x32 S_MINIT_2
+  0x41 S_SINIT_1
+  0x42 S_SINIT_2
+  0x43 S_SINIT_3
+)
+/* mem_test_mode */
+(
+  0 TEST_MODE_ALLOWED
+  1 TEST_MODE_ACTIVE
+)
+/* values for mem_tester_emulate */
+(
+  0x00 NO_TEST_MODE
+  0x00 CONTINUOUS_TRANSMIT
+  0x10 TRANSMIT_TEST
+  0x08 LOOPBACK
+)
+
+/* mem_tx_misc */
+(
+  1 SEND_TX_ADDR
+)
+/* BBHWREG_page_stat */
+(
+  5 PAGE_MODE_END
+)
+/* host_return_parameters_status codes */
+(
+  0x00 HOST_RETURN_SUCCESS
+  0x01 HOST_RETURN_SLAVE_CANT_ISSUE
+  0x02 HOST_RETURN_NO_CONNECTION
+  0x04 HOST_RETURN_PAGE_TIMEOUT
+  0x05 HOST_RETURN_INQUIRY_TIMEOUT
+  0x08 HOST_RETURN_CONNECTION_TIMEOUT
+  0x09 HOST_RETURN_MAX_NUM_CONNECTIONS
+  0x0a HOST_RETURN_MAX_NUM_SCO
+  0x0b HOST_RETURN_MAX_NUM_ACL
+  0x0c HOST_RETURN_SECURITY_REASONS
+  0x10 HOST_RETURN_HOST_TIMEOUT
+  0x11 HOST_RETURN_UNSUPPORTED_FEATURE_PARAMETER
+  0x13 HOST_RETURN_OTHER_END_USER
+  0x14 HOST_RETURN_OTHER_END_LOW_RESOURCE
+  0x15 HOST_RETURN_OTHER_END_POWER_OFF
+  0x16 HOST_RETURN_LOCAL_HOST
+  0x18 HOST_RETURN_PAIRING_NOT_ALLOWED
+  0x19 HOST_RETURN_UNKNOWN_PDU
+  0x1a HOST_RETURN_UNSUPPORTED_REMOTE_FEATURE
+  0x1d HOST_RETURN_SCO_AIR_MODE_REJECTED
+  0x20 HOST_RETURN_UNSUPPORTED_LMP_VALUE
+  0x21 HOST_RETURN_AUTHENTICATION_FAILURE
+  0x22 HOST_RETURN_CHANGED_EXISTING_SCO
+  0x23 HOST_RETURN_HOST_REJECTED
+  0x24 HOST_RETURN_UNSPECIFIED_ERROR
+  0x25 HOST_RESET
+  0x26 HOST_RETURN_BAD_HANDLE
+
+  0x00 HOST_RETURN_ACCEPT_COMMAND
+  0x01 HOST_RETURN_REJECT_COMMAND
+)
+/* host_present */
+(
+  0 HOST_IS_PRESENT
+  1 BCI_IS_PRESENT
+  2 DONT_INIT_RADIO
+)
+/* mem_master_state */
+(
+  0 MASTER_STATE_STANDBY
+  1 MASTER_INQUIRY
+)
+/* misc */
+(
+  92 SECOND_SWITCH_REQ
+  93 SLAVE_DELAY_DETACH
+  94 MASTER_DELAY_DETACH
+  95 UNSNIFF_DELAY_DETACH
+  0 WE_STARTED_AS_MASTER
+  1 WE_STARTED_AS_SLAVE
+)
+/* mem_host_commands */
+(
+  0x01 HOST_INQUIRY
+  0x02 HOST_INQUIRY_CANCEL
+  0x03 HOST_CREATE_CONNECTION
+  0x04 HOST_DISCONNECT_CONNECTION
+  0x05 HOST_ADD_SCO_REQUEST
+  0x06 HOST_REMOTE_NAME_REQUEST
+  0x07 HOST_WRITE_SUPPORTED_FEATURES
+  0x08 HOST_SET_TX_LEVEL
+  0x09 HOST_SET_RX_LEVEL
+  0x0a HOST_SNIFF_REQUEST
+  0x0b HOST_UNSNIFF_REQUEST
+  0x0c HOST_WRITE_LINK_SUPERVISION_TIMEOUT
+  0x0e HOST_WRITE_SCAN_ENABLE
+  0x0f HOST_READ_AUDIO_QUALITY
+  0x10 HOST_ENABLE_DEVICE_UNDER_TEST
+  0x14 HOST_BUTTON_CONFIGURE
+  0x15 HOST_SET_LOW_BATTERY_LEVEL
+  0x16 HOST_WRITE_LOCAL_NAME
+  0x17 HOST_WRITE_LOCAL_PIN
+  0x18 HOST_KILL_SCO_REQUEST
+  0x19 HOST_QOS_REQ
+
+  0x1a HOST_FEATURES_REQUEST
+  0x1b HOST_VERSION_REQUEST
+  0x1c HOST_TIMING_REQUEST
+  0x1d HOST_CLK_OFFSET_REQUEST
+  0x1e HOST_AUTHENTICATE
+  0x1f HOST_START_ENCRYPTION
+  0x20 HOST_STOP_ENCRYPTION
+  0x21 HOST_HOLD_REQUEST
+  0x22 HOST_HOLD_FORCE
+  0x23 HOST_PARK_REQUEST
+  0x24 HOST_MOD_BEACON
+  0x25 HOST_SET_BROADCAST_SCAN_WINDOW
+  0x26 HOST_UNPARK_PM_REQUEST
+  0x27 HOST_UNPARK_BD_REQUEST
+  0x28 HOST_SLAVE_REQUEST_UNPARK
+  0x29 HOST_DECREASE_POWER_REQUEST
+  0x2a HOST_INCREASE_POWER_REQUEST
+  0x2b HOST_SEND_PREFERRED_RATE
+  0x2c HOST_MAX_SLOT_REQ
+  0x2d HOST_MAX_SLOT_FORCE
+  0x2e HOST_PAGE_MODE_REQUEST
+  0x2f HOST_PAGE_SCAN_MODE_REQUEST
+  0x30 HOST_MASTER_SLAVE_SWITCH
+  0x31 HOST_SEND_AUTO_RATE
+  0x32 HOST_PAGE_CANCEL
+  0x33 HOST_CHANGE_LINK_KEY
+  0x34 HOST_RADIO_READ
+  0x35 HOST_RADIO_WRITE
+  0x36 HOST_REMOTE_SLAVE_INIT_UNPARK_REQUESTED
+
+  0x40 HOST_REMOTE_CONNECTION_REQUESTED
+  0x41 HOST_REMOTE_DETACH
+  0x42 HOST_REMOTE_SCO_CREATE_REQUESTED
+  0x43 HOST_REMOTE_SCO_KILL_REQUESTED
+  0x44 HOST_REMOTE_PARK_REQUESTED
+  0x45 HOST_REMOTE_UNPARK_REQUESTED
+  0x46 HOST_REMOTE_SNIFF_REQUESTED
+  0x47 HOST_REMOTE_UNSNIFF_REQUESTED
+  0x48 HOST_REMOTE_HOLD_REQUESTED
+  0x49 HOST_REMOTE_AUTHENTICATION
+  0x4a HOST_REMOTE_START_ENCRYPTION_REQUESTED
+  0x4b HOST_REMOTE_STOP_ENCRYPTION_REQUESTED
+  0x4c HOST_MODE_CHANGE_EVENT
+  0x4d HOST_REMOTE_TEST_ACTIVATE
+  0x4e HOST_REMOTE_TEST_CONTROL
+  0x4f HOST_REMOTE_TIMING_REQUEST
+)
+/* BCI interface (not used if not compiled in ) */
+(
+  0x01 BCI_INQUIRY
+  0x02 BCI_INQUIRY_CANCEL
+  0x03 BCI_CREATE_CONNECTION
+  0x04 BCI_DISCONNECT
+  0x05 BCI_ADD_SCO_CONNECTION
+  0x06 BCI_REMOTE_NAME_REQUEST
+  0x07 BCI_WRITE_SUPPORTED_FEATURES
+  0x08 BCI_SET_TX_POWER_LEVEL
+  0x09 BCI_SET_RX_POWER_LEVEL
+  0x0a BCI_SNIFF_MODE
+  0x0b BCI_EXIT_SNIFF_MODE
+  0x0c BCI_WRITE_LINK_SUPERVISION_TIMEOUT
+  0x0d BCI_WRITE_PAGE_TIMEOUT
+  0x0e BCI_WRITE_SCAN_ENABLE
+  0x0f BCI_GET_AUDIO_QUALITY
+  0x10 BCI_ENABLE_DEVICE_UNDER_TEST
+  0x11 BCI_SEND_DATA
+  0x12 BCI_REGISTER_SERVICE_RECORD
+  0x13 BCI_SERVICE_SEARCH_ATTRIB_REQ
+  0x14 BCI_BUTTON_CONFIGURE
+  0x15 BCI_SET_LOW_BATTERY_LEVEL
+  0x16 BCI_WRITE_LOCAL_NAME
+  0x17 BCI_WRITE_LOCAL_PIN
+  0x18 BCI_REMOVE_SCO_CONNECTION
+  0x19 BCI_QUALITY_OF_SERVICE
+  0x40 BCI_REMOTE_CONNECTION_REQUEST
+  0x41 BCI_REMOTE_DETACH
+  0x42 BCI_REMOTE_ADD_SCO_REQUEST
+  0x43 BCI_REMOTE_REMOVE_SCO_REQUEST
+  0x44 BCI_REMOTE_PARK_REQUEST
+  0x45 BCI_REMOTE_UNPARK_REQUEST
+  0x46 BCI_REMOTE_SNIFF_REQUEST
+  0x47 BCI_REMOTE_UNSNIFF_REQUEST
+  0x48 BCI_REMOTE_HOLD_REQUEST
+  0x49 BCI_REMOTE_AUTHENTICATION_PAIRING_REQUEST
+  0x4a BCI_REMOTE_START_ENCRYPTION_REQUEST
+  0x4b BCI_REMOTE_STOP_ENCRYPTION_REQUEST
+  0x4c BCI_MODE_CHANGE_EVENT
+)
+/* mode changes */
+(
+  0 MODE_CHANGE_ACTIVE
+  1 MODE_CHANGE_SNIFFING
+  2 MODE_CHANGE_PARKED
+  3 MODE_CHANGE_HOLDING
+  4 MODE_CHANGE_SCO_ADDED
+  5 MODE_CHANGE_SCO_REMOVED
+  6 MODE_CHANGE_ACL_CONNECTION
+  7 MODE_CHANGE_DISCONNECT
+  8 MODE_CHANGE_SCO_CHANGED
+  9 MODE_CHANGE_ENCRYPTING
+  10 MODE_CHANGE_NOT_ENCRYPTING
+  11 MODE_CHANGE_BUTTON_UP
+  12 MODE_CHANGE_BUTTON_DOWN
+  13 MODE_CHANGE_BATTERY_LOW
+  14 MODE_CHANGE_RESET
+  15 MODE_CHANGE_INQUIRY_CANCELED_RMTCMD
+  16 MODE_ACTIVE_MSSWITCH_PASSED
+  17 MODE_ACTIVE_MSSWITCH_FAILED
+)
+/* mem_battery - low nibble is level information, upper nibble is status info */
+(
+  6 BATTERY_CHECK_LEVEL
+  7 BATTERY_SENT_STATUS
+)
+/* mem_radio_version */
+(
+  0x02 RADIO_2001
+  0x12 RADIO_2002
+  0x32 RADIO_2002_DDM
+  0x42 RADIO_1008A1
+  0x52 RADIO_1018A0
+)
+/* mem_slave_initiated_conn */
+(
+  0 SLAVE_INIT_AUTHENTICATION
+  1 SLAVE_INIT_ENCRYPTION
+  2 SLAVE_INIT_MASTER_SLAVE_SWITCH
+)
+/* connection_options */
+(
+  0 CONNECTION_AUTH
+  1 CONNECTION_ENCRYPT
+  2 CONNECTION_SWITCH
+  3 CONNECTION_ACL
+  4 CONNECTION_FEATURE_EXT
+)
+/* mem_debug_config */
+(
+  7 AA_INSERTION
+)

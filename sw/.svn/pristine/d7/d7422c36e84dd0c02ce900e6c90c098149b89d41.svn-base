@@ -1,0 +1,114 @@
+pmemalloc(
+	87 mem_sf_data
+)
+
+(
+	0x05 CMD_SPIFLASH_RDSR
+	0x20 CMD_SPIFLASH_SECTOR_ERASE
+	0x03 CMD_SPIFLASH_READ
+	0x02 CMD_SPIFLASH_WRITE
+	
+	0x00 SPIFLASH_DATA_ADDR_B0
+	0xa0 SPIFLASH_DATA_ADDR_B1
+	0x00 SPIFLASH_DATA_ADDR_B2
+
+	0x4C SPIFLASH_READ_LENGTH
+)
+
+(
+	0 NOT_ENTER_LPM 
+	1 ENTER_LPM
+)
+
+	(
+		0 MODULE_LED_DISABLE
+		1 MODULE_LED_BLINK
+	)
+	
+(
+	0x4b00 mem_module_rx_buf_custom//0x100
+	0x4bff mem_module_rx_buf_end_custom
+)
+
+
+(
+	0x4f00	mem_cmd_buf                             	
+	0x4f7f	mem_cmd_buf_end                         	
+	0x4f80	mem_event_buf                           	
+	0x4fff	mem_event_buf_end                       	
+)
+
+(
+	-1 param_hibernate_clks  	//the unit time is 1/32K
+)
+(
+	0x02 spid_start
+)
+(
+	0x01	GAP_ADTYPE_FLAGS
+	0x02	GAP_ADTYPE_16BIT_MORE
+	0x03	GAP_ADTYPE_16BIT_COMPLETE
+	0x04	GAP_ADTYPE_32BIT_MORE
+	0x05	GAP_ADTYPE_32BIT_COMPLETE
+	0x06	GAP_ADTYPE_128BIT_MORE
+	0x07	GAP_ADTYPE_128BIT_COMPLETE
+	0x08	GAP_ADTYPE_LOCAL_NAME_SHORT
+	0x09	GAP_ADTYPE_LOCAL_NAME_COMPLETE
+	0x0a	GAP_ADTYPE_POWER_LEVEL
+	0xff	GAP_ADTYPE_MANUFACTURER_SPECIFIC
+)
+
+(
+	0 ATT_BIT_NOTIFICATION
+	1 ATT_BIT_INDICATION
+)
+
+(
+	0xC5 CS_PREFIX_CMD
+	0xC6 CS_PREFIX_EVENT
+)
+
+//ctrl command packet:CS_PREFIX_CMD+len+cmd+data+checksum
+(
+	0x10 CS_CMD_LE_RD_DATARAM				//read data from dataram: address+length			ok
+	0x11 CS_CMD_LE_WR_DATARAM				//write data to dataram: address+length			ok
+
+	0x20 CS_CMD_SLEEP_REQ					//goto sleep								ok
+	0x21 CS_CMD_STATUS_INQ					//inquiry the current status of bluetooth			ok
+	0x22 CS_CMD_ADV_INTERV_SET_REQ			//set the advertisement interval					ok
+	0x23 CS_CMD_CONN_INTERV_SET_REQ		//set the connection interval, latency and timeout	ok
+	0x24 CS_CMD_ADV_CONTEXT_SET_REQ		//set the advertisement data,modify manufacture data	ok
+	0x25 CS_CMD_ADV_ALL_CONTEXT_SET_REQ	//set all of the advertisement data				ok
+	0x26 CS_CMD_ADV_WORK_CTRL_REQ			//start or stop the advertisement	ok
+	0x27 CS_CMD_SCANRSP_CONTEXT_SET_REQ	//set the scanrsp data			ok
+	0x28 CS_CMD_TXPOWER_SET_REQ			//set the txpower				ok
+	0x29 CS_CMD_LE_DISC_REQ					//disconnect the bluetooth			ok
+	0x2a CS_CMD_LE_NAME_SET_REQ				//set the bluetooth name			ok
+	0x2b CS_CMD_LE_MAC_SET_REQ				//set the bluetooth mac address	ok
+	0x2c CS_CMD_LE_RST_REQ					//reset the bluetooth				ok
+	0x2d CS_CMD_LE_NOTIFY_FLOW_CTL			//notify flow control				ok
+	0x2e CS_CMD_LE_INQUIRY_NOTIFY				//inquiry notify					ok
+	0x2f CS_CMD_ADV_TYPE_SET_REQ			//set the advertisement type		ok
+	
+	0x30 CS_CMD_LE_TX_DAT						//write the characteristic value, and send the data to APP if the permision is notify or indication       ok
+	0x31 CS_CMD_LE_RD_DAT					//read the characteristic value 		ok
+	0x32 CS_CMD_LE_WR_DAT					//write the characteristic value		ok
+
+	0x40 CS_CMD_READ_FLASH
+	0x41 CS_CMD_WRITE_FLASH
+)
+
+
+//notify packet:CS_PREFIX_NOTIFY+len+cmd+data+checksum
+(
+	0x10 CS_NOTIFY_POWERON	//no data							
+	0x11 CS_NOTIFY_DISC	//data:disc reason						ok
+	0x12 CS_NOTIFY_CONN	//no data								ok
+	0x13 CS_NOTIFY_DATA	//data:handle(2 Byte)+data				ok
+	0x14 CS_NOTIFY_OPENHANDLE	//data:handle+enableFlag			ok
+	0x15 CS_NOTIFY_READ_REQ		//data:handle					ok
+	0x16 CS_NOTIFY_IOWAKE			//io wakeup
+	0x17 CS_NOTIFY_TIMEOUTWAKE	//timeout wakeup
+	0x18 CS_NOTIFY_INDICATE_CONFIRM	//indication confirm			ok
+)
+

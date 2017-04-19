@@ -1,0 +1,2463 @@
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE CS_COMMTO1186
+OBJECT MODULE PLACED IN out/CS_CommTo1186.obj
+COMPILER INVOKED BY: C:\Keil\c51\bin\C51.exe CS_CommTo1186.c OBJECT(out/CS_CommTo1186.obj) OBJECTADVANCED OPTIMIZE(9,SPE
+                    -ED) BROWSE CODE SYMBOLS DF(ENABLE_APE) PR(out/CS_CommTo1186.lst) OT(7,SPEED) LARGE
+
+line level    source
+
+   1          #include "YC_Define.h"
+   2          #include "YC_Peripheral.h"
+   3          #include "YC_Utilities.h"
+   4          #include "hwreg.h"
+   5          #include "system.h"
+   6          #include "CS_Scale_Proc.h"
+   7          #include "CS_CommTo1186.h"
+   8          #include "CS_ScaleDisplay.h"
+   9          #include "btreg.h"
+  10          #include "BT_IPC.h"
+  11          
+  12          CS_ComState     xdata R_Weight_Com_Coo; //协助通信处理的变量
+  13          u8_t uartRcvBuf[16];
+  14          u8_t uartTxBuf[16];
+  15          u8_t uartTimeoutCnt;            //timeunit is 10ms
+  16          
+  17          
+  18          void CS_Scale_1186ComSend(u8_t com_comand)
+  19          {
+  20   1      R_Weight_Com_Coo.sucess=false;
+  21   1      R_Weight_Com_Coo.now = com_comand;
+  22   1      }
+  23          
+  24          
+  25          u8_t CS_If1186ComSucess(void)
+  26          {
+  27   1      return R_Weight_Com_Coo.sucess;
+  28   1      }
+  29          
+  30          
+  31          void CS_Scale_1186Com(void)
+  32          {       
+  33   1              
+  34   1              if(uartTimeoutCnt < CS_CommTo1186_TimeOut)       
+  35   1                      {
+  36   2                      
+  37   2                              switch(R_Scale_state)
+  38   2                              {
+  39   3                              case CS_Scale_state_init:
+  40   3                                      CS_1186Com_Reset_Proc();                        
+  41   3                                      CS_1186Com_ReadMacAdress_Proc();
+  42   3                                      CS_1186Com_ReadTime_Proc();
+  43   3                                      CS_1186Com_SetOpenWeight_Proc();
+  44   3                                      CS_1186Com_SetLcd_Proc();
+  45   3                                      break;                  
+  46   3                              case CS_Scale_state_standby:
+  47   3                                      CS_1186Com_SetSleepMode_Proc();
+  48   3                                      CS_1186Com_ReadAdZero_Proc();
+  49   3                                      CS_1186Com_SetLcd_Proc();
+  50   3                                      break;
+  51   3                              case CS_Scale_state_weighting:
+  52   3                              case CS_Scale_state_caling:
+  53   3                              case CS_Scale_state_locking:
+  54   3                                      CS_1186Com_ReadTime_Proc();
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 2   
+
+  55   3                                      CS_1186Com_ReadAdc_Proc();
+  56   3                                      CS_1186Com_SetLcd_Proc();
+  57   3      
+  58   3                                      /*
+  59   3                                      if(B_Weight_AdOk == true)
+  60   3                                              {
+  61   3                                              R_Weight_Com_Coo.now = CS_CommTo1186_LcdDisplay;
+  62   3                                              B_Weight_LcdOk =false;
+  63   3                                              }
+  64   3                                      if(B_Weight_LcdOk == true)
+  65   3                                              {
+  66   3                                              R_Weight_Com_Coo.now = CS_CommTo1186_ReadAd;    
+  67   3                                              }
+  68   3                                      */
+  69   3                                      break;
+  70   3                              default:
+  71   3                                      break;                  
+  72   3                              }               
+  73   2                      }
+  74   1              else
+  75   1                      {
+  76   2                      YC_UARTClearBuffer();   // fresh rec buffer
+  77   2                      uartTimeoutCnt=0;
+  78   2                      if(R_Weight_Com_Coo.now !=CS_CommTo1186_Null)
+  79   2                      R_Weight_Com_Coo.now = R_Weight_Com_Coo.pre;    //re send
+  80   2                      }
+  81   1      
+  82   1      }
+  83          
+  84          
+  85          
+  86          void CS_1186Com_ReadMacAdress_Proc(void)
+  87          {
+  88   1              u8_t i;
+  89   1              u8_t xdata * ptr;
+  90   1      
+  91   1              i=0;
+  92   1              ptr =&i;
+  93   1              
+  94   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_ReadOtp)
+  95   1                      {
+  96   2                      uartTxBuf[0]=6;         //read 6 byte MacAdress
+  97   2                      uartTxBuf[1]=0xF7;      //OTP  adress low 8bits
+  98   2                      uartTxBuf[2]=0x0F;      //OTP  adress high 8bits
+  99   2                      CS_CommTo1186_SendCmd(CS_CommTo1186_ReadOtp,uartTxBuf);
+ 100   2                      R_Weight_Com_Coo.pre = CS_CommTo1186_ReadOtp;
+ 101   2                      R_Weight_Com_Coo.now = CS_CommTo1186_ReadOtpStandby;
+ 102   2                      uartTimeoutCnt=0;
+ 103   2                      YC_UARTClearBuffer();
+ 104   2                      }
+ 105   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_ReadOtpStandby)
+ 106   1                      {
+ 107   2                      if(YC_UARTReciveDataExpected(uartRcvBuf, 11) == 11)
+ 108   2                              {
+ 109   3                              if(generateChecksum(uartRcvBuf,10) == uartRcvBuf[10] &&
+ 110   3                              uartRcvBuf[2] == UART_EVENT_OK &&
+ 111   3                              uartRcvBuf[3] == CS_CommTo1186_ReadOtp)
+ 112   3                                      {       
+ 113   4                                      //slave_state = SLAVE_ST_SET_PARAM;
+ 114   4                                      //R_Debug_temp= uartRcvBuf[5];  //测试用
+ 115   4      
+ 116   4                                      //数据放错地址，部分数据手动赋值
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 3   
+
+ 117   4                                      uartRcvBuf[9]= uartRcvBuf[6];
+ 118   4                                      uartRcvBuf[8]=0x55;
+ 119   4                                      uartRcvBuf[7]=uartRcvBuf[5];
+ 120   4                                      uartRcvBuf[6]=0xbe;
+ 121   4                                      uartRcvBuf[5]=uartRcvBuf[4];
+ 122   4                                      uartRcvBuf[4]=0x08;
+ 123   4      
+ 124   4                                      /*
+ 125   4                                      xmemcpy(mem_le_lap,&uartRcvBuf[4],6);
+ 126   4                                      if((*mem_adv_lap_ptr) != 0) 
+ 127   4                                              {
+ 128   4                                              for(i=0;i<6;i++) 
+ 129   4                                                      {
+ 130   4                                                      ptr = (u8_t xdata *)(ESWAP(*mem_adv_lap_ptr)+i);
+ 131   4                                                      *ptr= uartRcvBuf[9-i];
+ 132   4                                                      }
+ 133   4                                              }
+ 134   4                                      */
+ 135   4                                      R_Weight_Com_Coo.now = CS_CommTo1186_Null;
+ 136   4                                      R_Weight_Com_Coo.sucess=true;
+ 137   4                                      }
+ 138   3                              else
+ 139   3                                      uartTimeoutCnt =CS_CommTo1186_TimeOut;   //手动超时重发
+ 140   3                              }
+ 141   2                      }
+ 142   1      }
+ 143          
+ 144          
+ 145          void CS_1186Com_ReadAdc_Proc(void)
+ 146          {
+ 147   1              u32_t   data_rec;
+ 148   1              
+ 149   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_ReadAd)
+ 150   1                      {
+ 151   2                      CS_CommTo1186_SendCmd(CS_CommTo1186_ReadAd,0);
+ 152   2                      R_Weight_Com_Coo.pre = CS_CommTo1186_ReadAd;
+ 153   2                      R_Weight_Com_Coo.now = CS_CommTo1186_ReadAdStandby;
+ 154   2                      uartTimeoutCnt=0;
+ 155   2                      YC_UARTClearBuffer();
+ 156   2                      }
+ 157   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_ReadAdStandby)
+ 158   1                      {                                               
+ 159   2                      if(YC_UARTReciveDataExpected(uartRcvBuf, 9)==9)
+ 160   2                              {                                               
+ 161   3                              if(uartRcvBuf[3] == CS_CommTo1186_ReadAd)   
+ 162   3                                      {
+ 163   4                                      
+ 164   4                                      
+ 165   4                                      R_1186sys_state = uartRcvBuf[7];
+ 166   4      
+ 167   4                                      if(R_1186sys_state&0x08)                        //AD数据更新标志
+ 168   4                                              {
+ 169   5                                              B_Weight_AdOk = true;
+ 170   5                                              data_rec = uartRcvBuf[4];
+ 171   5                                              data_rec = (data_rec<<8) + uartRcvBuf[5];
+ 172   5                                              data_rec = (data_rec<<8) + uartRcvBuf[6];
+ 173   5                                              R_AD_Original =data_rec >> 6;   
+ 174   5                                              }
+ 175   4                                      
+ 176   4                                      if(R_Scale_state==CS_Scale_state_init)
+ 177   4                                              R_Weight_Com_Coo.now = CS_CommTo1186_Null;
+ 178   4                                      else
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 4   
+
+ 179   4                                              R_Weight_Com_Coo.now = CS_CommTo1186_LcdDisplay;
+ 180   4                                      R_Weight_Com_Coo.sucess=true;
+ 181   4                                      
+ 182   4                                      }
+ 183   3                              else
+ 184   3                                      uartTimeoutCnt =CS_CommTo1186_TimeOut;   //手动超时重发
+ 185   3                              }
+ 186   2                      }
+ 187   1      }
+ 188          
+ 189          
+ 190          
+ 191          void CS_1186Com_SetLcd_Proc(void)
+ 192          {
+ 193   1      
+ 194   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_LcdDisplay)
+ 195   1                      {
+ 196   2                      CS_CommTo1186_SendCmd(CS_CommTo1186_LcdDisplay,CS_Lcd_Send_Data);
+ 197   2                      R_Weight_Com_Coo.pre = CS_CommTo1186_LcdDisplay;
+ 198   2                      R_Weight_Com_Coo.now = CS_CommTo1186_LcdDisplayStandby;
+ 199   2                      uartTimeoutCnt=0;
+ 200   2                      YC_UARTClearBuffer();
+ 201   2                      }
+ 202   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_LcdDisplayStandby)
+ 203   1                      {
+ 204   2                      if(YC_UARTReciveDataExpected(uartRcvBuf, 5)==5)
+ 205   2                              {
+ 206   3                              if(uartRcvBuf[3] == CS_CommTo1186_LcdDisplay)    
+ 207   3                                      {
+ 208   4                                      if(R_Scale_state==CS_Scale_state_init)
+ 209   4                                              R_Weight_Com_Coo.now = CS_CommTo1186_Null;
+ 210   4                                      else
+ 211   4                                              R_Weight_Com_Coo.now = CS_CommTo1186_ReadAd;
+ 212   4                                      R_Weight_Com_Coo.sucess=true;           
+ 213   4                                      }
+ 214   3                              else
+ 215   3                                      uartTimeoutCnt =CS_CommTo1186_TimeOut;   //手动超时重发
+ 216   3                              }       
+ 217   2                      }
+ 218   1      }
+ 219          
+ 220          
+ 221          
+ 222          void CS_1186Com_ReadTime_Proc(void)
+ 223          {
+ 224   1              //static u8_t xdata temp=0;
+ 225   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_ReadTime)
+ 226   1                      {
+ 227   2                      CS_CommTo1186_SendCmd(CS_CommTo1186_ReadTime,0);
+ 228   2                      R_Weight_Com_Coo.pre = CS_CommTo1186_ReadTime;
+ 229   2                      R_Weight_Com_Coo.now = CS_CommTo1186_ReadTimeStandby;
+ 230   2                      uartTimeoutCnt=0;
+ 231   2                      YC_UARTClearBuffer();
+ 232   2                      }
+ 233   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_ReadTimeStandby)
+ 234   1                      {
+ 235   2                      if(YC_UARTReciveDataExpected(uartRcvBuf, 9)==9)
+ 236   2                              {
+ 237   3                              if(uartRcvBuf[3] == CS_CommTo1186_ReadTime)    
+ 238   3                                      {                       
+ 239   4                                      //读到时间的操作
+ 240   4                                      R_1186_RTC[3] = uartRcvBuf[4];
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 5   
+
+ 241   4                                      R_1186_RTC[2] = uartRcvBuf[5];
+ 242   4                                      R_1186_RTC[1] = uartRcvBuf[6];
+ 243   4                                      R_1186_RTC[0] = uartRcvBuf[7];
+ 244   4      
+ 245   4                              
+ 246   4                                      /*
+ 247   4                                      R_Debug_temp=R_1186RTC.R_32;
+ 248   4                                      CS_ScaleDisplay_Debug();
+ 249   4                                      while(temp==2);
+ 250   4                                      temp=2;
+ 251   4                                      */
+ 252   4                                      /*
+ 253   4                                      R_1186RTC.R_BYTE[3]=  uartRcvBuf[4];
+ 254   4                                      R_1186RTC.R_BYTE[2] = uartRcvBuf[5];
+ 255   4                                      R_1186RTC.R_BYTE[1] = uartRcvBuf[6];
+ 256   4                                      R_1186RTC.R_BYTE[0] = uartRcvBuf[7];
+ 257   4                                      /*
+ 258   4                                      R_1186_RTC = uartRcvBuf[4];
+ 259   4                                      R_1186_RTC = R_1186_RTC<<8;
+ 260   4                                      R_1186_RTC |= uartRcvBuf[5];
+ 261   4                                      R_1186_RTC = R_1186_RTC<<8;
+ 262   4                                      R_1186_RTC |= uartRcvBuf[6];
+ 263   4                                      R_1186_RTC = R_1186_RTC<<8;
+ 264   4                                      R_1186_RTC |= uartRcvBuf[7];
+ 265   4                                      */
+ 266   4                                      R_Weight_Com_Coo.now = CS_CommTo1186_Null;
+ 267   4                                      R_Weight_Com_Coo.sucess=true;
+ 268   4                                      B_Weight_AdOk = true;
+ 269   4                                                      
+ 270   4                                      }
+ 271   3                              else
+ 272   3                                      uartTimeoutCnt =CS_CommTo1186_TimeOut;   //手动超时重发
+ 273   3                              }       
+ 274   2                      }
+ 275   1      }
+ 276          
+ 277          
+ 278          
+ 279          void CS_1186Com_SetSleepMode_Proc(void)
+ 280          {
+ 281   1              u16_t   R_AD_Zero;
+ 282   1              
+ 283   1              R_AD_Zero = CS_Scale_ZeroProc(GetRunningZero,0);
+ 284   1                      
+ 285   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_SetSleepMode)
+ 286   1                      {
+ 287   2                      
+ 288   2                      uartTxBuf[0]= 0x91;
+ 289   2                      uartTxBuf[1]= R_AD_Zero<<6;
+ 290   2                      uartTxBuf[2]= R_AD_Zero>>2;
+ 291   2                      uartTxBuf[3]= R_AD_Zero>>10;
+ 292   2                      uartTxBuf[3]|= 0x80;
+ 293   2                      CS_CommTo1186_SendCmd(CS_CommTo1186_SetSleepMode,uartTxBuf);
+ 294   2                      
+ 295   2                      YC_UARTWaitSendData();
+ 296   2                      
+ 297   2                      R_Weight_Com_Coo.pre = CS_CommTo1186_SetSleepMode;
+ 298   2                      R_Weight_Com_Coo.now = CS_CommTo1186_SetSleepModeStandby;
+ 299   2                      uartTimeoutCnt=0;
+ 300   2                      YC_UARTClearBuffer();
+ 301   2                      }
+ 302   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_SetSleepModeStandby)
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 6   
+
+ 303   1                      {
+ 304   2                      if(YC_UARTReciveDataExpected(uartRcvBuf, 5)==5)
+ 305   2                              {
+ 306   3                              if(uartRcvBuf[3] == CS_CommTo1186_SetSleepMode)    
+ 307   3                                      {                       
+ 308   4                                      R_Weight_Com_Coo.now = CS_CommTo1186_Null;
+ 309   4                                      R_Weight_Com_Coo.sucess=true;   
+ 310   4                                      }
+ 311   3                              else
+ 312   3                                      uartTimeoutCnt =CS_CommTo1186_TimeOut;   //手动超时重发
+ 313   3                              }       
+ 314   2                      }
+ 315   1      }
+ 316          
+ 317          
+ 318          
+ 319          
+ 320          void CS_1186Com_SetOpenWeight_Proc(void)
+ 321          {
+ 322   1              u16_t   R_Open_Weight;
+ 323   1              R_Open_Weight = CS_Scale_CaliProc(CaliProcGetOpenWeight);       //获取开机重量值
+ 324   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_SetOpenWeight)
+ 325   1                      {
+ 326   2                      uartTxBuf[0]= 0x20;
+ 327   2                      uartTxBuf[1]= R_Open_Weight<<6;
+ 328   2                      uartTxBuf[2]= R_Open_Weight>>2;
+ 329   2                      uartTxBuf[3]= R_Open_Weight<<6;
+ 330   2                      uartTxBuf[4]= R_Open_Weight>>2; 
+ 331   2                      CS_CommTo1186_SendCmd(CS_CommTo1186_SetOpenWeight,uartTxBuf);
+ 332   2                      R_Weight_Com_Coo.pre = CS_CommTo1186_SetOpenWeight;
+ 333   2                      R_Weight_Com_Coo.now = CS_CommTo1186_SetOpenWeightStandby;
+ 334   2                      uartTimeoutCnt=0;
+ 335   2                      YC_UARTClearBuffer();
+ 336   2                      }
+ 337   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_SetOpenWeightStandby)
+ 338   1                      {
+ 339   2                      if(YC_UARTReciveDataExpected(uartRcvBuf, 5)==5)
+ 340   2                              {
+ 341   3                              if(uartRcvBuf[3] == CS_CommTo1186_SetOpenWeight)    
+ 342   3                                      {                       
+ 343   4                                      //读到时间的操作
+ 344   4                                      //R_Debug_temp=uartRcvBuf[5];
+ 345   4                                      
+ 346   4                                      R_Weight_Com_Coo.now = CS_CommTo1186_Null;
+ 347   4                                      R_Weight_Com_Coo.sucess=true;
+ 348   4                                      
+ 349   4                                                      
+ 350   4                                      }
+ 351   3                              else
+ 352   3                                      uartTimeoutCnt =CS_CommTo1186_TimeOut;   //手动超时重发
+ 353   3                              }       
+ 354   2                      }
+ 355   1      }
+ 356          
+ 357          
+ 358          
+ 359          void CS_1186Com_ReadAdZero_Proc(void)
+ 360          {
+ 361   1              u32_t   data_rec;
+ 362   1              u16_t   R_AD_Zero;
+ 363   1              
+ 364   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_ReadAdZero)
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 7   
+
+ 365   1                      {
+ 366   2                      CS_CommTo1186_SendCmd(CS_CommTo1186_ReadAdZero,0);
+ 367   2                      R_Weight_Com_Coo.pre = CS_CommTo1186_ReadAdZero;
+ 368   2                      R_Weight_Com_Coo.now = CS_CommTo1186_ReadAdZeroStandby;
+ 369   2                      uartTimeoutCnt=0;
+ 370   2                      YC_UARTClearBuffer();
+ 371   2                      }
+ 372   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_ReadAdZeroStandby)
+ 373   1                      {                                               
+ 374   2                      if(YC_UARTReciveDataExpected(uartRcvBuf, 8)==8)
+ 375   2                              {                                               
+ 376   3                              if(uartRcvBuf[3] == CS_CommTo1186_ReadAdZero)   
+ 377   3                                      {
+ 378   4                                      data_rec = uartRcvBuf[4];
+ 379   4                                      data_rec = (data_rec<<8) + uartRcvBuf[5];
+ 380   4                                      data_rec = (data_rec<<8) + uartRcvBuf[6];
+ 381   4                                      R_AD_Zero =data_rec >> 6;       
+ 382   4                                      CS_Scale_ZeroProc(SetRunningZero,R_AD_Zero);
+ 383   4                                      
+ 384   4                                      R_Weight_Com_Coo.now = CS_CommTo1186_Null;
+ 385   4                                      R_Weight_Com_Coo.sucess=true;
+ 386   4                                      
+ 387   4                                      }
+ 388   3                              else
+ 389   3                                      uartTimeoutCnt =CS_CommTo1186_TimeOut;   //手动超时重发
+ 390   3                              }
+ 391   2                      }
+ 392   1      }
+ 393          
+ 394          
+ 395          
+ 396          void CS_1186Com_Reset_Proc(void)
+ 397          {
+ 398   1      
+ 399   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_Reset)
+ 400   1                      {
+ 401   2                      CS_CommTo1186_SendCmd(CS_CommTo1186_Reset,0);
+ 402   2                      YC_UARTClearBuffer();
+ 403   2                      R_Weight_Com_Coo.now=CS_CommTo1186_Null;
+ 404   2                      
+ 405   2                      }
+ 406   1                                                                                                              
+ 407   1      }
+ 408          
+ 409          
+ 410          
+ 411          u8_t CS_CommTo1186_Xor(u8_t * buf,u8_t len)
+ 412          {
+ 413   1              u8_t    i;
+ 414   1              for(i=0;i<len;i++)
+ 415   1                      {
+ 416   2                      *(buf+9) = *(buf+9) ^   *(buf+i);
+ 417   2                      }
+ 418   1              return *(buf+9);
+ 419   1      }
+ 420          
+ 421          void CS_CommTo1186_SendCmd(u8_t cmd_code ,u8_t * databuf)
+ 422          {
+ 423   1              u8_t buf[10] = {0x00, 0x00, 0x00, 0x00,0x00, 0x00, 0x00, 0x00,0x00,0x00};
+ 424   1             u8_t len;
+ 425   1      
+ 426   1               buf[0] = 0xc5;                                                 //包头数据
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 8   
+
+ 427   1              switch(cmd_code)
+ 428   1                      {
+ 429   2                      case CS_CommTo1186_Reset:                       //0
+ 430   2                              buf[0] = 0x00;
+ 431   2                              buf[1] = 0x00;
+ 432   2                              buf[2] = 0x00;
+ 433   2                              len  =  3;
+ 434   2                              break;
+ 435   2                      case CS_CommTo1186_ReadAd:                      // 1 
+ 436   2                              buf[1] = 0x01;
+ 437   2                              buf[2] = 0x80;
+ 438   2                              buf[3] = 0x44;
+ 439   2                              len  =  4;
+ 440   2                              break;                  
+ 441   2                      case CS_CommTo1186_ReadVersion:          // 2 
+ 442   2                              buf[1] = 0x01;
+ 443   2                              buf[2] = 0x81;
+ 444   2                              buf[3] = 0x45;
+ 445   2                              len  =  4;
+ 446   2                              break;
+ 447   2                      case CS_CommTo1186_ReadTime:             // 3 
+ 448   2                              buf[1] = 0x01;
+ 449   2                              buf[2] = 0x82;
+ 450   2                              buf[3] = 0x46;
+ 451   2                              len  =  4;
+ 452   2                              break;
+ 453   2                      case CS_CommTo1186_ReadRam:              // 4 
+ 454   2                              buf[1] = 0x03;
+ 455   2                              buf[2] = 0x83;
+ 456   2                              buf[3] = databuf[1];
+ 457   2                              buf[4] = databuf[0];     
+ 458   2                              buf[5] =  CS_CommTo1186_Xor(buf,5);
+ 459   2                              len  =  6;
+ 460   2                              break;
+ 461   2                      case CS_CommTo1186_ReadOtp:              // 5 
+ 462   2                              buf[1] = 0x04;
+ 463   2                              buf[2] = 0x84;
+ 464   2                              buf[3] = databuf[2];
+ 465   2                              buf[4] = databuf[1];    
+ 466   2                              buf[5] = databuf[0]; 
+ 467   2                              buf[6] = CS_CommTo1186_Xor(buf,6);
+ 468   2                              len  =  7;
+ 469   2                              break;
+ 470   2                      case CS_CommTo1186_ReadAdZero:           // 6 
+ 471   2                              buf[1] = 0x01;
+ 472   2                              buf[2] = 0x85;
+ 473   2                              buf[3] = 0x41;
+ 474   2                              len  =  4;
+ 475   2                              break;
+ 476   2                      case CS_CommTo1186_SetSleepMode:         // 7 
+ 477   2                              buf[1] = 0x05;
+ 478   2                              buf[2] = 0xA0;
+ 479   2                              buf[3] = databuf[3];
+ 480   2                              buf[4] = databuf[2];    
+ 481   2                              buf[5] = databuf[1];
+ 482   2                              buf[6] = databuf[0]; 
+ 483   2                              buf[7] = CS_CommTo1186_Xor(buf,7);
+ 484   2                              len  =  8;
+ 485   2                              break;
+ 486   2                      case CS_CommTo1186_SetOpenWeight:        // 8 
+ 487   2                              buf[1] = 0x06;
+ 488   2                              buf[2] = 0xA1;
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 9   
+
+ 489   2                              buf[3] = databuf[4];
+ 490   2                              buf[4] = databuf[3];    
+ 491   2                              buf[5] = databuf[2];
+ 492   2                              buf[6] = databuf[1];
+ 493   2                              buf[7] = databuf[0]; 
+ 494   2                              buf[8] = CS_CommTo1186_Xor(buf,8);
+ 495   2                              len  =  9;
+ 496   2                              break;
+ 497   2                      case CS_CommTo1186_SetTime:              // 9 
+ 498   2                              buf[1] = 0x05;
+ 499   2                              buf[2] = 0xA2;
+ 500   2                              buf[3] = databuf[3];
+ 501   2                              buf[4] = databuf[2];    
+ 502   2                              buf[5] = databuf[1];
+ 503   2                              buf[6] = databuf[0]; 
+ 504   2                              buf[7] = CS_CommTo1186_Xor(buf,7);
+ 505   2                              len  =  8;      
+ 506   2                              break;
+ 507   2                      case CS_CommTo1186_SetRam:                      // 10 
+ 508   2                              buf[1] = 0x04;
+ 509   2                              buf[2] = 0xA3;
+ 510   2                              buf[3] = databuf[2];
+ 511   2                              buf[4] = databuf[1];    
+ 512   2                              buf[5] = databuf[0]; 
+ 513   2                              buf[6] = CS_CommTo1186_Xor(buf,6);
+ 514   2                              len  =  7;                      
+ 515   2                              break;
+ 516   2                      case CS_CommTo1186_LcdDisplay:          // 11 
+ 517   2                              buf[1] = 0x07;
+ 518   2                              buf[2] = 0xe0;
+ 519   2                              buf[3] = databuf[5];
+ 520   2                              buf[4] = databuf[4];
+ 521   2                              buf[5] = databuf[3];
+ 522   2                              buf[6] = databuf[2];
+ 523   2                              buf[7] = databuf[1];
+ 524   2                              buf[8] = databuf[0];             
+ 525   2                              buf[9] = CS_CommTo1186_Xor(buf,9);
+ 526   2                              len  =  10;
+ 527   2                              break;
+ 528   2                      default:                
+ 529   2                              buf[1] = 0x00;
+ 530   2                              len   = 2;
+ 531   2                              break;
+ 532   2                      }
+ 533   1              YC_UARTSendData(buf, len);
+ 534   1      }
+ 535          
+ 536          
+ 537          
+ 538          
+ 539          
+ 540          
+ 541          
+ 542          
+ 543          
+ 544          
+ 545          
+ 546          
+ 547          
+ 548          
+ 549          
+ 550          
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 10  
+
+ 551          
+ 552          
+ 553          
+ 554          
+ 555          
+ 556          
+ 557          
+ 558          
+ 559          
+ 560          
+ 561          
+ 562          
+ 563          
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 11  
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION _CS_Scale_1186ComSend (BEGIN)
+                                           ; SOURCE LINE # 18
+;---- Variable 'com_comand' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 19
+                                           ; SOURCE LINE # 20
+                       CLR     A
+                 R     MOV     DPTR,#R_Weight_Com_Coo+02H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 21
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 22
+                       RET     
+             ; FUNCTION _CS_Scale_1186ComSend (END)
+
+             ; FUNCTION CS_If1186ComSucess (BEGIN)
+                                           ; SOURCE LINE # 25
+                                           ; SOURCE LINE # 26
+                                           ; SOURCE LINE # 27
+                 R     MOV     DPTR,#R_Weight_Com_Coo+02H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                                           ; SOURCE LINE # 28
+             ?C0002:
+                       RET     
+             ; FUNCTION CS_If1186ComSucess (END)
+
+             ; FUNCTION CS_Scale_1186Com (BEGIN)
+                                           ; SOURCE LINE # 31
+                                           ; SOURCE LINE # 32
+                                           ; SOURCE LINE # 34
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOVX    A,@DPTR
+                       CLR     C
+                       SUBB    A,#015H
+                 R     xJGE    ?C0003
+                                           ; SOURCE LINE # 35
+                                           ; SOURCE LINE # 37
+                 E     MOV     DPTR,#R_Scale_state
+                       MOVX    A,@DPTR
+                       ADD     A,#0FEH
+                 R     xJZ     ?C0006
+                       INC     A
+                       ADD     A,#0FCH
+                 R     xJNC    ?C0009
+                       ADD     A,#05H
+                 R     xJNZ    ?C0013
+                                           ; SOURCE LINE # 38
+                                           ; SOURCE LINE # 39
+             ?C0005:
+                                           ; SOURCE LINE # 40
+                 R     CALL    CS_1186Com_Reset_Proc
+                                           ; SOURCE LINE # 41
+                 R     CALL    CS_1186Com_ReadMacAdress_Proc
+                                           ; SOURCE LINE # 42
+                 R     CALL    CS_1186Com_ReadTime_Proc
+                                           ; SOURCE LINE # 43
+                 R     CALL    CS_1186Com_SetOpenWeight_Proc
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 12  
+
+                                           ; SOURCE LINE # 44
+                 R     CALL    CS_1186Com_SetLcd_Proc
+                                           ; SOURCE LINE # 45
+                       RET     
+                                           ; SOURCE LINE # 46
+             ?C0006:
+                                           ; SOURCE LINE # 47
+                 R     CALL    CS_1186Com_SetSleepMode_Proc
+                                           ; SOURCE LINE # 48
+                 R     CALL    CS_1186Com_ReadAdZero_Proc
+                                           ; SOURCE LINE # 49
+                 R     CALL    CS_1186Com_SetLcd_Proc
+                                           ; SOURCE LINE # 50
+                       RET     
+                                           ; SOURCE LINE # 51
+                                           ; SOURCE LINE # 52
+                                           ; SOURCE LINE # 53
+             ?C0009:
+                                           ; SOURCE LINE # 54
+                 R     CALL    CS_1186Com_ReadTime_Proc
+                                           ; SOURCE LINE # 55
+                 R     CALL    CS_1186Com_ReadAdc_Proc
+                                           ; SOURCE LINE # 56
+                 R     CALL    CS_1186Com_SetLcd_Proc
+                                           ; SOURCE LINE # 69
+                       RET     
+                                           ; SOURCE LINE # 70
+                                           ; SOURCE LINE # 71
+                                           ; SOURCE LINE # 72
+                                           ; SOURCE LINE # 73
+                       RET     
+             ?C0003:
+                                           ; SOURCE LINE # 75
+                                           ; SOURCE LINE # 76
+                 E     CALL    YC_UARTClearBuffer
+                                           ; SOURCE LINE # 77
+                       CLR     A
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 78
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                 R     xJZ     ?C0013
+                                           ; SOURCE LINE # 79
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 80
+                                           ; SOURCE LINE # 82
+             ?C0013:
+                       RET     
+             ; FUNCTION CS_Scale_1186Com (END)
+
+             ; FUNCTION CS_1186Com_ReadMacAdress_Proc (BEGIN)
+                                           ; SOURCE LINE # 86
+                                           ; SOURCE LINE # 87
+                                           ; SOURCE LINE # 91
+                       CLR     A
+                 R     MOV     DPTR,#i
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 92
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 13  
+
+                       INC     DPTR
+                 R     MOV     A,#HIGH i
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                 R     MOV     A,#LOW i
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 94
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#084H,?C0014
+                                           ; SOURCE LINE # 95
+                                           ; SOURCE LINE # 96
+                 R     MOV     DPTR,#uartTxBuf
+                       MOV     A,#06H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 97
+                       INC     DPTR
+                       MOV     A,#0F7H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 98
+                       INC     DPTR
+                       MOV     A,#0FH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 99
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH uartTxBuf
+                 R     MOV     R1,#LOW uartTxBuf
+                       MOV     R7,#084H
+                 R     CALL    _CS_CommTo1186_SendCmd
+                                           ; SOURCE LINE # 100
+                 R     MOV     DPTR,#R_Weight_Com_Coo+01H
+                       MOV     A,#084H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 101
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOV     A,#05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 102
+                       CLR     A
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 103
+                 E     CALL    YC_UARTClearBuffer
+                                           ; SOURCE LINE # 104
+             ?C0014:
+                                           ; SOURCE LINE # 105
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                       XRL     A,#05H
+                 R     xJNZ    ?C0019
+                                           ; SOURCE LINE # 106
+                                           ; SOURCE LINE # 107
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH uartRcvBuf
+                 R     MOV     R1,#LOW uartRcvBuf
+                       MOV     R5,#0BH
+                       MOV     R4,A
+                 E     CALL    _YC_UARTReciveDataExpected
+                       MOV     A,R7
+                       XRL     A,#0BH
+                       ORL     A,R6
+                 R     xJNZ    ?C0019
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 14  
+
+                                           ; SOURCE LINE # 108
+                                           ; SOURCE LINE # 109
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH uartRcvBuf
+                 R     MOV     R1,#LOW uartRcvBuf
+                       MOV     R5,#0AH
+                 E     CALL    _generateChecksum
+                 R     MOV     DPTR,#uartRcvBuf+0AH
+                       MOVX    A,@DPTR
+                       XRL     A,R7
+                 R     xJNZ    ?C0017
+                 R     MOV     DPTR,#uartRcvBuf+02H
+                       MOVX    A,@DPTR
+                       XRL     A,#010H
+                 R     xJNZ    ?C0017
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#084H,?C0017
+                                           ; SOURCE LINE # 112
+                                           ; SOURCE LINE # 117
+                 R     MOV     DPTR,#uartRcvBuf+06H
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#uartRcvBuf+09H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 118
+                 R     MOV     DPTR,#uartRcvBuf+08H
+                       MOV     A,#055H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 119
+                 R     MOV     DPTR,#uartRcvBuf+05H
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#uartRcvBuf+07H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 120
+                 R     MOV     DPTR,#uartRcvBuf+06H
+                       MOV     A,#0BEH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 121
+                 R     MOV     DPTR,#uartRcvBuf+04H
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 122
+                 R     MOV     DPTR,#uartRcvBuf+04H
+                       MOV     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 135
+                       CLR     A
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 136
+                 R     MOV     DPTR,#R_Weight_Com_Coo+02H
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 137
+                       RET     
+             ?C0017:
+                                           ; SOURCE LINE # 139
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 140
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 15  
+
+                                           ; SOURCE LINE # 141
+                                           ; SOURCE LINE # 142
+             ?C0019:
+                       RET     
+             ; FUNCTION CS_1186Com_ReadMacAdress_Proc (END)
+
+             ; FUNCTION CS_1186Com_ReadAdc_Proc (BEGIN)
+                                           ; SOURCE LINE # 145
+                                           ; SOURCE LINE # 146
+                                           ; SOURCE LINE # 149
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#080H,?C0020
+                                           ; SOURCE LINE # 150
+                                           ; SOURCE LINE # 151
+                       MOV     R3,#00H
+                       MOV     R2,#00H
+                       MOV     R1,#00H
+                       MOV     R7,#080H
+                 R     CALL    _CS_CommTo1186_SendCmd
+                                           ; SOURCE LINE # 152
+                 R     MOV     DPTR,#R_Weight_Com_Coo+01H
+                       MOV     A,#080H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 153
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 154
+                       CLR     A
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 155
+                 E     CALL    YC_UARTClearBuffer
+                                           ; SOURCE LINE # 156
+             ?C0020:
+                                           ; SOURCE LINE # 157
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                       XRL     A,#01H
+                 R     xJNZ    ?C0028
+                                           ; SOURCE LINE # 158
+                                           ; SOURCE LINE # 159
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH uartRcvBuf
+                 R     MOV     R1,#LOW uartRcvBuf
+                       MOV     R5,#09H
+                       MOV     R4,A
+                 E     CALL    _YC_UARTReciveDataExpected
+                       MOV     A,R7
+                       XRL     A,#09H
+                       ORL     A,R6
+                 R     xJNZ    ?C0028
+                                           ; SOURCE LINE # 160
+                                           ; SOURCE LINE # 161
+                 R     MOV     DPTR,#uartRcvBuf+03H
+                       MOVX    A,@DPTR
+                       XRL     A,#080H
+                 R     xJNZ    ?C0023
+                                           ; SOURCE LINE # 162
+                                           ; SOURCE LINE # 165
+                 R     MOV     DPTR,#uartRcvBuf+07H
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 16  
+
+                       MOVX    A,@DPTR
+                 E     MOV     DPTR,#R_1186sys_state
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 167
+                 R     xJNB    ACC.3,?C0024
+                                           ; SOURCE LINE # 168
+                                           ; SOURCE LINE # 169
+                 E     MOV     DPTR,#B_Weight_AdOk
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 170
+                 R     MOV     DPTR,#uartRcvBuf+04H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+;---- Variable 'data_rec' assigned to Register 'R4/R5/R6/R7' ----
+                                           ; SOURCE LINE # 171
+                       MOV     R0,#08H
+                 E     CALL    ?C?LSHL
+                       MOV     R0,AR4
+                       MOV     R1,AR5
+                       MOV     R2,AR6
+                       MOV     R3,AR7
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     A,R3
+                       ADD     A,R7
+                       MOV     R7,A
+                       MOV     A,R6
+                       ADDC    A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       ADDC    A,R1
+                       MOV     R5,A
+                       MOV     A,R4
+                       ADDC    A,R0
+                       MOV     R4,A
+                                           ; SOURCE LINE # 172
+                       MOV     R0,#08H
+                 E     CALL    ?C?LSHL
+                       MOV     R0,AR4
+                       MOV     R1,AR5
+                       MOV     R2,AR6
+                       MOV     R3,AR7
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     A,R3
+                       ADD     A,R7
+                       MOV     R7,A
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 17  
+
+                       MOV     A,R6
+                       ADDC    A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       ADDC    A,R1
+                       MOV     R5,A
+                       MOV     A,R4
+                       ADDC    A,R0
+                       MOV     R4,A
+                                           ; SOURCE LINE # 173
+                       MOV     R0,#06H
+                 E     CALL    ?C?ULSHR
+                 E     MOV     DPTR,#R_AD_Original
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 174
+             ?C0024:
+                                           ; SOURCE LINE # 176
+                 E     MOV     DPTR,#R_Scale_state
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0025
+                                           ; SOURCE LINE # 177
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    @DPTR,A
+                 R     xJMP    ?C0026
+             ?C0025:
+                                           ; SOURCE LINE # 179
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOV     A,#0E0H
+                       MOVX    @DPTR,A
+             ?C0026:
+                                           ; SOURCE LINE # 180
+                 R     MOV     DPTR,#R_Weight_Com_Coo+02H
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 182
+                       RET     
+             ?C0023:
+                                           ; SOURCE LINE # 184
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 185
+                                           ; SOURCE LINE # 186
+                                           ; SOURCE LINE # 187
+             ?C0028:
+                       RET     
+             ; FUNCTION CS_1186Com_ReadAdc_Proc (END)
+
+             ; FUNCTION CS_1186Com_SetLcd_Proc (BEGIN)
+                                           ; SOURCE LINE # 191
+                                           ; SOURCE LINE # 192
+                                           ; SOURCE LINE # 194
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#0E0H,?C0029
+                                           ; SOURCE LINE # 195
+                                           ; SOURCE LINE # 196
+                       MOV     R3,#01H
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 18  
+
+                 E     MOV     R2,#HIGH CS_Lcd_Send_Data
+                 E     MOV     R1,#LOW CS_Lcd_Send_Data
+                       MOV     R7,#0E0H
+                 R     CALL    _CS_CommTo1186_SendCmd
+                                           ; SOURCE LINE # 197
+                 R     MOV     DPTR,#R_Weight_Com_Coo+01H
+                       MOV     A,#0E0H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 198
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOV     A,#0BH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 199
+                       CLR     A
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 200
+                 E     CALL    YC_UARTClearBuffer
+                                           ; SOURCE LINE # 201
+             ?C0029:
+                                           ; SOURCE LINE # 202
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                       XRL     A,#0BH
+                 R     xJNZ    ?C0036
+                                           ; SOURCE LINE # 203
+                                           ; SOURCE LINE # 204
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH uartRcvBuf
+                 R     MOV     R1,#LOW uartRcvBuf
+                       MOV     R5,#05H
+                       MOV     R4,A
+                 E     CALL    _YC_UARTReciveDataExpected
+                       MOV     A,R7
+                       XRL     A,#05H
+                       ORL     A,R6
+                 R     xJNZ    ?C0036
+                                           ; SOURCE LINE # 205
+                                           ; SOURCE LINE # 206
+                 R     MOV     DPTR,#uartRcvBuf+03H
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#0E0H,?C0032
+                                           ; SOURCE LINE # 207
+                                           ; SOURCE LINE # 208
+                 E     MOV     DPTR,#R_Scale_state
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0033
+                                           ; SOURCE LINE # 209
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    @DPTR,A
+                 R     xJMP    ?C0034
+             ?C0033:
+                                           ; SOURCE LINE # 211
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOV     A,#080H
+                       MOVX    @DPTR,A
+             ?C0034:
+                                           ; SOURCE LINE # 212
+                 R     MOV     DPTR,#R_Weight_Com_Coo+02H
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 213
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 19  
+
+                       RET     
+             ?C0032:
+                                           ; SOURCE LINE # 215
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 216
+                                           ; SOURCE LINE # 217
+                                           ; SOURCE LINE # 218
+             ?C0036:
+                       RET     
+             ; FUNCTION CS_1186Com_SetLcd_Proc (END)
+
+             ; FUNCTION CS_1186Com_ReadTime_Proc (BEGIN)
+                                           ; SOURCE LINE # 222
+                                           ; SOURCE LINE # 223
+                                           ; SOURCE LINE # 225
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#082H,?C0037
+                                           ; SOURCE LINE # 226
+                                           ; SOURCE LINE # 227
+                       MOV     R3,#00H
+                       MOV     R2,#00H
+                       MOV     R1,#00H
+                       MOV     R7,#082H
+                 R     CALL    _CS_CommTo1186_SendCmd
+                                           ; SOURCE LINE # 228
+                 R     MOV     DPTR,#R_Weight_Com_Coo+01H
+                       MOV     A,#082H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 229
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOV     A,#03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 230
+                       CLR     A
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 231
+                 E     CALL    YC_UARTClearBuffer
+                                           ; SOURCE LINE # 232
+             ?C0037:
+                                           ; SOURCE LINE # 233
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                       XRL     A,#03H
+                 R     xJNZ    ?C0042
+                                           ; SOURCE LINE # 234
+                                           ; SOURCE LINE # 235
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH uartRcvBuf
+                 R     MOV     R1,#LOW uartRcvBuf
+                       MOV     R5,#09H
+                       MOV     R4,A
+                 E     CALL    _YC_UARTReciveDataExpected
+                       MOV     A,R7
+                       XRL     A,#09H
+                       ORL     A,R6
+                 R     xJNZ    ?C0042
+                                           ; SOURCE LINE # 236
+                                           ; SOURCE LINE # 237
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 20  
+
+                 R     MOV     DPTR,#uartRcvBuf+03H
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#082H,?C0040
+                                           ; SOURCE LINE # 238
+                                           ; SOURCE LINE # 240
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 E     MOV     DPTR,#R_1186_RTC+03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 241
+                 R     MOV     DPTR,#uartRcvBuf+05H
+                       MOVX    A,@DPTR
+                 E     MOV     DPTR,#R_1186_RTC+02H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 242
+                 R     MOV     DPTR,#uartRcvBuf+06H
+                       MOVX    A,@DPTR
+                 E     MOV     DPTR,#R_1186_RTC+01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 243
+                 R     MOV     DPTR,#uartRcvBuf+07H
+                       MOVX    A,@DPTR
+                 E     MOV     DPTR,#R_1186_RTC
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 266
+                       CLR     A
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 267
+                 R     MOV     DPTR,#R_Weight_Com_Coo+02H
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 268
+                 E     MOV     DPTR,#B_Weight_AdOk
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 270
+                       RET     
+             ?C0040:
+                                           ; SOURCE LINE # 272
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 273
+                                           ; SOURCE LINE # 274
+                                           ; SOURCE LINE # 275
+             ?C0042:
+                       RET     
+             ; FUNCTION CS_1186Com_ReadTime_Proc (END)
+
+             ; FUNCTION CS_1186Com_SetSleepMode_Proc (BEGIN)
+                                           ; SOURCE LINE # 279
+                                           ; SOURCE LINE # 280
+                                           ; SOURCE LINE # 283
+                       CLR     A
+                       MOV     R5,A
+                       MOV     R4,A
+                       MOV     R7,#01H
+                 E     CALL    _CS_Scale_ZeroProc
+;---- Variable 'R_AD_Zero' assigned to Register 'R4/R5' ----
+                       MOV     R5,AR7
+                       MOV     R4,AR6
+                                           ; SOURCE LINE # 285
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 21  
+
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                       XRL     A,#0A0H
+                 R     xJNZ    ?C0043
+                                           ; SOURCE LINE # 286
+                                           ; SOURCE LINE # 288
+                 R     MOV     DPTR,#uartTxBuf
+                       MOV     A,#091H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 289
+                       MOV     A,R5
+                       MOV     R0,#06H
+             ?C0082:
+                       CLR     C
+                       RLC     A
+                       XCH     A,R6
+                       RLC     A
+                       XCH     A,R6
+                 R     DJNZ    R0,?C0082
+                 R     MOV     DPTR,#uartTxBuf+01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 290
+                       MOV     A,R5
+                       MOV     R6,AR4
+                       MOV     R0,#02H
+             ?C0083:
+                       XCH     A,R6
+                       CLR     C
+                       RRC     A
+                       XCH     A,R6
+                       RRC     A
+                 R     DJNZ    R0,?C0083
+                 R     MOV     DPTR,#uartTxBuf+02H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 291
+                       MOV     A,R4
+                       RRC     A
+                       RRC     A
+                       ANL     A,#03FH
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 292
+                       ORL     A,#080H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 293
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH uartTxBuf
+                 R     MOV     R1,#LOW uartTxBuf
+                       MOV     R7,#0A0H
+                 R     CALL    _CS_CommTo1186_SendCmd
+                                           ; SOURCE LINE # 295
+                 E     CALL    YC_UARTWaitSendData
+                                           ; SOURCE LINE # 297
+                 R     MOV     DPTR,#R_Weight_Com_Coo+01H
+                       MOV     A,#0A0H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 298
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOV     A,#07H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 299
+                       CLR     A
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 22  
+
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 300
+                 E     CALL    YC_UARTClearBuffer
+                                           ; SOURCE LINE # 301
+             ?C0043:
+                                           ; SOURCE LINE # 302
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#07H,?C0048
+                                           ; SOURCE LINE # 303
+                                           ; SOURCE LINE # 304
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH uartRcvBuf
+                 R     MOV     R1,#LOW uartRcvBuf
+                       MOV     R5,#05H
+                       MOV     R4,#00H
+                 E     CALL    _YC_UARTReciveDataExpected
+                       MOV     A,R7
+                       XRL     A,#05H
+                       ORL     A,R6
+                 R     xJNZ    ?C0048
+                                           ; SOURCE LINE # 305
+                                           ; SOURCE LINE # 306
+                 R     MOV     DPTR,#uartRcvBuf+03H
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#0A0H,?C0046
+                                           ; SOURCE LINE # 307
+                                           ; SOURCE LINE # 308
+                       CLR     A
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 309
+                 R     MOV     DPTR,#R_Weight_Com_Coo+02H
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 310
+                       RET     
+             ?C0046:
+                                           ; SOURCE LINE # 312
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 313
+                                           ; SOURCE LINE # 314
+                                           ; SOURCE LINE # 315
+             ?C0048:
+                       RET     
+             ; FUNCTION CS_1186Com_SetSleepMode_Proc (END)
+
+             ; FUNCTION CS_1186Com_SetOpenWeight_Proc (BEGIN)
+                                           ; SOURCE LINE # 320
+                                           ; SOURCE LINE # 321
+                                           ; SOURCE LINE # 323
+                       MOV     R7,#07H
+                 E     CALL    _CS_Scale_CaliProc
+;---- Variable 'R_Open_Weight' assigned to Register 'R4/R5' ----
+                       MOV     R5,AR7
+                       MOV     R4,AR6
+                                           ; SOURCE LINE # 324
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 23  
+
+                       XRL     A,#0A1H
+                 R     xJNZ    ?C0049
+                                           ; SOURCE LINE # 325
+                                           ; SOURCE LINE # 326
+                 R     MOV     DPTR,#uartTxBuf
+                       MOV     A,#020H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 327
+                       MOV     A,R5
+                       MOV     R0,#06H
+             ?C0084:
+                       CLR     C
+                       RLC     A
+                       XCH     A,R6
+                       RLC     A
+                       XCH     A,R6
+                 R     DJNZ    R0,?C0084
+                       MOV     R3,A
+                 R     MOV     DPTR,#uartTxBuf+01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 328
+                       MOV     A,R5
+                       MOV     R6,AR4
+                       MOV     R0,#02H
+             ?C0085:
+                       XCH     A,R6
+                       CLR     C
+                       RRC     A
+                       XCH     A,R6
+                       RRC     A
+                 R     DJNZ    R0,?C0085
+                       MOV     R7,A
+                 R     MOV     DPTR,#uartTxBuf+02H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 329
+                       INC     DPTR
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 330
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 331
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH uartTxBuf
+                 R     MOV     R1,#LOW uartTxBuf
+                       MOV     R7,#0A1H
+                 R     CALL    _CS_CommTo1186_SendCmd
+                                           ; SOURCE LINE # 332
+                 R     MOV     DPTR,#R_Weight_Com_Coo+01H
+                       MOV     A,#0A1H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 333
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOV     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 334
+                       CLR     A
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 335
+                 E     CALL    YC_UARTClearBuffer
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 24  
+
+                                           ; SOURCE LINE # 336
+             ?C0049:
+                                           ; SOURCE LINE # 337
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#08H,?C0054
+                                           ; SOURCE LINE # 338
+                                           ; SOURCE LINE # 339
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH uartRcvBuf
+                 R     MOV     R1,#LOW uartRcvBuf
+                       MOV     R5,#05H
+                       MOV     R4,#00H
+                 E     CALL    _YC_UARTReciveDataExpected
+                       MOV     A,R7
+                       XRL     A,#05H
+                       ORL     A,R6
+                 R     xJNZ    ?C0054
+                                           ; SOURCE LINE # 340
+                                           ; SOURCE LINE # 341
+                 R     MOV     DPTR,#uartRcvBuf+03H
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#0A1H,?C0052
+                                           ; SOURCE LINE # 342
+                                           ; SOURCE LINE # 346
+                       CLR     A
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 347
+                 R     MOV     DPTR,#R_Weight_Com_Coo+02H
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 350
+                       RET     
+             ?C0052:
+                                           ; SOURCE LINE # 352
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 353
+                                           ; SOURCE LINE # 354
+                                           ; SOURCE LINE # 355
+             ?C0054:
+                       RET     
+             ; FUNCTION CS_1186Com_SetOpenWeight_Proc (END)
+
+             ; FUNCTION CS_1186Com_ReadAdZero_Proc (BEGIN)
+                                           ; SOURCE LINE # 359
+                                           ; SOURCE LINE # 360
+                                           ; SOURCE LINE # 364
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#085H,?C0055
+                                           ; SOURCE LINE # 365
+                                           ; SOURCE LINE # 366
+                       MOV     R3,#00H
+                       MOV     R2,#00H
+                       MOV     R1,#00H
+                       MOV     R7,#085H
+                 R     CALL    _CS_CommTo1186_SendCmd
+                                           ; SOURCE LINE # 367
+                 R     MOV     DPTR,#R_Weight_Com_Coo+01H
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 25  
+
+                       MOV     A,#085H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 368
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOV     A,#06H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 369
+                       CLR     A
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 370
+                 E     CALL    YC_UARTClearBuffer
+                                           ; SOURCE LINE # 371
+             ?C0055:
+                                           ; SOURCE LINE # 372
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                       XRL     A,#06H
+                 R     xJNZ    ?C0060
+                                           ; SOURCE LINE # 373
+                                           ; SOURCE LINE # 374
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH uartRcvBuf
+                 R     MOV     R1,#LOW uartRcvBuf
+                       MOV     R5,#08H
+                       MOV     R4,A
+                 E     CALL    _YC_UARTReciveDataExpected
+                       MOV     A,R7
+                       XRL     A,#08H
+                       ORL     A,R6
+                 R     xJNZ    ?C0060
+                                           ; SOURCE LINE # 375
+                                           ; SOURCE LINE # 376
+                 R     MOV     DPTR,#uartRcvBuf+03H
+                       MOVX    A,@DPTR
+                       XRL     A,#085H
+                 R     xJNZ    ?C0058
+                                           ; SOURCE LINE # 377
+                                           ; SOURCE LINE # 378
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+;---- Variable 'data_rec' assigned to Register 'R4/R5/R6/R7' ----
+                                           ; SOURCE LINE # 379
+                       MOV     R0,#08H
+                 E     CALL    ?C?LSHL
+                       MOV     R0,AR4
+                       MOV     R1,AR5
+                       MOV     R2,AR6
+                       MOV     R3,AR7
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     A,R3
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 26  
+
+                       ADD     A,R7
+                       MOV     R7,A
+                       MOV     A,R6
+                       ADDC    A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       ADDC    A,R1
+                       MOV     R5,A
+                       MOV     A,R4
+                       ADDC    A,R0
+                       MOV     R4,A
+                                           ; SOURCE LINE # 380
+                       MOV     R0,#08H
+                 E     CALL    ?C?LSHL
+                       MOV     R0,AR4
+                       MOV     R1,AR5
+                       MOV     R2,AR6
+                       MOV     R3,AR7
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                       MOV     R6,A
+                       MOV     A,R3
+                       ADD     A,R7
+                       MOV     R7,A
+                       MOV     A,R6
+                       ADDC    A,R2
+                       MOV     R6,A
+                       MOV     A,R5
+                       ADDC    A,R1
+                       MOV     R5,A
+                       MOV     A,R4
+                       ADDC    A,R0
+                       MOV     R4,A
+                                           ; SOURCE LINE # 381
+                       MOV     R0,#06H
+                 E     CALL    ?C?ULSHR
+;---- Variable 'R_AD_Zero' assigned to Register 'R6/R7' ----
+                                           ; SOURCE LINE # 382
+                       MOV     R5,AR7
+                       MOV     R4,AR6
+                       MOV     R7,#06H
+                 E     CALL    _CS_Scale_ZeroProc
+                                           ; SOURCE LINE # 384
+                       CLR     A
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 385
+                 R     MOV     DPTR,#R_Weight_Com_Coo+02H
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 387
+                       RET     
+             ?C0058:
+                                           ; SOURCE LINE # 389
+                 R     MOV     DPTR,#uartTimeoutCnt
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 390
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 27  
+
+                                           ; SOURCE LINE # 391
+                                           ; SOURCE LINE # 392
+             ?C0060:
+                       RET     
+             ; FUNCTION CS_1186Com_ReadAdZero_Proc (END)
+
+             ; FUNCTION CS_1186Com_Reset_Proc (BEGIN)
+                                           ; SOURCE LINE # 396
+                                           ; SOURCE LINE # 397
+                                           ; SOURCE LINE # 399
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#0C5H,?C0062
+                                           ; SOURCE LINE # 400
+                                           ; SOURCE LINE # 401
+                       MOV     R3,#00H
+                       MOV     R2,#00H
+                       MOV     R1,#00H
+                       MOV     R7,#0C5H
+                 R     CALL    _CS_CommTo1186_SendCmd
+                                           ; SOURCE LINE # 402
+                 E     CALL    YC_UARTClearBuffer
+                                           ; SOURCE LINE # 403
+                       CLR     A
+                 R     MOV     DPTR,#R_Weight_Com_Coo
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 405
+                                           ; SOURCE LINE # 407
+             ?C0062:
+                       RET     
+             ; FUNCTION CS_1186Com_Reset_Proc (END)
+
+             ; FUNCTION _CS_CommTo1186_Xor (BEGIN)
+                                           ; SOURCE LINE # 411
+                 R     MOV     DPTR,#buf
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+;---- Variable 'len' assigned to Register 'R5' ----
+                                           ; SOURCE LINE # 412
+                                           ; SOURCE LINE # 414
+;---- Variable 'i' assigned to Register 'R7' ----
+                       CLR     A
+                       MOV     R7,A
+             ?C0063:
+                       MOV     A,R7
+                       CLR     C
+                       SUBB    A,R5
+                 R     xJGE    ?C0064
+                                           ; SOURCE LINE # 415
+                                           ; SOURCE LINE # 416
+                 R     MOV     DPTR,#buf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 28  
+
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ADD     A,#09H
+                       MOV     R1,A
+                       CLR     A
+                       ADDC    A,R2
+                       MOV     R2,A
+                       PUSH    AR2
+                       PUSH    AR1
+                 E     CALL    ?C?CLDPTR
+                       MOV     R6,A
+                 R     MOV     DPTR,#buf
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPL,R7
+                       MOV     DPH,#00H
+                 E     CALL    ?C?CLDOPTR
+                       XRL     A,R6
+                       POP     AR1
+                       POP     AR2
+                 E     CALL    ?C?CSTPTR
+                                           ; SOURCE LINE # 417
+                       INC     R7
+                 R     xJMP    ?C0063
+             ?C0064:
+                                           ; SOURCE LINE # 418
+                 R     MOV     DPTR,#buf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#09H
+                 E     CALL    ?C?CLDOPTR
+                       MOV     R7,A
+                                           ; SOURCE LINE # 419
+             ?C0066:
+                       RET     
+             ; FUNCTION _CS_CommTo1186_Xor (END)
+
+             ; FUNCTION _CS_CommTo1186_SendCmd (BEGIN)
+                                           ; SOURCE LINE # 421
+                 R     MOV     DPTR,#cmd_code
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 29  
+
+                                           ; SOURCE LINE # 422
+                                           ; SOURCE LINE # 423
+                 R     MOV     R0,#LOW buf
+                 R     MOV     R4,#HIGH buf
+                       MOV     R5,#01H
+                       MOV     R3,#0FFH
+                 R     MOV     R2,#HIGH _?ix1000
+                 R     MOV     R1,#LOW _?ix1000
+                       MOV     R6,#00H
+                       MOV     R7,#0AH
+                 E     CALL    ?C?COPY
+                                           ; SOURCE LINE # 426
+                 R     MOV     DPTR,#buf
+                       MOV     A,#0C5H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 427
+                 R     MOV     DPTR,#cmd_code
+                       MOVX    A,@DPTR
+                 E     CALL    ?C?CCASE
+                 R     DW      ?C0069
+                       DB      080H
+                 R     DW      ?C0070
+                       DB      081H
+                 R     DW      ?C0071
+                       DB      082H
+                 R     DW      ?C0072
+                       DB      083H
+                 R     DW      ?C0073
+                       DB      084H
+                 R     DW      ?C0074
+                       DB      085H
+                 R     DW      ?C0075
+                       DB      0A0H
+                 R     DW      ?C0076
+                       DB      0A1H
+                 R     DW      ?C0077
+                       DB      0A2H
+                 R     DW      ?C0078
+                       DB      0A3H
+                 R     DW      ?C0068
+                       DB      0C5H
+                 R     DW      ?C0079
+                       DB      0E0H
+                       DW      00H
+                 R     DW      ?C0080
+                                           ; SOURCE LINE # 428
+                                           ; SOURCE LINE # 429
+             ?C0068:
+                                           ; SOURCE LINE # 430
+                       CLR     A
+                 R     MOV     DPTR,#buf
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 431
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 432
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 433
+                 R     MOV     DPTR,#len
+                       MOV     A,#03H
+                       MOVX    @DPTR,A
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 30  
+
+                                           ; SOURCE LINE # 434
+                 R     xJMP    ?C0067
+                                           ; SOURCE LINE # 435
+             ?C0069:
+                                           ; SOURCE LINE # 436
+                 R     MOV     DPTR,#buf+01H
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 437
+                       INC     DPTR
+                       MOV     A,#080H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 438
+                       INC     DPTR
+                       MOV     A,#044H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 439
+                 R     MOV     DPTR,#len
+                       MOV     A,#04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 440
+                 R     xJMP    ?C0067
+                                           ; SOURCE LINE # 441
+             ?C0070:
+                                           ; SOURCE LINE # 442
+                 R     MOV     DPTR,#buf+01H
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 443
+                       INC     DPTR
+                       MOV     A,#081H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 444
+                       INC     DPTR
+                       MOV     A,#045H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 445
+                 R     MOV     DPTR,#len
+                       MOV     A,#04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 446
+                 R     xJMP    ?C0067
+                                           ; SOURCE LINE # 447
+             ?C0071:
+                                           ; SOURCE LINE # 448
+                 R     MOV     DPTR,#buf+01H
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 449
+                       INC     DPTR
+                       MOV     A,#082H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 450
+                       INC     DPTR
+                       MOV     A,#046H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 451
+                 R     MOV     DPTR,#len
+                       MOV     A,#04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 452
+                 R     xJMP    ?C0067
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 31  
+
+                                           ; SOURCE LINE # 453
+             ?C0072:
+                                           ; SOURCE LINE # 454
+                 R     MOV     DPTR,#buf+01H
+                       MOV     A,#03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 455
+                       INC     DPTR
+                       MOV     A,#083H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 456
+                 R     MOV     DPTR,#databuf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#01H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 457
+                 E     CALL    ?C?CLDPTR
+                 R     MOV     DPTR,#buf+04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 458
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH buf
+                 R     MOV     R1,#LOW buf
+                       MOV     R5,#05H
+                 R     CALL    _CS_CommTo1186_Xor
+                 R     MOV     DPTR,#buf+05H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 459
+                 R     MOV     DPTR,#len
+                       MOV     A,#06H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 460
+                 R     xJMP    ?C0067
+                                           ; SOURCE LINE # 461
+             ?C0073:
+                                           ; SOURCE LINE # 462
+                 R     MOV     DPTR,#buf+01H
+                       MOV     A,#04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 463
+                       INC     DPTR
+                       MOV     A,#084H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 464
+                 R     MOV     DPTR,#databuf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 32  
+
+                       MOV     R1,A
+                       MOV     DPTR,#02H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 465
+                       MOV     DPTR,#01H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 466
+                 E     CALL    ?C?CLDPTR
+                 R     MOV     DPTR,#buf+05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 467
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH buf
+                 R     MOV     R1,#LOW buf
+                       MOV     R5,#06H
+                 R     CALL    _CS_CommTo1186_Xor
+                 R     MOV     DPTR,#buf+06H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 468
+                 R     MOV     DPTR,#len
+                       MOV     A,#07H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 469
+                 R     xJMP    ?C0067
+                                           ; SOURCE LINE # 470
+             ?C0074:
+                                           ; SOURCE LINE # 471
+                 R     MOV     DPTR,#buf+01H
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 472
+                       INC     DPTR
+                       MOV     A,#085H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 473
+                       INC     DPTR
+                       MOV     A,#041H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 474
+                 R     MOV     DPTR,#len
+                       MOV     A,#04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 475
+                 R     xJMP    ?C0067
+                                           ; SOURCE LINE # 476
+             ?C0075:
+                                           ; SOURCE LINE # 477
+                 R     MOV     DPTR,#buf+01H
+                       MOV     A,#05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 478
+                       INC     DPTR
+                       MOV     A,#0A0H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 479
+                 R     MOV     DPTR,#databuf
+                       MOVX    A,@DPTR
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 33  
+
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#03H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 480
+                       MOV     DPTR,#02H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 481
+                       MOV     DPTR,#01H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 482
+                 E     CALL    ?C?CLDPTR
+                 R     MOV     DPTR,#buf+06H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 483
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH buf
+                 R     MOV     R1,#LOW buf
+                       MOV     R5,#07H
+                 R     CALL    _CS_CommTo1186_Xor
+                 R     MOV     DPTR,#buf+07H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 484
+                 R     MOV     DPTR,#len
+                       MOV     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 485
+                 R     xJMP    ?C0067
+                                           ; SOURCE LINE # 486
+             ?C0076:
+                                           ; SOURCE LINE # 487
+                 R     MOV     DPTR,#buf+01H
+                       MOV     A,#06H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 488
+                       INC     DPTR
+                       MOV     A,#0A1H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 489
+                 R     MOV     DPTR,#databuf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#04H
+                 E     CALL    ?C?CLDOPTR
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 34  
+
+                 R     MOV     DPTR,#buf+03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 490
+                       MOV     DPTR,#03H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 491
+                       MOV     DPTR,#02H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 492
+                       MOV     DPTR,#01H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+06H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 493
+                 E     CALL    ?C?CLDPTR
+                 R     MOV     DPTR,#buf+07H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 494
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH buf
+                 R     MOV     R1,#LOW buf
+                       MOV     R5,#08H
+                 R     CALL    _CS_CommTo1186_Xor
+                 R     MOV     DPTR,#buf+08H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 495
+                 R     MOV     DPTR,#len
+                       MOV     A,#09H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 496
+                 R     xJMP    ?C0067
+                                           ; SOURCE LINE # 497
+             ?C0077:
+                                           ; SOURCE LINE # 498
+                 R     MOV     DPTR,#buf+01H
+                       MOV     A,#05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 499
+                       INC     DPTR
+                       MOV     A,#0A2H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 500
+                 R     MOV     DPTR,#databuf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#03H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 501
+                       MOV     DPTR,#02H
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 35  
+
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 502
+                       MOV     DPTR,#01H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 503
+                 E     CALL    ?C?CLDPTR
+                 R     MOV     DPTR,#buf+06H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 504
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH buf
+                 R     MOV     R1,#LOW buf
+                       MOV     R5,#07H
+                 R     CALL    _CS_CommTo1186_Xor
+                 R     MOV     DPTR,#buf+07H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 505
+                 R     MOV     DPTR,#len
+                       MOV     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 506
+                 R     xJMP    ?C0067
+                                           ; SOURCE LINE # 507
+             ?C0078:
+                                           ; SOURCE LINE # 508
+                 R     MOV     DPTR,#buf+01H
+                       MOV     A,#04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 509
+                       INC     DPTR
+                       MOV     A,#0A3H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 510
+                 R     MOV     DPTR,#databuf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#02H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 511
+                       MOV     DPTR,#01H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 512
+                 E     CALL    ?C?CLDPTR
+                 R     MOV     DPTR,#buf+05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 513
+                       MOV     R3,#01H
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 36  
+
+                 R     MOV     R2,#HIGH buf
+                 R     MOV     R1,#LOW buf
+                       MOV     R5,#06H
+                 R     CALL    _CS_CommTo1186_Xor
+                 R     MOV     DPTR,#buf+06H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 514
+                 R     MOV     DPTR,#len
+                       MOV     A,#07H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 515
+                 R     xJMP    ?C0067
+                                           ; SOURCE LINE # 516
+             ?C0079:
+                                           ; SOURCE LINE # 517
+                 R     MOV     DPTR,#buf+01H
+                       MOV     A,#07H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 518
+                       INC     DPTR
+                       MOV     A,#0E0H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 519
+                 R     MOV     DPTR,#databuf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#05H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 520
+                       MOV     DPTR,#04H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 521
+                       MOV     DPTR,#03H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 522
+                       MOV     DPTR,#02H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+06H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 523
+                       MOV     DPTR,#01H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#buf+07H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 524
+                 E     CALL    ?C?CLDPTR
+                 R     MOV     DPTR,#buf+08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 525
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 37  
+
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH buf
+                 R     MOV     R1,#LOW buf
+                       MOV     R5,#09H
+                 R     CALL    _CS_CommTo1186_Xor
+                 R     MOV     DPTR,#buf+09H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 526
+                       INC     DPTR
+                       MOV     A,#0AH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 527
+                 R     xJMP    ?C0067
+                                           ; SOURCE LINE # 528
+             ?C0080:
+                                           ; SOURCE LINE # 529
+                       CLR     A
+                 R     MOV     DPTR,#buf+01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 530
+                 R     MOV     DPTR,#len
+                       MOV     A,#02H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 531
+                                           ; SOURCE LINE # 532
+             ?C0067:
+                                           ; SOURCE LINE # 533
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH buf
+                 R     MOV     R1,#LOW buf
+                 R     MOV     DPTR,#len
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       MOV     R4,#00H
+                 E     CALL    _YC_UARTSendData
+                                           ; SOURCE LINE # 534
+                       RET     
+             ; FUNCTION _CS_CommTo1186_SendCmd (END)
+
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 38  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+s8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  CHAR     -----  1
+u8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+CS_1186Com_SetLcd_Proc . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+UART_CardProtcol . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+YC_UARTPARAM_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  15
+  uartCtrl . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pRxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  pTxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0004H  3
+  rxBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0007H  2
+  txBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0009H  2
+  baud . . . . . . . . . . . . . . . .  MEMBER   -----  U_LONG   000BH  4
+YC_UARTClearBuffer . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+pxdbyte. . . . . . . . . . . . . . . .  TYPEDEF  DATA   PTR      -----  2
+YC_LedBlink. . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  6
+  active_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  gpio_num . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  light_time . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  dark_time. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+CS_1186Com_ReadAdZero_Proc . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  data_rec . . . . . . . . . . . . . .  * REG *  DATA   U_LONG   0004H  4
+  R_AD_Zero. . . . . . . . . . . . . .  * REG *  DATA   U_INT    0006H  2
+_generateChecksum. . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+uartRcvBuf . . . . . . . . . . . . . .  PUBLIC   XDATA  ARRAY    0000H  16
+pdbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  1
+UART_HalfDuplex. . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+CS_If1186ComSucess . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+CS_Weight_T. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+DFIFO0 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0094H  1
+DFIFO1 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0095H  1
+UART_Parity. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+dbyte. . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_CHAR   -----  1
+CS_ComState. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  3
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+DFIFO2 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0096H  1
+_CS_CommTo1186_SendCmd . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  cmd_code . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0000H  1
+  databuf. . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0001H  3
+  buf. . . . . . . . . . . . . . . . .  AUTO     XDATA  ARRAY    0004H  10
+  len. . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   000EH  1
+pxbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  2
+ibyte. . . . . . . . . . . . . . . . .  TYPEDEF  IDATA  U_CHAR   -----  1
+BT_EVENTFIFO . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+R_Weight_Com_Coo . . . . . . . . . . .  PUBLIC   XDATA  STRUCT   0010H  3
+R_Scale_state. . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+uartTxBuf. . . . . . . . . . . . . . .  PUBLIC   XDATA  ARRAY    0013H  16
+s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
+YC_UARTPARAM . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  15
+  uartCtrl . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 39  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  pRxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  pTxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0004H  3
+  rxBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0007H  2
+  txBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0009H  2
+  baud . . . . . . . . . . . . . . . .  MEMBER   -----  U_LONG   000BH  4
+bool . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+u32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+s16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  INT      -----  2
+xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
+u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
+CS_Scale_1186Com . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+_CS_CommTo1186_Xor . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  buf. . . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+  len. . . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0005H  1
+  i. . . . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+byte . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+CS_1186Com_ReadMacAdress_Proc. . . . .  PUBLIC   CODE   PROC     0000H  -----
+  i. . . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0000H  1
+  ptr. . . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0001H  2
+YC_UartCTRLBit_e . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+UART_DataLen . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+_CS_Scale_1186ComSend. . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  com_comand . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+_?ix1000 . . . . . . . . . . . . . . .  STATIC   CODE   ARRAY    0000H  10
+_YC_UARTSendData . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+BT_CMDFIFO_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+CS_1186Com_Reset_Proc. . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+CS_1186Com_ReadAdc_Proc. . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  data_rec . . . . . . . . . . . . . .  * REG *  DATA   U_LONG   0004H  4
+UART_BaudSet . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+R_1186_RTC . . . . . . . . . . . . . .  EXTERN   XDATA  ARRAY    -----  4
+B_Weight_AdOk. . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+CS_1186Com_ReadTime_Proc . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+uartTimeoutCnt . . . . . . . . . . . .  PUBLIC   XDATA  U_CHAR   0023H  1
+R_AD_Original. . . . . . . . . . . . .  EXTERN   XDATA  U_INT    -----  2
+_YC_UARTReciveDataExpected . . . . . .  EXTERN   CODE   PROC     -----  -----
+CS_Lcd_Send_Data . . . . . . . . . . .  EXTERN   XDATA  ARRAY    -----  6
+_CS_Scale_CaliProc . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+YC_LedBlink_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  active_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  gpio_num . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  light_time . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  dark_time. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+YC_UARTWaitSendData. . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+UART_Enable. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+R_1186sys_state. . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+UART_EnableFlowControl . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+CS_1186Com_SetOpenWeight_Proc. . . . .  PUBLIC   CODE   PROC     0000H  -----
+  R_Open_Weight. . . . . . . . . . . .  * REG *  DATA   U_INT    0004H  2
+BT_CMDFIFO . . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+CS_1186Com_SetSleepMode_Proc . . . . .  PUBLIC   CODE   PROC     0000H  -----
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 40  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  R_AD_Zero. . . . . . . . . . . . . .  * REG *  DATA   U_INT    0004H  2
+YC_UartCTRLBit . . . . . . . . . . . .  * TAG *  -----  ENUM     -----  -----
+BT_EVENTFIFO_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+_CS_Weight_T . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+_CS_ComState . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  3
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+_CS_Scale_ZeroProc . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   2242    ----
+   CONSTANT SIZE    =     10    ----
+   XDATA SIZE       =     36      21
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,435 @@
+ui_init:
+	rtn wake
+	call ui_button_init
+	call ui_timer_init
+	branch ui_led_init
+
+ui_dispatch:
+	fetch 1,mem_device_option
+	rtneq dvc_op_hci
+	call ui_led_blink_polling
+	
+	branch ui_timer_check
+	
+ui_button_init:
+	fetch 1,mem_ui_button_gpio
+	rtneq UI_BUTTON_GPIO_DISABLE
+	iforce temp
+	call gpio_config_output
+	fetcht 1,mem_ui_button_gpio
+	call gpio_out_inactive
+	nop 100
+	fetcht 1,mem_ui_button_gpio
+	call gpio_config_input
+	branch ui_button_polling
+
+ui_button_disable:
+	jam UI_BUTTON_GPIO_DISABLE,mem_ui_button_gpio
+	rtn
+	
+ui_button_polling:
+	set1 mark_ext_patch,mark
+	bpatch patch30_5,mem_patch30
+	fetch 1,mem_ui_button_gpio
+	rtneq UI_BUTTON_GPIO_DISABLE
+	copy pdata,temp
+	call gpio_get_bit
+	nbranch ui_button_up,true
+	//fall through
+ui_button_down:
+	call ui_button_check_long_press
+	fetch 2,mem_ui_state_map
+	set1 UI_STATE_BTN_DOWN
+	store 2,mem_ui_state_map
+	fetch 1,mem_ui_button_last_state
+	rtneq UI_BUTTON_STATE_DOWN
+	jam UI_BUTTON_STATE_DOWN,mem_ui_button_last_state
+	//Down Edge
+	fetch 1,mem_ui_button_timeout
+	store 1,mem_ui_button_timer //start long press timer
+	call lpm_button_get_wake_lock
+	jam BT_EVT_BUTTON_DOWN,mem_fifo_temp
+	branch ui_ipc_send_event
+ui_button_up:
+	fetch 2,mem_ui_state_map
+	set0 UI_STATE_BTN_DOWN
+	store 2,mem_ui_state_map
+	fetch 1,mem_ui_button_last_state
+	rtneq UI_BUTTON_STATE_UP
+	jam UI_BUTTON_STATE_UP,mem_ui_button_last_state
+	//Up Edge
+	jam 0,mem_ui_button_timer//stop long press timer
+	call lpm_button_clean_wake_lock
+	jam BT_EVT_BUTTON_UP,mem_fifo_temp
+	branch ui_ipc_send_event
+
+ui_button_check_long_press:
+	fetch 1,mem_ui_button_timer
+	rtn blank
+	increase -1,pdata
+	store 1,mem_ui_button_timer
+	nrtn blank
+	//Long Press
+	jam BT_EVT_BUTTON_LONG_PRESSED,mem_fifo_temp
+	branch ui_ipc_send_event
+
+lpm_button_get_wake_lock:
+	arg wake_lock_button,queue
+	branch lpm_get_wake_lock
+	
+lpm_button_clean_wake_lock:
+	arg wake_lock_button,queue
+	branch lpm_put_wake_lock
+
+ui_led_init:
+	fetch 1,mem_led_gpio
+	rtneq UI_BUTTON_GPIO_DISABLE
+	iforce temp
+	call gpio_config_output
+	branch ui_led_off
+	
+ui_led_blink_stop:
+	fetch 2,mem_ui_state_map
+	set0 UI_STATE_LED_BLINK
+	store 2,mem_ui_state_map
+	jam ui_led_stop,mem_led_switch
+ui_led_off:
+	fetch 2,mem_ui_state_map
+	set0 UI_STATE_LED_ON
+	store 2,mem_ui_state_map
+	fetcht 1,mem_led_gpio
+	branch gpio_out_inactive
+
+ui_led_on:
+	fetch 2,mem_ui_state_map
+	set1 UI_STATE_LED_ON
+	store 2,mem_ui_state_map
+	jam ui_led_stop,mem_led_switch
+	fetcht 1,mem_led_gpio
+	branch gpio_out_active
+
+ui_led_blink_start:
+	fetch 2,mem_ui_state_map
+	set1 UI_STATE_LED_BLINK
+	store 2,mem_ui_state_map
+	jam ui_led_start,mem_led_switch
+	rtn
+	
+ui_led_blink_polling:
+	set1 mark_ext_patch,mark
+	bpatch patch30_6,mem_patch30
+	fetch 1,mem_led_switch
+	rtneq ui_led_stop
+	arg ui_led_blink,queue
+	call timer_check
+	nrtn blank
+	fetch 1,mem_led_switch
+	beq ui_led_dark_time,ui_led_blink_polling_dark
+	call ui_led_on
+	jam ui_led_dark_time,mem_led_switch
+	fetch 2,mem_led_light_time
+	branch ui_led_blink_timer_start
+ui_led_blink_polling_dark:
+	call ui_led_off
+	jam ui_led_light_time,mem_led_switch
+	fetch 2,mem_led_dark_time
+ui_led_blink_timer_start:
+	arg ui_led_blink,queue
+	branch timer_init	
+
+	
+ui_timer_check:
+	set1 mark_ext_patch,mark
+	bpatch patch30_7,mem_patch30
+	arg 0,rega
+	fetcht 4,mem_ui_timer_last_btclk
+	copy clkn_bt,regb
+	//call ice_break
+ui_timer_check_loop:
+	copy regb,pdata
+	increase 160,temp    //320btclk = 100ms
+	increase 160,temp
+	isub temp,null
+	nbranch ui_timer_check_end,positive
+	increase 1,rega   //increase 1 every 100ms count
+	and rega,0x0f,pdata
+	nbranch ui_timer_check_loop,blank
+	arg 0,rega  //reset timer if it's longer than 1.5s between 2 checks
+	call ui_timer_check_send_evt
+ui_timer_init:
+	copy clkn_bt,pdata
+	store 4,mem_ui_timer_last_btclk
+	rtn
+ui_timer_check_end:
+	set1 mark_ext_patch,mark
+	bpatch patch31_0,mem_patch31
+	copy rega,pdata
+	rtn blank
+	increase -160,temp    //320btclk = 100ms
+	increase -160,temp
+	storet 4,mem_ui_timer_last_btclk
+ui_timer_check_send_evt:
+	increase BT_EVT_TIMER_INIT,pdata
+	store 1,mem_fifo_temp
+	branch ui_ipc_send_event
+	
+
+//**********************************************************//
+//************UI Inter-Processor Communication*******//
+//**********************************************************//
+ui_ipc_get_lock:
+	jam 1,mem_ipc_lock_bt
+ui_ipc_get_lock_wait:
+	fetch 1,mem_ipc_lock_c51
+	nbranch ui_ipc_get_lock_wait,blank
+	rtn
+	
+ui_ipc_put_lock:
+	jam 0,mem_ipc_lock_bt
+	rtn
+	
+ui_ipc_fifo_out:
+	branch fifo_out
+
+
+	
+ui_ipc_send_event:
+	set1 mark_ext_patch,mark
+	bpatch patch31_1,mem_patch31
+	fetch 1,mem_device_option
+	rtneq dvc_op_hci
+	call ui_ipc_get_lock
+	copy rega,pdata
+	store 4,mem_ipc_rega_temp
+	arg mem_ipc_fifo_bt2c51,rega
+	call fifo_in
+	fetch 4,mem_ipc_rega_temp
+	copy pdata,rega
+	branch ui_ipc_put_lock
+
+ui_ipc_send_cmd:
+	set1 mark_ext_patch,mark
+	bpatch patch31_2,mem_patch31
+	fetch 1,mem_device_option
+	rtneq dvc_op_hci
+	call ui_ipc_get_lock
+	copy rega,pdata
+	store 4,mem_ipc_rega_temp	
+	arg mem_ipc_fifo_c512bt,rega
+	call fifo_in
+	fetch 4,mem_ipc_rega_temp
+	copy pdata,rega	
+	branch ui_ipc_put_lock
+
+ui_ipc_clean_all_fifo:
+	set1 mark_ext_patch,mark
+	bpatch patch31_3,mem_patch31
+	setarg 0
+	store UTIL_FIFO_LEN,mem_ipc_fifo_c512bt
+	store UTIL_FIFO_LEN,mem_ipc_fifo_bt2c51
+	rtn
+	
+check_51cmd:
+	set1 mark_ext_patch,mark
+	bpatch patch31_4,mem_patch31
+	fetch 1,mem_hci_cmd
+	nrtn blank
+	arg mem_ipc_fifo_c512bt,rega
+	call fifo_is_empty
+	rtn blank
+	jam IPC_CONTINUE_PROCESS,mem_ipc_skip_continue_proc
+	call check_51cmd_once
+	fetch 1,mem_ipc_skip_continue_proc
+	branch check_51cmd,blank
+	rtn
+
+check_51cmd_once:
+	set1 mark_ext_patch,mark
+	bpatch patch31_5,mem_patch31
+	call ui_ipc_get_lock
+	arg mem_ipc_fifo_c512bt,rega
+	call fifo_out
+	copy pdata,temp
+	call ui_ipc_put_lock
+	copy temp,pdata
+	rtn blank
+ 	beq BT_CMD_START_DISCOVERY,check_51cmd_start_discovery
+  	beq BT_CMD_STOP_DISCOVERY,check_51cmd_stop_discovery
+  	beq BT_CMD_RECONNECT,check_51cmd_reconnect
+  	beq BT_CMD_ENTER_SNIFF_SUBRATING,check_51cmd_enter_sniff_subrating
+  	beq BT_CMD_EXIT_SNIFF_SUBRATING,check_51cmd_exit_sniff_subrating
+  	beq BT_CMD_SNIFF_TEST,check_51cmd_sniff_test
+	beq BT_CMD_START_INQUIRY,check_51cmd_inq
+	beq BT_CMD_STOP_INQUIRY,check_51cmd_stop_inq
+	beq BT_CMD_START_ADV,check_51cmd_adv
+	beq BT_CMD_STOP_ADV,check_51cmd_stop_adv
+	beq BT_CMD_START_DIRECT_ADV,check_51cmd_direct_adv
+	beq BT_CMD_STOP_DIRECT_ADV,check_51cmd_stop_direct_adv
+	beq BT_CMD_LE_UPDATE_CONN,check_51cmd_le_update_conn
+check_51cmd_once0:
+	beq BT_CMD_LED_BLINK,ui_led_blink_start
+	beq BT_CMD_LED_ON,ui_led_on
+	beq BT_CMD_LED_OFF,ui_led_blink_stop
+	beq BT_CMD_LE_START_CONN,check_51cmd_le_start_con
+	beq BT_CMD_LE_START_SCAN,check_51cmd_start_scan
+	beq BT_CMD_LE_STOP_SCAN,check_51cmd_stop_scan
+	beq BT_CMD_ENTER_HIBERNATE,check_51cmd_hibernate
+	beq BT_CMD_LE_SMP_SECURITY_REQUEST,check_51cmd_le_smp_sec_req
+	beq BT_CMD_LE_START_WRITE,check_51cmd_le_start_write
+	beq BT_CMD_BB_RECONN_CANCEL,check_51cmd_bb_reconn_cancel
+	//context related, process in context
+	store 1,mem_fifo_temp
+	set1 mark_ext_patch,mark
+	bpatch patch31_6,mem_patch31
+	fetch 1,mem_lmo_opcode2
+	branch check_51cmd_once_continue,blank
+	call lmo_fifo_process
+	fetch 1,mem_lmo_opcode2
+	nbranch check_51cmd_restore,blank  //process this cmd next time while lmo fifo is full
+check_51cmd_once_continue:
+	fetch 1,mem_fifo_temp
+	bmark0 mark_context,check_51cmd_check_idle
+  	beq BT_CMD_ENTER_SNIFF,cmd_in_sniff
+  	beq BT_CMD_EXIT_SNIFF,cmd_exit_sniff
+  	beq BT_CMD_SET_PIN_CODE,check_51cmd_pincode
+	beq BT_CMD_DISCONNECT,check_51cmd_disconnect
+	beq BT_CMD_LE_DISCONNECT,check_51cmd_le_disconnect
+	beq BT_CMD_ROLE_SWITCH,check_51cmd_role_switch
+	beq BT_CMD_STORE_RECONN_INFO_LE,eeprom_store_le_reconn_info
+	beq BT_CMD_STORE_RECONN_INFO_BT,eeprom_store_bd_reconn_info
+	beq BT_CMD_LE_UPDATE_CONN,BT_CMD_LE_UPDATE_CONN_1
+  	rtn
+
+
+BT_CMD_LE_UPDATE_CONN_1:
+	jam XT_LL_CONNECTION_PARAM_REQ,mem_fifo_temp
+	branch le_xtype_fifo_in
+check_51cmd_check_idle:
+	store 1,mem_fifo_temp
+  	call context_check_idle
+	branch check_51cmd_restore,zero
+	call context_search_plap
+	nrtn zero
+check_51cmd_restore:
+	jam IPC_SKIP_CONTINUE_PROCESS,mem_ipc_skip_continue_proc
+	branch ui_ipc_send_cmd
+
+
+check_51cmd_role_switch:
+  	jam LMP_SLOT_OFFSET,mem_lmo_opcode2
+	set1 mark_switch_initiated,mark
+	nrtn master
+	jam SWITCH_FLAG_INIT,mem_switch_flag
+	jam LMP_SWITCH_REQ ,mem_lmo_opcode2
+	fetch 1,mem_connection_options
+	set0 CONNECTION_SWITCH,pdata
+	store 1,mem_connection_options
+	rtn
+	
+check_51cmd_start_discovery:
+	fetch 2,mem_ui_state_map
+	set1 UI_STATE_BT_DISCOVERY
+	store 2,mem_ui_state_map
+	jam 3,mem_scan_mode
+	rtn
+	
+check_51cmd_stop_discovery:
+	jam 0,mem_hid_handshake_timer_count
+	jam 0,mem_scan_mode
+	fetch 2,mem_ui_state_map
+	set0 UI_STATE_BT_DISCOVERY
+	store 2,mem_ui_state_map
+	rtn
+	
+check_51cmd_reconnect:	
+	jam hci_cmd_create_conn,mem_hci_cmd
+	rtn
+	
+check_51cmd_disconnect:
+	jam LMP_DETACH,mem_lmo_opcode2
+	jam OTHER_END_TERMINATED,mem_disconn_reason_send
+	rtn
+	
+	
+check_51cmd_enter_sniff_subrating:
+	rtn
+	
+check_51cmd_exit_sniff_subrating:
+	rtn	
+	
+check_51cmd_sniff_test:
+	rtn
+	
+check_51cmd_pincode:
+	jam pincode_state_pincode_ready,mem_pincode_state
+	branch cmd_pair
+
+check_51cmd_inq:
+	rtn
+check_51cmd_stop_inq:
+	rtn
+check_51cmd_adv:
+	jam ON,mem_le_adv_enable
+	jam ADV_IND,mem_le_adv_type
+	rtn
+check_51cmd_stop_adv:
+	jam OFF,mem_le_adv_enable
+	rtn
+check_51cmd_direct_adv:
+	jam ON,mem_le_adv_enable
+	jam ADV_DIRECT_IND,mem_le_adv_type
+	rtn
+check_51cmd_stop_direct_adv:
+	jam OFF,mem_le_adv_enable
+	rtn
+check_51cmd_le_disconnect:
+	setarg 1
+	store 2,mem_le_superto
+	rtn
+check_51cmd_le_update_conn:
+	rtn
+check_51cmd_le_start_con:
+	jam ON,mem_le_scan_enable
+	jam hci_cmd_le_create_conn,mem_hci_cmd
+	fetch 6,mem_app_peer_addr
+	store 6,mem_le_conn_peer_addr
+	rtn
+check_51cmd_start_scan:
+	jam ON,mem_le_scan_enable
+	rtn
+check_51cmd_stop_scan:
+	jam OFF,mem_le_scan_enable
+	jam 0,mem_hci_cmd
+	rtn
+check_51cmd_le_smp_sec_req:
+	jam XT_SMP_SECURITY_REQUEST,mem_fifo_temp
+	branch le_xtype_fifo_in
+check_51cmd_hibernate:
+	set1 mark_ext_patch,mark
+	bpatch patch31_7,mem_patch31
+	fetch 2,mem_cb_before_hibernate
+	call callback_func
+	fetch 1,mem_ui_button_gpio
+	beq UI_BUTTON_GPIO_DISABLE,check_51cmd_hibernate_btn_disabled
+	copy pdata,temp
+	call gpio_config_input
+check_51cmd_hibernate_btn_disabled:
+	call ui_led_off
+	call ui_ipc_clean_all_fifo
+	branch lpm_hibernate
+	
+check_51cmd_le_start_write:
+	jam 1,mem_le_switch_send_data
+	rtn
+
+check_51cmd_bb_reconn_cancel:
+	force page_length_timer,queue
+	branch timer_stop
+
+ui_check_paring_button:
+	fetch 1,mem_ui_state_map
+	rtnbit0 UI_STATE_BTN_DOWN
+	rtnbit0 UI_STATE_BT_RECONNECT
+	branch check_51cmd_bb_reconn_cancel
+
+

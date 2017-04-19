@@ -1,0 +1,33 @@
+
+mem_lpm_config:8f 10 ca
+mem_lpm_xtalcnt:00 0a 0b ef 0f
+mem_lpm_hibernate_switch:00
+mem_gpio_wakeup_low:00 00 00 00 00 00 00 00
+mem_fcomp_mul:02
+mem_fcomp_div:24
+mem_iscan_window:12 00
+mem_iscan_interval:00 10
+mem_pscan_window:12 00
+mem_pscan_interval:00 08
+mem_inq_window:20 00
+mem_page_window:20 00
+mem_page_to:00 20
+mem_rx_window_init:80 03
+mem_rx_window_sniff:00 06
+
+
+mem_eeprom_base:30 0f
+mem_eeprom_block_size:20
+
+#pointers to tail space of mem_le_att_list
+mem_le_att_list+485:
+68 e4
+69 00
+6a 00
+6b 30
+57 4c
+58 6c
+59 50
+ff
+mem_rf_init_ptr:mem_le_att_list+485
+

@@ -1,0 +1,2065 @@
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE LXPROTOCOL
+OBJECT MODULE PLACED IN out/lxProtocol.obj
+COMPILER INVOKED BY: C:\Keil51\c51\bin\C51.exe lxProtocol.c OBJECT(out/lxProtocol.obj) OBJECTADVANCED OPTIMIZE(9,SPEED) 
+                    -BROWSE CODE SYMBOLS DF(ENABLE_APE) PR(out/lxProtocol.lst) OT(7,SPEED) LARGE
+
+line level    source
+
+   1          #include "YC_Define.h"
+   2          #include "lxProtocol.h"
+   3          #include "retation_variable.h"
+   4          #include "BT_IPC.h"
+   5          #include "YC_Utilities.h"
+   6          #include "BTReg.h"
+   7          #include "spiflash.h"
+   8          #include "crc32.h"
+   9          #include "CS_ScaleDisplay.h"
+  10          
+  11          static void lxSettingDeviceRespone(u16_t cmd, u8_t state);
+  12          static void sendHistoryData(void);
+  13          static void delUserData(void);
+  14          
+  15          static UserMeasureData* QueuePop(void);
+  16          static void QueuePush(UserMeasureData *userData);
+  17          
+  18          static void bigLittleEndianSwap(u8_t *buf, u16_t len)
+  19          {
+  20   1              u16_t i, size;
+  21   1              u8_t temp;
+  22   1              
+  23   1              size = len -1;
+  24   1              for(i=0; i<len/2; i++)
+  25   1              {
+  26   2                      temp = buf[i];
+  27   2                      buf[i] = buf[size -i];
+  28   2                      buf[size -i] = temp;
+  29   2              }
+  30   1      }
+  31          
+  32          static void lxSendRecvDataACK(u16_t handle, u8_t state)
+  33          {
+  34   1              if(notifyValueUUIDA625 != NOTIFY_ENABLE)
+  35   1              {
+  36   2                      return;
+  37   2              }
+  38   1      
+  39   1              btCmdBuf.len = 0x06;
+  40   1              btCmdBuf.DATA[0] = CS_CMD_LE_TX_DAT;
+  41   1              btCmdBuf.DATA[1] = LO_UINT16(handle);
+  42   1              btCmdBuf.DATA[2] = HI_UINT16(handle);
+  43   1              btCmdBuf.DATA[3] = ACK_FRAME;
+  44   1              btCmdBuf.DATA[4] = RECV_ACK_FRAME_LEN;
+  45   1              btCmdBuf.DATA[5] = state;
+  46   1              
+  47   1              BT_CmdFifoIn(&btCmdBuf);
+  48   1              YC_Delay10ms(10);
+  49   1      }
+  50          
+  51          void lxRecvDataFromApp(BT_EVENTFIFO_t *event)
+  52          {
+  53   1              //data[0]:total length, data[1~2]:handle
+  54   1              //data[3]:frame control,data[4]:length,data[5~N]:content
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 2   
+
+  55   1              u8_t frameControl = event->DATA[3];
+  56   1              u16_t cmd;
+  57   1              
+  58   1              bigLittleEndianSwap(&(event->DATA[5]), event->DATA[4]);
+  59   1              cmd = event->DATA[5] | (event->DATA[6] << 8);
+  60   1              
+  61   1              //numTotalFrames == 1
+  62   1              if(frameControl == FRAME_CONTROL_SINGLE)
+  63   1              {
+  64   2                      //send ack
+  65   2                      lxSendRecvDataACK(HANDLE_UUIDA625_NOTIFY, RECV_ACK_SUCCESS);
+  66   2      
+  67   2                      //copy data
+  68   2                      xmemcpy(LX_RECV_BUF, &(event->DATA[5]), event->DATA[4]);
+  69   2                      
+  70   2                      switch(cmd)
+  71   2                      {
+  72   3                              case CMD_REGISTRATION_REQ:
+  73   3                                      changeLxOptStatus(OPT_REGISTER_REQ);
+  74   3                                      break;
+  75   3                              case CMD_BIND_REQ:
+  76   3                                      changeLxOptStatus(OPT_BIND_REQ);
+  77   3                                      break;
+  78   3                              case CMD_LOGIN_RSP:
+  79   3                                      changeLxOptStatus(OPT_LOGIN_RSP);
+  80   3                                      break;
+  81   3                              case CMD_INIT_RSP:
+  82   3                                      changeLxOptStatus(OPT_INIT_RSP);
+  83   3                                      break;
+  84   3                                      
+  85   3                              case CMD_TIME_SETTING_REQ:
+  86   3                                      changeLxOptStatus(OPT_TIME_SETTING_REQ);
+  87   3                                      break;
+  88   3                              case CMD_UNIT_SETTING_REQ:
+  89   3                                      changeLxOptStatus(OPT_UNIT_SETTING_REQ);
+  90   3                                      break;
+  91   3                              case CMD_DATA_CLEAR_SETTING_REQ:
+  92   3                                      changeLxOptStatus(OPT_DATA_DEL_SETTING_REQ);
+  93   3                                      break;
+  94   3                                      
+  95   3                              case CMD_SYNC_DATA_REQ:
+  96   3                                      changeLxOptStatus(OPT_SYNC_DATA_REQ);
+  97   3                                      break;
+  98   3                      }
+  99   2                      
+ 100   2              }
+ 101   1              //ACK:numTotalFrames == 0
+ 102   1              else if(frameControl == FRAME_CONTROL_ACK)
+ 103   1              {
+ 104   2                      if(event->DATA[5] == RECV_ACK_SUCCESS)
+ 105   2                      {
+ 106   3                              if(lxOptStatus == OPT_REGISTER_RSP_WAIT_ACK)
+ 107   3                              {
+ 108   4                                      SpiFlashOperator(CS_CMD_WRITE_FLASH);
+ 109   4                              }
+ 110   3                              
+ 111   3                              lxOptStatus = OPT_IDLE;
+ 112   3                      }
+ 113   2                      else
+ 114   2                      {
+ 115   3                              if(lxOptStatus == OPT_REGISTER_RSP_WAIT_ACK)
+ 116   3                              {
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 3   
+
+ 117   4                                      xmemset(mem_register_buf , 0, 10);
+ 118   4                                      //update adv flag
+ 119   4                                      *(mem_le_adv_data + 13) = 0;
+ 120   4                              }
+ 121   3                              lxOptStatus = OPT_IDLE;
+ 122   3                      }
+ 123   2              }
+ 124   1      }
+ 125          
+ 126          void changeLxOptStatus(u8_t opt)
+ 127          {
+ 128   1              if(lxOptStatus == OPT_IDLE)
+ 129   1              {
+ 130   2                      lxOptStatus = opt;
+ 131   2              }
+ 132   1      }
+ 133          
+ 134          void lxOptProcess(void)
+ 135          {
+ 136   1              //u8_t i;
+ 137   1      
+ 138   1              btCmdBuf.DATA[0] = CS_CMD_LE_TX_DAT;
+ 139   1              btCmdBuf.DATA[1] = LO_UINT16(HANDLE_UUIDA621_NOTIFY);
+ 140   1              btCmdBuf.DATA[2] = HI_UINT16(HANDLE_UUIDA621_NOTIFY);
+ 141   1              switch(lxOptStatus)
+ 142   1              {
+ 143   2      #if 0
+                              case OPT_REGISTER_REQ:
+                                      if(*(LX_RECV_BUF + 8) == DEVICE_ID_UNREGISTERED ||
+                                              *(LX_RECV_BUF + 8) == DEVICE_ID_REGISTERED)
+                                      {
+                                              //save deviceID
+                                              dmemcpy(deviceInfo.deviceID, LX_RECV_BUF + 2, DEVICE_ID_LENGTH);
+                                              //register success
+                                              deviceInfo.registerFlag = DEVICE_REGISTERED;
+                                              //update adv flag
+                                              *(mem_le_adv_data + 13) = DEVICE_REGISTERED;
+                                      }
+                                      else// if(*(LX_RECV_BUF + 8) == DEVICE_ID_ILLEGALED)
+                                      {
+                                              deviceInfo.registerFlag = DEVICE_UNREGISTERED;
+                                      }
+                                      
+                                      btCmdBuf.len = 0x08;
+                                      btCmdBuf.DATA[3] = TOTAL_FRAMES_SINGLE << 4;
+                                      btCmdBuf.DATA[4] = REGISTER_RSP_DATA_LEN;
+                                      btCmdBuf.DATA[5] = LO_UINT16(CMD_REGISTER_RSP);
+                                      btCmdBuf.DATA[6] = HI_UINT16(CMD_REGISTER_RSP);
+                                      btCmdBuf.DATA[7] = deviceInfo.registerFlag;
+                                      bigLittleEndianSwap(&(btCmdBuf.DATA[5]), REGISTER_RSP_DATA_LEN);
+                                      BT_CmdFifoIn(&btCmdBuf);
+                                      lxOptStatus = OPT_REGISTER_RSP_WAIT_ACK;
+                                      break;
+                                      
+                              case OPT_BIND_REQ:
+                                      //bind success
+                                      if(*(LX_RECV_BUF + 2) >= 1 && *(LX_RECV_BUF + 2) <= 4 && *(LX_RECV_BUF + 3) == 1)
+                                      {
+                                              //save user number
+                                              deviceInfo.userNum = *(LX_RECV_BUF + 2);
+                                              //lcd display result
+                                              deviceInfo.bindFlag = BIND_SUCCESS;
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 4   
+
+                                      }
+                                      else
+                                      {
+                                              deviceInfo.bindFlag =  BIND_FAIL;
+                                      }
+                                      
+                                      btCmdBuf.len = 0x08;
+                                      btCmdBuf.DATA[0] = CS_CMD_LE_TX_DAT;
+                                      btCmdBuf.DATA[1] = LO_UINT16(HANDLE_UUIDA621_NOTIFY);
+                                      btCmdBuf.DATA[2] = HI_UINT16(HANDLE_UUIDA621_NOTIFY);
+                                      btCmdBuf.DATA[3] = TOTAL_FRAMES_SINGLE << 4;
+                                      btCmdBuf.DATA[4] = BIND_RSP_DATA_LEN;
+                                      btCmdBuf.DATA[5] = LO_UINT16(CMD_BIND_RSP);
+                                      btCmdBuf.DATA[6] = HI_UINT16(CMD_BIND_RSP);
+                                      btCmdBuf.DATA[7] = deviceInfo.bindFlag;
+              
+                                      bigLittleEndianSwap(&(btCmdBuf.DATA[5]), BIND_RSP_DATA_LEN);
+                                      BT_CmdFifoIn(&btCmdBuf);
+                                      lxOptStatus = OPT_BIND_RSP_WAIT_ACK;
+                                      break;
+                              
+                              case OPT_LOGIN_REQ:
+                                      btCmdBuf.len = 0x0f;
+                                      btCmdBuf.DATA[3] = TOTAL_FRAMES_SINGLE << 4;
+                                      btCmdBuf.DATA[4] = LOGIN_REQ_DATA_LEN;
+                                      btCmdBuf.DATA[5] = LO_UINT16(CMD_LOGIN_REQ);
+                                      btCmdBuf.DATA[6] = HI_UINT16(CMD_LOGIN_REQ);
+                                      //Verification code:6bytes deviceID XOR MAC
+                                      for(i=0;i<6;i++)
+                                      {
+                                              btCmdBuf.DATA[7+i] = deviceInfo.deviceID[i] ^ (*(mem_le_mac+i));
+                                      }
+                                      
+                                      //user number:1bytes
+                                      btCmdBuf.DATA[13] = deviceInfo.userNum;
+                                      //battery:1bytes
+                                      if(CS_Scale_JudgeLowBat(GetIfLowBat) == true)
+                                              btCmdBuf.DATA[14] = 10;
+                                      else
+                                              btCmdBuf.DATA[14] = 100;
+              
+                                      bigLittleEndianSwap(&(btCmdBuf.DATA[5]), LOGIN_REQ_DATA_LEN);
+                                      BT_CmdFifoIn(&btCmdBuf);
+                                      YC_Delay10ms(10);
+                                      lxOptStatus = OPT_LOGIN_REQ_WAIT_ACK;
+                                      break;
+                              case OPT_LOGIN_RSP:
+                                      *(mem_register_buf + 2) = *(LX_RECV_BUF + 2);
+                                      if(*(mem_register_buf + 2) == LOGIN_SUCCESS)
+                                      {
+                                              //Verification code:6bytes deviceID XOR MAC
+                                              for(i=0;i<6;i++)
+                                              {
+                                                      if(*(LX_RECV_BUF + 3+i) != *(mem_register_buf + 4 + i) ^ (*(mem_le_mac+i)))
+                                                      {
+                                                              //disconnected
+                                                              btCmdBuf.len = 0x01;
+                                                              //btCmdBuf.DATA[0] = CS_CMD_LE_DISC_REQ;
+                                                              //BT_CmdFifoIn(&btCmdBuf);
+                                                              //return;
+                                                      }
+                                              }
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 5   
+
+                                              //login success:sync time
+                                              lxOptStatus = OPT_INIT_REQ;
+                                      }
+                                      else
+                                      {
+                                              lxOptStatus = OPT_IDLE;
+                                              //disconnected
+                                              btCmdBuf.len = 0x01;
+                                              btCmdBuf.DATA[0] = CS_CMD_LE_DISC_REQ;
+                                              BT_CmdFifoIn(&btCmdBuf);
+                                              return;
+                                      }
+                                      break;
+                                      
+                              case OPT_INIT_REQ:
+                                      btCmdBuf.len = 0x08;
+                                      btCmdBuf.DATA[0] = CS_CMD_LE_TX_DAT;
+                                      btCmdBuf.DATA[1] = LO_UINT16(HANDLE_UUIDA621_NOTIFY);
+                                      btCmdBuf.DATA[2] = HI_UINT16(HANDLE_UUIDA621_NOTIFY);
+                                      btCmdBuf.DATA[3] = TOTAL_FRAMES_SINGLE << 4;
+                                      btCmdBuf.DATA[4] = INIT_REQ_DATA_LEN;
+                                      btCmdBuf.DATA[5] = LO_UINT16(CMD_INIT_REQ);
+                                      btCmdBuf.DATA[6] = HI_UINT16(CMD_INIT_REQ);
+                                      btCmdBuf.DATA[7] = 0x08;
+                                      
+                                      bigLittleEndianSwap(&(btCmdBuf.DATA[5]), INIT_REQ_DATA_LEN);
+                                      BT_CmdFifoIn(&btCmdBuf);
+                                      lxOptStatus = OPT_INIT_REQ_WAIT_ACK;
+                                      break;
+                              case OPT_INIT_RSP:
+                                      if(*(LX_RECV_BUF + 2) == 0x08)
+                                      {
+                                              //save UTC time
+                                              dmemcpy((pxbyte)&UTCTime, LX_RECV_BUF + 3, 4);
+                                      }
+                                      lxOptStatus = OPT_IDLE;
+                                      break;
+                                      
+                              case OPT_TIME_SETTING_REQ:
+                                      if(*(LX_RECV_BUF+2) &0x01 == 1)
+                                      {
+                                              dmemcpy((pxbyte)&UTCTime, LX_RECV_BUF + 3, 4);
+                                      }
+                                      /*
+                                      if(*(LX_RECV_BUF+2) &0x02 == 1)
+                                      {
+              
+                                      }
+                                      */
+                                      lxSettingDeviceRespone(CMD_TIME_SETTING_REQ, DEVICE_RSP_SUCCESS);
+                                      lxOptStatus = OPT_TIME_SETTING_RSP_WAIT_ACK;
+                                      break;
+                              
+                              case OPT_UNIT_SETTING_REQ:
+                                      //save
+                                      if(*(LX_RECV_BUF + 2) <= 3)
+                                      {
+                                              R_Selet_Unit = *(LX_RECV_BUF + 2);
+                                              lxSettingDeviceRespone(CMD_UNIT_SETTING_REQ, DEVICE_RSP_SUCCESS);
+                                      }
+                                      else
+                                      {
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 6   
+
+                                              lxSettingDeviceRespone(CMD_UNIT_SETTING_REQ, DEVICE_RSP_FAIL);
+                                      }
+                                      lxOptStatus = OPT_UNIT_SETTING_RSP_WAIT_ACK;
+                                      break;
+              
+                              case OPT_DATA_DEL_SETTING_REQ:
+                                      if(*(LX_RECV_BUF + 3)&0x01 == 1)
+                                      {
+                                              delUserData();
+                                      }
+                                      if(*(LX_RECV_BUF + 3)&0x04 == 1)
+                                      {
+                                              UTCTime = 0;
+                                              R_Selet_Unit = CS_ScaleDisplay_L_kg;
+                                      }
+                                      if(*(LX_RECV_BUF + 3)&0x08 == 1)
+                                      {
+                                              QueueInit();
+                                      }
+                                      
+                                      lxSettingDeviceRespone(CMD_DATA_CLEAR_SETTING_REQ, DEVICE_RSP_SUCCESS);
+                                      lxOptStatus = OPT_DATA_DEL_SETTING_RSP_WAIT_ACK;
+                                      break;
+              #endif
+ 327   2                      case OPT_SYNC_DATA_REQ:
+ 328   2                              //forbidden
+ 329   2                              if(*(LX_RECV_BUF + 3) == 0)
+ 330   2                              {
+ 331   3                                      lxOptStatus = OPT_IDLE;
+ 332   3                              }
+ 333   2                              else
+ 334   2                              {
+ 335   3                                      lxOptStatus = OPT_SYNC_DATA_RSP;
+ 336   3                              }
+ 337   2                              break;
+ 338   2                      case OPT_SYNC_DATA_RSP:
+ 339   2                              //send measuredata
+ 340   2                              sendHistoryData();
+ 341   2                              lxOptStatus = OPT_SYNC_DATA_RSP_WAIT_ACK;
+ 342   2                              break;
+ 343   2                      /*
+ 344   2                      case LX_OPT_STATUS_RESEND:
+ 345   2                              BT_CmdFifoIn(&btCmdBuf);
+ 346   2                              lxOptStatus = OPT_IDLE;
+ 347   2                              break;
+ 348   2                              */
+ 349   2              }
+ 350   1      }
+ 351          
+ 352          static void lxSettingDeviceRespone(u16_t cmd, u8_t state)
+ 353          {
+ 354   1              btCmdBuf.len = DEVICE_RSP_DATA_LEN + 5;
+ 355   1              btCmdBuf.DATA[0] = CS_CMD_LE_TX_DAT;
+ 356   1              btCmdBuf.DATA[1] = LO_UINT16(HANDLE_UUIDA621_NOTIFY);
+ 357   1              btCmdBuf.DATA[2] = HI_UINT16(HANDLE_UUIDA621_NOTIFY);
+ 358   1              btCmdBuf.DATA[3] = TOTAL_FRAMES_SINGLE << 4;
+ 359   1              btCmdBuf.DATA[4] = DEVICE_RSP_DATA_LEN;
+ 360   1              btCmdBuf.DATA[5] = LO_UINT16(CMD_DEVICE_RSP);
+ 361   1              btCmdBuf.DATA[6] = HI_UINT16(CMD_DEVICE_RSP);
+ 362   1              btCmdBuf.DATA[7] = LO_UINT16(cmd);
+ 363   1              btCmdBuf.DATA[8] = HI_UINT16(cmd);
+ 364   1              btCmdBuf.DATA[9] = state;
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 7   
+
+ 365   1      
+ 366   1              bigLittleEndianSwap(&(btCmdBuf.DATA[5]), DEVICE_RSP_DATA_LEN);
+ 367   1              BT_CmdFifoIn(&btCmdBuf);
+ 368   1              YC_Delay10ms(10);
+ 369   1      }
+ 370          
+ 371          static void delUserData(void)
+ 372          {
+ 373   1              //(mem_register_buf) = DEVICE_UNREGISTERED;
+ 374   1              //*(mem_le_adv_data + 13) = *(mem_register_buf);
+ 375   1              xmemset((u8_t *)&deviceInfo, 0, sizeof(DeviceInfo_t));
+ 376   1              QueueInit();
+ 377   1              *(mem_le_adv_data + 13) = DEVICE_UNREGISTERED;
+ 378   1              UTCTime = 0;
+ 379   1              SpiFlashOperator(CS_CMD_WRITE_FLASH);
+ 380   1      }
+ 381          
+ 382          void sendMeasureData(UserMeasureData userData)
+ 383          {
+ 384   1              QueuePush(&userData);
+ 385   1      }
+ 386          
+ 387          #define SYNC_DATA_HDR_LEN       0x08
+ 388          #define WEIGHT_UTC_FLAG         0x05
+ 389          static void sendHistoryData(void)
+ 390          {
+ 391   1              static u8_t total_len = 0;
+ 392   1              UserMeasureData *temp = NULL;
+ 393   1              u32_t crc32;
+ 394   1              u8_t i=0;
+ 395   1              u8_t pkgCnt; 
+ 396   1              u8_t size;
+ 397   1              /*
+ 398   1              UserMeasureData temp1;
+ 399   1              temp1.UTCTime[0] = 0x12;
+ 400   1              temp1.UTCTime[0] = 0x34;
+ 401   1              temp1.UTCTime[0] = 0x56;
+ 402   1              temp1.UTCTime[0] = 0x78;
+ 403   1              temp1.weight = 0xabba;
+ 404   1              QueuePush(&temp1);
+ 405   1              QueuePush(&temp1);
+ 406   1              */
+ 407   1              
+ 408   1              size = historyUserData.size;
+ 409   1              pkgCnt = (8 + historyUserData.size * 6 + 4)/18 + (((8 + historyUserData.size * 6 + 4)%18)>0?1:0);
+ 410   1              total_len = 8 + historyUserData.size * 6 + 4;
+ 411   1              
+ 412   1              btCmdBuf.DATA[0] = CS_CMD_LE_TX_DAT;
+ 413   1              btCmdBuf.DATA[1] = LO_UINT16(HANDLE_UUIDA621_NOTIFY);
+ 414   1              btCmdBuf.DATA[2] = HI_UINT16(HANDLE_UUIDA621_NOTIFY);
+ 415   1      
+ 416   1              *(LX_SEND_BUF+0) = LO_UINT16(CMD_SYNC_DATA_RSP);
+ 417   1              *(LX_SEND_BUF+1) = HI_UINT16(CMD_SYNC_DATA_RSP);
+ 418   1              *(LX_SEND_BUF+2) = pkgCnt - 1;
+ 419   1              *(LX_SEND_BUF+3) = 0;
+ 420   1              *(LX_SEND_BUF+4) = WEIGHT_UTC_FLAG;
+ 421   1              *(LX_SEND_BUF+5) = 0;
+ 422   1              *(LX_SEND_BUF+6) = 0;
+ 423   1              *(LX_SEND_BUF+7) = 0;
+ 424   1              if(pkgCnt > 1)
+ 425   1              {
+ 426   2                      for(i=0;i<size;i++)
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 8   
+
+ 427   2                      {
+ 428   3                              temp = QueuePop();
+ 429   3                              dmemcpy(LX_SEND_BUF + (sizeof(UserMeasureData) * i) + 8, (u8_t *)temp, sizeof(UserMeasureData));
+ 430   3                      }
+ 431   2                      crc32 = cal_crc32_multiple(0, LX_SEND_BUF, total_len - 4);
+ 432   2                      dmemcpy(LX_SEND_BUF + (sizeof(UserMeasureData) * i) + 8, (u8_t *)&crc32, sizeof(crc32));
+ 433   2                      bigLittleEndianSwap(LX_SEND_BUF, total_len);
+ 434   2                      
+ 435   2                      for(i=0;i<pkgCnt;i++)
+ 436   2                      {
+ 437   3                              btCmdBuf.DATA[3] = (pkgCnt << 4) + i;
+ 438   3                              if(i == pkgCnt -1)
+ 439   3                              {
+ 440   4                                      btCmdBuf.DATA[4] = total_len;
+ 441   4                              }
+ 442   3                              else
+ 443   3                              {
+ 444   4                                      btCmdBuf.DATA[4] = 20 - 2;
+ 445   4                                      total_len -= 18;
+ 446   4                                      
+ 447   4                              }
+ 448   3                              btCmdBuf.DATA[7] = pkgCnt - i - 1;
+ 449   3                              btCmdBuf.len = 3 + 2 + btCmdBuf.DATA[4] ;
+ 450   3                              dmemcpy(&btCmdBuf.DATA[5], (u8_t *)(LX_SEND_BUF+i*18), btCmdBuf.DATA[4] );
+ 451   3                              BT_CmdFifoIn(&btCmdBuf);
+ 452   3                              YC_Delay10ms(12);
+ 453   3                      }
+ 454   2              }
+ 455   1              else
+ 456   1              {
+ 457   2                      btCmdBuf.len = 3 + 2 + SYNC_DATA_HDR_LEN + sizeof(UserMeasureData);
+ 458   2                      btCmdBuf.DATA[3] = TOTAL_FRAMES_SINGLE << 4;
+ 459   2                      btCmdBuf.DATA[4] = SYNC_DATA_HDR_LEN + sizeof(UserMeasureData);
+ 460   2                      temp = QueuePop();
+ 461   2                      if(temp != NULL)
+ 462   2                      {
+ 463   3                              dmemcpy(LX_SEND_BUF + 8, (u8_t *)temp, sizeof(UserMeasureData));
+ 464   3                      }
+ 465   2                      else
+ 466   2                      {
+ 467   3                              xmemset(LX_SEND_BUF, 0, sizeof(UserMeasureData));
+ 468   3                      }
+ 469   2                      dmemcpy(&(btCmdBuf.DATA[5]), LX_SEND_BUF, btCmdBuf.DATA[4]);
+ 470   2                      bigLittleEndianSwap(&(btCmdBuf.DATA[5]), btCmdBuf.DATA[4]);
+ 471   2                      BT_CmdFifoIn(&btCmdBuf);
+ 472   2              }
+ 473   1      }
+ 474          
+ 475          void SpiFlashOperator(u8_t opt)
+ 476          {
+ 477   1      #if 1
+ 478   1              if(CS_CMD_READ_FLASH == opt)
+ 479   1              {
+ 480   2                      SPIFlashRead(mem_spiflash_buf, SPIFLASH_DATA_ADDR, SPIFLASH_READ_LENGTH);
+ 481   2              }
+ 482   1              else if(CS_CMD_WRITE_FLASH == opt)
+ 483   1              {
+ 484   2                      SPIFlashEraseSector(SPIFLASH_DATA_ADDR);
+ 485   2                      SPIFlashWrite(mem_spiflash_buf, SPIFLASH_DATA_ADDR, SPIFLASH_READ_LENGTH);
+ 486   2              }
+ 487   1      #else
+                      btCmdBuf.len = 1;
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 9   
+
+                      btCmdBuf.DATA[0] = opt;
+                      BT_CmdFifoIn(&btCmdBuf);
+                      YC_Delay10ms(10);
+              #endif
+ 493   1      }
+ 494          
+ 495          
+ 496          
+ 497          
+ 498          /**************************************************************************/
+ 499          #define QUEUE_IS_EMPTY  (historyUserData.size <= 0)             
+ 500          #define QUEUE_IS_FULL   (historyUserData.size >= MAX_SIZE)
+ 501          
+ 502          void QueueInit(void)
+ 503          {
+ 504   1              historyUserData.head = 0;
+ 505   1              historyUserData.tail = 0;
+ 506   1              historyUserData.size = 0;
+ 507   1      }
+ 508          
+ 509          static UserMeasureData* QueuePop(void)
+ 510          {
+ 511   1              UserMeasureData *temp = NULL;
+ 512   1              
+ 513   1              if(QUEUE_IS_EMPTY)
+ 514   1                      return NULL;
+ 515   1      
+ 516   1              temp = &(historyUserData.measureData[historyUserData.head]);
+ 517   1              historyUserData.head = (historyUserData.head + 1)%MAX_SIZE;
+ 518   1              historyUserData.size--;
+ 519   1      
+ 520   1              return temp;
+ 521   1      }
+ 522          
+ 523          static void QueuePush(UserMeasureData *userData)
+ 524          {
+ 525   1              if(QUEUE_IS_FULL)
+ 526   1                      QueuePop();
+ 527   1              
+ 528   1              dmemcpy((u8_t *)&(historyUserData.measureData[historyUserData.tail]), (u8_t *)userData, sizeof(UserMeasur
+             -eData));
+ 529   1              historyUserData.tail = (historyUserData.tail + 1)%MAX_SIZE;
+ 530   1              historyUserData.size++;
+ 531   1      }
+ 532          
+ 533          
+ 534          
+ 535          
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 10  
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION _bigLittleEndianSwap (BEGIN)
+                                           ; SOURCE LINE # 18
+                 R     MOV     DPTR,#buf
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R4
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R5
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 19
+                                           ; SOURCE LINE # 23
+                       ADD     A,#0FFH
+                       MOV     R6,A
+                       MOV     A,R4
+                       ADDC    A,#0FFH
+                 R     MOV     DPTR,#size
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       XCH     A,R6
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 24
+                       CLR     A
+                 R     MOV     DPTR,#i
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+             ?C0001:
+                 R     MOV     DPTR,#len
+                       MOVX    A,@DPTR
+                       CLR     C
+                       RRC     A
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       RRC     A
+                       MOV     R7,A
+                       CLR     C
+                 R     MOV     DPTR,#i+01H
+                       MOVX    A,@DPTR
+                       SUBB    A,R7
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       SUBB    A,R6
+                 R     xJGE    ?C0004
+                                           ; SOURCE LINE # 25
+                                           ; SOURCE LINE # 26
+                 R     MOV     DPTR,#buf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 11  
+
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     DPL,A
+                       MOV     DPH,R6
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#temp
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 27
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     C
+                 R     MOV     DPTR,#size+01H
+                       MOVX    A,@DPTR
+                       SUBB    A,R7
+                       MOV     R7,A
+                 R     MOV     DPTR,#size
+                       MOVX    A,@DPTR
+                       SUBB    A,R6
+                       MOV     DPL,R7
+                       MOV     DPH,A
+                 E     CALL    ?C?CLDOPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       MOV     DPL,A
+                       MOV     DPH,R4
+                       MOV     A,R7
+                 E     CALL    ?C?CSTOPTR
+                                           ; SOURCE LINE # 28
+                 R     MOV     DPTR,#temp
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     C
+                 R     MOV     DPTR,#size+01H
+                       MOVX    A,@DPTR
+                       SUBB    A,R5
+                       MOV     R5,A
+                 R     MOV     DPTR,#size
+                       MOVX    A,@DPTR
+                       SUBB    A,R4
+                       MOV     R4,A
+                 R     MOV     DPTR,#buf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 12  
+
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPL,R5
+                       MOV     DPH,R4
+                       MOV     A,R7
+                 E     CALL    ?C?CSTOPTR
+                                           ; SOURCE LINE # 29
+                 R     MOV     DPTR,#i+01H
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                 R     JNZ     ?C0059
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+             ?C0059:
+                 R     xJMP    ?C0001
+                                           ; SOURCE LINE # 30
+             ?C0004:
+                       RET     
+             ; FUNCTION _bigLittleEndianSwap (END)
+
+             ; FUNCTION _lxSendRecvDataACK (BEGIN)
+                                           ; SOURCE LINE # 32
+;---- Variable 'handle' assigned to Register 'R2/R3' ----
+                       MOV     R3,AR7
+                       MOV     R2,AR6
+;---- Variable 'state' assigned to Register 'R5' ----
+                                           ; SOURCE LINE # 33
+                                           ; SOURCE LINE # 34
+                 E     MOV     DPTR,#notifyValueUUIDA625
+                       MOVX    A,@DPTR
+                       XRL     A,#01H
+                 R     xJNZ    ?C0006
+                                           ; SOURCE LINE # 35
+                                           ; SOURCE LINE # 37
+             ?C0005:
+                                           ; SOURCE LINE # 39
+                 E     MOV     DPTR,#btCmdBuf
+                       MOV     A,#06H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 40
+                       INC     DPTR
+                       MOV     A,#030H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 41
+                       MOV     A,R3
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 42
+                       MOV     A,R2
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 43
+                       CLR     A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 44
+                       INC     DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 13  
+
+                                           ; SOURCE LINE # 45
+                       INC     DPTR
+                       MOV     A,R5
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 47
+                       MOV     R3,#01H
+                 E     MOV     R2,#HIGH btCmdBuf
+                 E     MOV     R1,#LOW btCmdBuf
+                 E     CALL    _BT_CmdFifoIn
+                                           ; SOURCE LINE # 48
+                       MOV     R7,#0AH
+                 E     CALL    _YC_Delay10ms
+                                           ; SOURCE LINE # 49
+             ?C0006:
+                       RET     
+             ; FUNCTION _lxSendRecvDataACK (END)
+
+             ; FUNCTION _lxRecvDataFromApp (BEGIN)
+                                           ; SOURCE LINE # 51
+                 R     MOV     DPTR,#event
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 52
+                                           ; SOURCE LINE # 55
+                 R     MOV     DPTR,#event
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#04H
+                 E     CALL    ?C?CLDOPTR
+                 R     MOV     DPTR,#frameControl
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 58
+                       MOV     A,R1
+                       ADD     A,#06H
+                       MOV     R1,A
+                       CLR     A
+                       ADDC    A,R2
+                       MOV     R2,A
+                       PUSH    AR2
+                       PUSH    AR1
+                 R     MOV     DPTR,#event
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#05H
+                 E     CALL    ?C?CLDOPTR
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 14  
+
+                       MOV     R5,A
+                       MOV     R4,#00H
+                       POP     AR1
+                       POP     AR2
+                 R     CALL    _bigLittleEndianSwap
+                                           ; SOURCE LINE # 59
+                 R     MOV     DPTR,#event
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#07H
+                 E     CALL    ?C?CLDOPTR
+                       MOV     R6,A
+                       MOV     DPTR,#06H
+                 E     CALL    ?C?CLDOPTR
+                       MOV     R5,A
+                       MOV     A,R6
+                       MOV     A,R5
+                       MOV     R7,A
+                 R     MOV     DPTR,#cmd
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 62
+                 R     MOV     DPTR,#frameControl
+                       MOVX    A,@DPTR
+                       XRL     A,#010H
+                 R     xJNZ    ?C0007
+                                           ; SOURCE LINE # 63
+                                           ; SOURCE LINE # 65
+                       MOV     R5,#01H
+                       MOV     R7,#025H
+                       MOV     R6,A
+                 R     CALL    _lxSendRecvDataACK
+                                           ; SOURCE LINE # 68
+                 R     MOV     DPTR,#event
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ADD     A,#06H
+                       MOV     R1,A
+                       CLR     A
+                       ADDC    A,R2
+                       MOV     R2,A
+                       PUSH    AR2
+                       PUSH    AR1
+                 R     MOV     DPTR,#event
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 15  
+
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#05H
+                 E     CALL    ?C?CLDOPTR
+                 E     MOV     ?_xmemcpy?BYTE+05H,A
+                       POP     AR1
+                       POP     AR2
+                       MOV     R7,#0A0H
+                       MOV     R6,#048H
+                 E     CALL    _xmemcpy
+                                           ; SOURCE LINE # 70
+                 R     MOV     DPTR,#cmd
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     B,R6
+                 E     CALL    ?C?ICASE
+                 R     DW      ?C0009
+                       DW      01H
+                 R     DW      ?C0010
+                       DW      03H
+                 R     DW      ?C0011
+                       DW      08H
+                 R     DW      ?C0012
+                       DW      0AH
+                 R     DW      ?C0013
+                       DW      01002H
+                 R     DW      ?C0014
+                       DW      01004H
+                 R     DW      ?C0015
+                       DW      01005H
+                 R     DW      ?C0016
+                       DW      04801H
+                       DW      00H
+                 R     DW      ?C0023
+                                           ; SOURCE LINE # 71
+                                           ; SOURCE LINE # 72
+             ?C0009:
+                                           ; SOURCE LINE # 73
+                       MOV     R7,#010H
+                 R     CALL    _changeLxOptStatus
+                                           ; SOURCE LINE # 74
+                       RET     
+                                           ; SOURCE LINE # 75
+             ?C0010:
+                                           ; SOURCE LINE # 76
+                       MOV     R7,#013H
+                 R     CALL    _changeLxOptStatus
+                                           ; SOURCE LINE # 77
+                       RET     
+                                           ; SOURCE LINE # 78
+             ?C0011:
+                                           ; SOURCE LINE # 79
+                       MOV     R7,#018H
+                 R     CALL    _changeLxOptStatus
+                                           ; SOURCE LINE # 80
+                       RET     
+                                           ; SOURCE LINE # 81
+             ?C0012:
+                                           ; SOURCE LINE # 82
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 16  
+
+                       MOV     R7,#022H
+                 R     CALL    _changeLxOptStatus
+                                           ; SOURCE LINE # 83
+                       RET     
+                                           ; SOURCE LINE # 85
+             ?C0013:
+                                           ; SOURCE LINE # 86
+                       MOV     R7,#025H
+                 R     CALL    _changeLxOptStatus
+                                           ; SOURCE LINE # 87
+                       RET     
+                                           ; SOURCE LINE # 88
+             ?C0014:
+                                           ; SOURCE LINE # 89
+                       MOV     R7,#028H
+                 R     CALL    _changeLxOptStatus
+                                           ; SOURCE LINE # 90
+                       RET     
+                                           ; SOURCE LINE # 91
+             ?C0015:
+                                           ; SOURCE LINE # 92
+                       MOV     R7,#031H
+                 R     CALL    _changeLxOptStatus
+                                           ; SOURCE LINE # 93
+                       RET     
+                                           ; SOURCE LINE # 95
+             ?C0016:
+                                           ; SOURCE LINE # 96
+                       MOV     R7,#035H
+                 R     CALL    _changeLxOptStatus
+                                           ; SOURCE LINE # 97
+                       RET     
+                                           ; SOURCE LINE # 98
+                                           ; SOURCE LINE # 100
+                       RET     
+             ?C0007:
+                                           ; SOURCE LINE # 102
+                 R     MOV     DPTR,#frameControl
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0023
+                                           ; SOURCE LINE # 103
+                                           ; SOURCE LINE # 104
+                 R     MOV     DPTR,#event
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPTR,#06H
+                 E     CALL    ?C?CLDOPTR
+                 R     xJNE    A,#01H,?C0019
+                                           ; SOURCE LINE # 105
+                                           ; SOURCE LINE # 106
+                 E     MOV     DPTR,#lxOptStatus
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#011H,?C0020
+                                           ; SOURCE LINE # 107
+                                           ; SOURCE LINE # 108
+                       MOV     R7,#041H
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 17  
+
+                 R     CALL    _SpiFlashOperator
+                                           ; SOURCE LINE # 109
+             ?C0020:
+                                           ; SOURCE LINE # 111
+                       CLR     A
+                 E     MOV     DPTR,#lxOptStatus
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 112
+                       RET     
+             ?C0019:
+                                           ; SOURCE LINE # 114
+                                           ; SOURCE LINE # 115
+                 E     MOV     DPTR,#lxOptStatus
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#011H,?C0022
+                                           ; SOURCE LINE # 116
+                                           ; SOURCE LINE # 117
+                       MOV     R3,#0AH
+                       CLR     A
+                       MOV     R5,A
+                       MOV     R7,#0EH
+                       MOV     R6,#04CH
+                 E     CALL    _xmemset
+                                           ; SOURCE LINE # 119
+                       MOV     DPTR,#043E7H
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 120
+             ?C0022:
+                                           ; SOURCE LINE # 121
+                       CLR     A
+                 E     MOV     DPTR,#lxOptStatus
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 122
+                                           ; SOURCE LINE # 123
+                                           ; SOURCE LINE # 124
+             ?C0023:
+                       RET     
+             ; FUNCTION _lxRecvDataFromApp (END)
+
+             ; FUNCTION _changeLxOptStatus (BEGIN)
+                                           ; SOURCE LINE # 126
+;---- Variable 'opt' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 127
+                                           ; SOURCE LINE # 128
+                 E     MOV     DPTR,#lxOptStatus
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0025
+                                           ; SOURCE LINE # 129
+                                           ; SOURCE LINE # 130
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 131
+                                           ; SOURCE LINE # 132
+             ?C0025:
+                       RET     
+             ; FUNCTION _changeLxOptStatus (END)
+
+             ; FUNCTION lxOptProcess (BEGIN)
+                                           ; SOURCE LINE # 134
+                                           ; SOURCE LINE # 135
+                                           ; SOURCE LINE # 138
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 18  
+
+                 E     MOV     DPTR,#btCmdBuf+01H
+                       MOV     A,#030H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 139
+                       INC     DPTR
+                       MOV     A,#01CH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 140
+                       CLR     A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 141
+                 E     MOV     DPTR,#lxOptStatus
+                       MOVX    A,@DPTR
+                       ADD     A,#0CAH
+                 R     xJZ     ?C0030
+                       INC     A
+                 R     xJNZ    ?C0031
+                                           ; SOURCE LINE # 142
+                                           ; SOURCE LINE # 327
+             ?C0027:
+                                           ; SOURCE LINE # 329
+                       MOV     DPTR,#048A3H
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0028
+                                           ; SOURCE LINE # 330
+                                           ; SOURCE LINE # 331
+                 E     MOV     DPTR,#lxOptStatus
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 332
+                       RET     
+             ?C0028:
+                                           ; SOURCE LINE # 334
+                                           ; SOURCE LINE # 335
+                 E     MOV     DPTR,#lxOptStatus
+                       MOV     A,#036H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 336
+                                           ; SOURCE LINE # 337
+                       RET     
+                                           ; SOURCE LINE # 338
+             ?C0030:
+                                           ; SOURCE LINE # 340
+                 R     CALL    sendHistoryData
+                                           ; SOURCE LINE # 341
+                 E     MOV     DPTR,#lxOptStatus
+                       MOV     A,#037H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 342
+                                           ; SOURCE LINE # 349
+                                           ; SOURCE LINE # 350
+             ?C0031:
+                       RET     
+             ; FUNCTION lxOptProcess (END)
+
+             ; FUNCTION _lxSettingDeviceRespone (BEGIN)
+                                           ; SOURCE LINE # 352
+;---- Variable 'cmd' assigned to Register 'R2/R3' ----
+                       MOV     R3,AR7
+                       MOV     R2,AR6
+;---- Variable 'state' assigned to Register 'R5' ----
+                                           ; SOURCE LINE # 353
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 19  
+
+                                           ; SOURCE LINE # 354
+                 E     MOV     DPTR,#btCmdBuf
+                       MOV     A,#0AH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 355
+                       INC     DPTR
+                       MOV     A,#030H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 356
+                       INC     DPTR
+                       MOV     A,#01CH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 357
+                       CLR     A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 358
+                       INC     DPTR
+                       MOV     A,#010H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 359
+                       INC     DPTR
+                       MOV     A,#05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 360
+                       CLR     A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 361
+                       INC     DPTR
+                       MOV     A,#010H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 362
+                       MOV     A,R7
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 363
+                       MOV     A,R6
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 364
+                       INC     DPTR
+                       MOV     A,R5
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 366
+                       MOV     R3,#01H
+                 E     MOV     R2,#HIGH btCmdBuf+06H
+                 E     MOV     R1,#LOW btCmdBuf+06H
+                       MOV     R5,#05H
+                       MOV     R4,#00H
+                 R     CALL    _bigLittleEndianSwap
+                                           ; SOURCE LINE # 367
+                       MOV     R3,#01H
+                 E     MOV     R2,#HIGH btCmdBuf
+                 E     MOV     R1,#LOW btCmdBuf
+                 E     CALL    _BT_CmdFifoIn
+                                           ; SOURCE LINE # 368
+                       MOV     R7,#0AH
+                 E     CALL    _YC_Delay10ms
+                                           ; SOURCE LINE # 369
+                       RET     
+             ; FUNCTION _lxSettingDeviceRespone (END)
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 20  
+
+
+             ; FUNCTION delUserData (BEGIN)
+                                           ; SOURCE LINE # 371
+                                           ; SOURCE LINE # 372
+                                           ; SOURCE LINE # 375
+                 E     MOV     R6,#HIGH deviceInfo
+                 E     MOV     R7,#LOW deviceInfo
+                       MOV     R3,#0AH
+                       CLR     A
+                       MOV     R5,A
+                 E     CALL    _xmemset
+                                           ; SOURCE LINE # 376
+                 R     CALL    QueueInit
+                                           ; SOURCE LINE # 377
+                       MOV     DPTR,#043E7H
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 378
+                 E     MOV     DPTR,#UTCTime
+                 E     CALL    ?C?LSTKXDATA
+                       DB      #00H
+                       DB      #00H
+                       DB      #00H
+                       DB      #00H
+                                           ; SOURCE LINE # 379
+                       MOV     R7,#041H
+                 R     CALL    _SpiFlashOperator
+                                           ; SOURCE LINE # 380
+                       RET     
+             ; FUNCTION delUserData (END)
+
+             ; FUNCTION sendMeasureData (BEGIN)
+                                           ; SOURCE LINE # 382
+                                           ; SOURCE LINE # 383
+                                           ; SOURCE LINE # 384
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH userData
+                 R     MOV     R1,#LOW userData
+                 R     CALL    _QueuePush
+                                           ; SOURCE LINE # 385
+                       RET     
+             ; FUNCTION sendMeasureData (END)
+
+             ; FUNCTION sendHistoryData (BEGIN)
+                                           ; SOURCE LINE # 389
+                                           ; SOURCE LINE # 390
+                                           ; SOURCE LINE # 392
+                 R     MOV     DPTR,#temp
+                       CLR     A
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 394
+                 R     MOV     DPTR,#i
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 408
+                 E     MOV     DPTR,#historyUserData+02H
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#size
+                       MOVX    @DPTR,A
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 21  
+
+                                           ; SOURCE LINE # 409
+                       MOV     B,#06H
+                       MUL     AB
+                       ADD     A,#0CH
+                       MOV     R7,A
+                       CLR     A
+                       ADDC    A,B
+                       MOV     R6,A
+                       MOV     R4,#00H
+                       MOV     R5,#012H
+                 E     CALL    ?C?UIDIV
+                       MOV     A,R5
+                       SETB    C
+                       SUBB    A,#00H
+                 R     xJLT    ?C0035
+                       MOV     R7,#01H
+                       MOV     R3,#01H
+                 R     xJMP    ?C0036
+             ?C0035:
+                       MOV     R7,#00H
+                       MOV     R3,#00H
+             ?C0036:
+                 E     MOV     DPTR,#historyUserData+02H
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       MOV     B,#06H
+                       MUL     AB
+                       ADD     A,#0CH
+                       MOV     R7,A
+                       CLR     A
+                       ADDC    A,B
+                       MOV     R6,A
+                       MOV     R4,#00H
+                       MOV     R5,#012H
+                 E     CALL    ?C?UIDIV
+                       MOV     A,R3
+                       ADD     A,R7
+                 R     MOV     DPTR,#pkgCnt
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 410
+                       MOV     A,R2
+                       MOV     B,#06H
+                       MUL     AB
+                       ADD     A,#0CH
+                 R     MOV     DPTR,#total_len
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 412
+                 E     MOV     DPTR,#btCmdBuf+01H
+                       MOV     A,#030H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 413
+                       INC     DPTR
+                       MOV     A,#01CH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 414
+                       CLR     A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 416
+                       MOV     DPTR,#048D2H
+                       MOV     A,#02H
+                       MOVX    @DPTR,A
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 22  
+
+                                           ; SOURCE LINE # 417
+                       INC     DPTR
+                       MOV     A,#048H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 418
+                 R     MOV     DPTR,#pkgCnt
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       DEC     A
+                       MOV     DPTR,#048D4H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 419
+                       INC     DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 420
+                       INC     DPTR
+                       MOV     A,#05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 421
+                       INC     DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 422
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 423
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 424
+                       MOV     A,R7
+                       SETB    C
+                       SUBB    A,#01H
+                 R     xJLT    ?C0037
+                                           ; SOURCE LINE # 425
+                                           ; SOURCE LINE # 426
+                       CLR     A
+                 R     MOV     DPTR,#i
+                       MOVX    @DPTR,A
+             ?C0038:
+                 R     MOV     DPTR,#size
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       CLR     C
+                       SUBB    A,R7
+                 R     xJGE    ?C0039
+                                           ; SOURCE LINE # 427
+                                           ; SOURCE LINE # 428
+                 R     CALL    QueuePop
+                 R     MOV     DPTR,#temp
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 429
+                 R     MOV     DPTR,#i
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 23  
+
+                       MOVX    A,@DPTR
+                       MOV     B,#06H
+                       MUL     AB
+                       ADD     A,#0DAH
+                       MOV     R7,A
+                       MOV     A,B
+                       ADDC    A,#048H
+                       MOV     R2,A
+                       MOV     R1,AR7
+                       MOV     R3,#01H
+                       PUSH    AR3
+                       PUSH    AR2
+                 R     MOV     DPTR,#temp
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 E     MOV     ?_dmemcpy?BYTE+03H,R3
+                 E     MOV     ?_dmemcpy?BYTE+04H,R2
+                 E     MOV     ?_dmemcpy?BYTE+05H,A
+                 E     MOV     ?_dmemcpy?BYTE+06H,#06H
+                       POP     AR2
+                       POP     AR3
+                 E     CALL    _dmemcpy
+                                           ; SOURCE LINE # 430
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                 R     xJMP    ?C0038
+             ?C0039:
+                                           ; SOURCE LINE # 431
+                       MOV     R3,#01H
+                       MOV     R2,#048H
+                       MOV     R1,#0D2H
+                 R     MOV     DPTR,#total_len
+                       MOVX    A,@DPTR
+                       ADD     A,#0FCH
+                       MOV     R7,A
+                       CLR     A
+                       ADDC    A,#0FFH
+                       MOV     R6,A
+                       CLR     A
+                       MOV     R4,A
+                       MOV     R5,A
+                 E     MOV     DPTR,#?_cal_crc32_multiple?BYTE+07H
+                 E     CALL    ?C?LSTXDATA
+                       MOV     R7,#00H
+                       MOV     R6,#00H
+                       MOV     R5,#00H
+                       MOV     R4,#00H
+                 E     CALL    _cal_crc32_multiple
+                 R     MOV     DPTR,#crc32
+                 E     CALL    ?C?LSTXDATA
+                                           ; SOURCE LINE # 432
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       MOV     B,#06H
+                       MUL     AB
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 24  
+
+                       ADD     A,#0DAH
+                       MOV     R7,A
+                       MOV     A,B
+                       ADDC    A,#048H
+                       MOV     R2,A
+                       MOV     R1,AR7
+                       MOV     R3,#01H
+                       PUSH    AR3
+                 E     MOV     ?_dmemcpy?BYTE+03H,R3
+                 R     MOV     ?_dmemcpy?BYTE+04H,#HIGH crc32
+                 R     MOV     ?_dmemcpy?BYTE+05H,#LOW crc32
+                 E     MOV     ?_dmemcpy?BYTE+06H,#04H
+                       POP     AR3
+                 E     CALL    _dmemcpy
+                                           ; SOURCE LINE # 433
+                       MOV     R3,#01H
+                       MOV     R2,#048H
+                       MOV     R1,#0D2H
+                 R     MOV     DPTR,#total_len
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       MOV     R4,#00H
+                 R     CALL    _bigLittleEndianSwap
+                                           ; SOURCE LINE # 435
+                       CLR     A
+                 R     MOV     DPTR,#i
+                       MOVX    @DPTR,A
+             ?C0041:
+                 R     MOV     DPTR,#pkgCnt
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       CLR     C
+                       SUBB    A,R7
+                 R     xJGE    ?C0049
+                                           ; SOURCE LINE # 436
+                                           ; SOURCE LINE # 437
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       SWAP    A
+                       ANL     A,#0F0H
+                       MOV     R7,A
+                       MOV     A,R6
+                       ADD     A,R7
+                 E     MOV     DPTR,#btCmdBuf+04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 438
+                       MOV     A,R5
+                       DEC     A
+                 R     xJNE    A,AR6,?C0044
+                                           ; SOURCE LINE # 439
+                                           ; SOURCE LINE # 440
+                 R     MOV     DPTR,#total_len
+                       MOVX    A,@DPTR
+                 E     MOV     DPTR,#btCmdBuf+05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 441
+                 R     xJMP    ?C0045
+             ?C0044:
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 25  
+
+                                           ; SOURCE LINE # 443
+                                           ; SOURCE LINE # 444
+                 E     MOV     DPTR,#btCmdBuf+05H
+                       MOV     A,#012H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 445
+                 R     MOV     DPTR,#total_len
+                       MOVX    A,@DPTR
+                       ADD     A,#0EEH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 447
+             ?C0045:
+                                           ; SOURCE LINE # 448
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       CLR     C
+                       SUBB    A,R5
+                       DEC     A
+                 E     MOV     DPTR,#btCmdBuf+08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 449
+                 E     MOV     DPTR,#btCmdBuf+05H
+                       MOVX    A,@DPTR
+                       ADD     A,#05H
+                 E     MOV     DPTR,#btCmdBuf
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 450
+                       MOV     A,R5
+                       MOV     B,#012H
+                       MUL     AB
+                       ADD     A,#0D2H
+                       MOV     R7,A
+                       MOV     A,B
+                       ADDC    A,#048H
+                       MOV     R1,AR7
+                 E     MOV     ?_dmemcpy?BYTE+03H,#01H
+                 E     MOV     ?_dmemcpy?BYTE+04H,A
+                 E     MOV     ?_dmemcpy?BYTE+05H,R1
+                 E     MOV     DPTR,#btCmdBuf+05H
+                       MOVX    A,@DPTR
+                 E     MOV     ?_dmemcpy?BYTE+06H,A
+                       MOV     R3,#01H
+                 E     MOV     R2,#HIGH btCmdBuf+06H
+                 E     MOV     R1,#LOW btCmdBuf+06H
+                 E     CALL    _dmemcpy
+                                           ; SOURCE LINE # 451
+                       MOV     R3,#01H
+                 E     MOV     R2,#HIGH btCmdBuf
+                 E     MOV     R1,#LOW btCmdBuf
+                 E     CALL    _BT_CmdFifoIn
+                                           ; SOURCE LINE # 452
+                       MOV     R7,#0CH
+                 E     CALL    _YC_Delay10ms
+                                           ; SOURCE LINE # 453
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                 R     xJMP    ?C0041
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 26  
+
+                                           ; SOURCE LINE # 454
+             ?C0037:
+                                           ; SOURCE LINE # 456
+                                           ; SOURCE LINE # 457
+                 E     MOV     DPTR,#btCmdBuf
+                       MOV     A,#013H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 458
+                 E     MOV     DPTR,#btCmdBuf+04H
+                       MOV     A,#010H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 459
+                       INC     DPTR
+                       MOV     A,#0EH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 460
+                 R     CALL    QueuePop
+                 R     MOV     DPTR,#temp
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 461
+                       ORL     A,R2
+                 R     xJZ     ?C0047
+                                           ; SOURCE LINE # 462
+                                           ; SOURCE LINE # 463
+                 R     MOV     DPTR,#temp
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 E     MOV     ?_dmemcpy?BYTE+03H,R3
+                 E     MOV     ?_dmemcpy?BYTE+04H,R2
+                 E     MOV     ?_dmemcpy?BYTE+05H,A
+                 E     MOV     ?_dmemcpy?BYTE+06H,#06H
+                       MOV     R3,#01H
+                       MOV     R2,#048H
+                       MOV     R1,#0DAH
+                 E     CALL    _dmemcpy
+                                           ; SOURCE LINE # 464
+                 R     xJMP    ?C0048
+             ?C0047:
+                                           ; SOURCE LINE # 466
+                                           ; SOURCE LINE # 467
+                       MOV     R3,#06H
+                       CLR     A
+                       MOV     R5,A
+                       MOV     R7,#0D2H
+                       MOV     R6,#048H
+                 E     CALL    _xmemset
+                                           ; SOURCE LINE # 468
+             ?C0048:
+                                           ; SOURCE LINE # 469
+                 E     MOV     ?_dmemcpy?BYTE+03H,#01H
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 27  
+
+                 E     MOV     ?_dmemcpy?BYTE+04H,#048H
+                 E     MOV     ?_dmemcpy?BYTE+05H,#0D2H
+                 E     MOV     DPTR,#btCmdBuf+05H
+                       MOVX    A,@DPTR
+                 E     MOV     ?_dmemcpy?BYTE+06H,A
+                       MOV     R3,#01H
+                 E     MOV     R2,#HIGH btCmdBuf+06H
+                 E     MOV     R1,#LOW btCmdBuf+06H
+                 E     CALL    _dmemcpy
+                                           ; SOURCE LINE # 470
+                       MOV     R3,#01H
+                 E     MOV     R2,#HIGH btCmdBuf+06H
+                 E     MOV     R1,#LOW btCmdBuf+06H
+                 E     MOV     DPTR,#btCmdBuf+05H
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       MOV     R4,#00H
+                 R     CALL    _bigLittleEndianSwap
+                                           ; SOURCE LINE # 471
+                       MOV     R3,#01H
+                 E     MOV     R2,#HIGH btCmdBuf
+                 E     MOV     R1,#LOW btCmdBuf
+                 E     CALL    _BT_CmdFifoIn
+                                           ; SOURCE LINE # 472
+                                           ; SOURCE LINE # 473
+             ?C0049:
+                       RET     
+             ; FUNCTION sendHistoryData (END)
+
+             ; FUNCTION _SpiFlashOperator (BEGIN)
+                                           ; SOURCE LINE # 475
+                 R     MOV     DPTR,#opt
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 476
+                                           ; SOURCE LINE # 478
+                 R     xJNE    R7,#040H,?C0050
+                                           ; SOURCE LINE # 479
+                                           ; SOURCE LINE # 480
+                       MOV     R3,#01H
+                       MOV     R2,#04CH
+                       MOV     R1,#00H
+                 E     MOV     DPTR,#?_SPIFlashRead?BYTE+07H
+                       MOV     A,#04CH
+                       MOVX    @DPTR,A
+                       MOV     R7,#00H
+                       MOV     R6,#0A0H
+                       MOV     R5,#00H
+                       MOV     R4,#00H
+                 E     CALL    _SPIFlashRead
+                                           ; SOURCE LINE # 481
+                       RET     
+             ?C0050:
+                                           ; SOURCE LINE # 482
+                 R     MOV     DPTR,#opt
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#041H,?C0053
+                                           ; SOURCE LINE # 483
+                                           ; SOURCE LINE # 484
+                       MOV     R7,#00H
+                       MOV     R6,#0A0H
+                       MOV     R5,#00H
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 28  
+
+                       MOV     R4,#00H
+                 E     CALL    _SPIFlashEraseSector
+                                           ; SOURCE LINE # 485
+                       MOV     R3,#01H
+                       MOV     R2,#04CH
+                       MOV     R1,#00H
+                 E     MOV     DPTR,#?_SPIFlashWrite?BYTE+07H
+                       MOV     A,#04CH
+                       MOVX    @DPTR,A
+                       MOV     R7,#00H
+                       MOV     R6,#0A0H
+                       MOV     R5,#00H
+                       MOV     R4,#00H
+                 E     CALL    _SPIFlashWrite
+                                           ; SOURCE LINE # 486
+                                           ; SOURCE LINE # 493
+             ?C0053:
+                       RET     
+             ; FUNCTION _SpiFlashOperator (END)
+
+             ; FUNCTION QueueInit (BEGIN)
+                                           ; SOURCE LINE # 502
+                                           ; SOURCE LINE # 503
+                                           ; SOURCE LINE # 504
+                       CLR     A
+                 E     MOV     DPTR,#historyUserData
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 505
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 506
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 507
+                       RET     
+             ; FUNCTION QueueInit (END)
+
+             ; FUNCTION QueuePop (BEGIN)
+                                           ; SOURCE LINE # 509
+                                           ; SOURCE LINE # 510
+                                           ; SOURCE LINE # 511
+                 R     MOV     DPTR,#temp
+                       CLR     A
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 513
+                 E     MOV     DPTR,#historyUserData+02H
+                       MOVX    A,@DPTR
+                       SETB    C
+                       SUBB    A,#00H
+                 R     xJGE    ?C0055
+                                           ; SOURCE LINE # 514
+                       MOV     R3,#00H
+                       MOV     R2,#00H
+                       MOV     R1,#00H
+                       RET     
+             ?C0055:
+                                           ; SOURCE LINE # 516
+                 E     MOV     DPTR,#historyUserData
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 29  
+
+                       MOVX    A,@DPTR
+                       MOV     B,#06H
+                       MUL     AB
+                 E     ADD     A,#LOW historyUserData+03H
+                       MOV     R1,A
+                 E     MOV     A,#HIGH historyUserData+03H
+                       ADDC    A,B
+                       MOV     R2,A
+                 R     MOV     DPTR,#temp
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 517
+                 E     MOV     DPTR,#historyUserData
+                       MOVX    A,@DPTR
+                       ADD     A,#01H
+                       MOV     R7,A
+                       CLR     A
+                       RLC     A
+                       MOV     R6,A
+                       MOV     R4,#00H
+                       MOV     R5,#0AH
+                 E     CALL    ?C?UIDIV
+                       MOV     A,R5
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 518
+                 E     MOV     DPTR,#historyUserData+02H
+                       MOVX    A,@DPTR
+                       DEC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 520
+                 R     MOV     DPTR,#temp
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                                           ; SOURCE LINE # 521
+             ?C0056:
+                       RET     
+             ; FUNCTION QueuePop (END)
+
+             ; FUNCTION _QueuePush (BEGIN)
+                                           ; SOURCE LINE # 523
+                 R     MOV     DPTR,#userData
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 524
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 30  
+
+                                           ; SOURCE LINE # 525
+                 E     MOV     DPTR,#historyUserData+02H
+                       MOVX    A,@DPTR
+                       CLR     C
+                       SUBB    A,#0AH
+                 R     xJLT    ?C0057
+                                           ; SOURCE LINE # 526
+                 R     CALL    QueuePop
+             ?C0057:
+                                           ; SOURCE LINE # 528
+                 E     MOV     DPTR,#historyUserData+01H
+                       MOVX    A,@DPTR
+                       MOV     B,#06H
+                       MUL     AB
+                 E     ADD     A,#LOW historyUserData+03H
+                       MOV     R1,A
+                 E     MOV     A,#HIGH historyUserData+03H
+                       ADDC    A,B
+                       MOV     R2,A
+                       MOV     R3,#01H
+                       PUSH    AR3
+                       PUSH    AR2
+                 R     MOV     DPTR,#userData
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 E     MOV     ?_dmemcpy?BYTE+03H,R3
+                 E     MOV     ?_dmemcpy?BYTE+04H,R2
+                 E     MOV     ?_dmemcpy?BYTE+05H,A
+                 E     MOV     ?_dmemcpy?BYTE+06H,#06H
+                       POP     AR2
+                       POP     AR3
+                 E     CALL    _dmemcpy
+                                           ; SOURCE LINE # 529
+                 E     MOV     DPTR,#historyUserData+01H
+                       MOVX    A,@DPTR
+                       ADD     A,#01H
+                       MOV     R7,A
+                       CLR     A
+                       RLC     A
+                       MOV     R6,A
+                       MOV     R4,#00H
+                       MOV     R5,#0AH
+                 E     CALL    ?C?UIDIV
+                       MOV     A,R5
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 530
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 531
+                       RET     
+             ; FUNCTION _QueuePush (END)
+
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 31  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+_lxSettingDeviceRespone. . . . . . . .  STATIC   CODE   PROC     0000H  -----
+  cmd. . . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0002H  2
+  state. . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0005H  1
+UTCTime. . . . . . . . . . . . . . . .  EXTERN   XDATA  LONG     -----  4
+lxOptProcess . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+s8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  CHAR     -----  1
+sendMeasureData. . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  userData . . . . . . . . . . . . . .  AUTO     XDATA  STRUCT   0000H  6
+u8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+deviceInfo . . . . . . . . . . . . . .  EXTERN   XDATA  STRUCT   -----  10
+_cal_crc32_multiple. . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+pxdbyte. . . . . . . . . . . . . . . .  TYPEDEF  DATA   PTR      -----  2
+_xmemcpy . . . . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+_xmemset . . . . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+btCmdBuf . . . . . . . . . . . . . . .  EXTERN   XDATA  STRUCT   -----  25
+pdbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  1
+CS_Weight_T. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+_bigLittleEndianSwap . . . . . . . . .  STATIC   CODE   PROC     0000H  -----
+  buf. . . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+  len. . . . . . . . . . . . . . . . .  AUTO     XDATA  U_INT    0003H  2
+  i. . . . . . . . . . . . . . . . . .  AUTO     XDATA  U_INT    0005H  2
+  size . . . . . . . . . . . . . . . .  AUTO     XDATA  U_INT    0007H  2
+  temp . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0009H  1
+dbyte. . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_CHAR   -----  1
+CS_ComState. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  4
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  fail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+QueueInit. . . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+pxbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  2
+ibyte. . . . . . . . . . . . . . . . .  TYPEDEF  IDATA  U_CHAR   -----  1
+sendHistoryData. . . . . . . . . . . .  STATIC   CODE   PROC     0000H  -----
+  total_len. . . . . . . . . . . . . .  STATIC   XDATA  U_CHAR   0000H  1
+  temp . . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+  crc32. . . . . . . . . . . . . . . .  AUTO     XDATA  U_LONG   0003H  4
+  i. . . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0007H  1
+  pkgCnt . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0008H  1
+  size . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0009H  1
+BT_EVENTFIFO . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UtilTimer . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+lxOptStatus. . . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+_QueuePush . . . . . . . . . . . . . .  STATIC   CODE   PROC     0000H  -----
+  userData . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
+bool . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 32  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+_lxRecvDataFromApp . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  event. . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+  frameControl . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0003H  1
+  cmd. . . . . . . . . . . . . . . . .  AUTO     XDATA  U_INT    0004H  2
+u32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+s16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  INT      -----  2
+xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
+u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
+_YC_Delay10ms. . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+historyUserData. . . . . . . . . . . .  EXTERN   XDATA  STRUCT   -----  63
+byte . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+notifyValueUUIDA625. . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+DeviceInfo_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  registerFlag . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  bindFlag . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  loginFlag. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  userNum. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  deviceID . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0004H  6
+QueuePop . . . . . . . . . . . . . . .  STATIC   CODE   PROC     0000H  -----
+  temp . . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+BT_CMDFIFO_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+_SPIFlashEraseSector . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+_BT_CmdFifoIn. . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+_lxSendRecvDataACK . . . . . . . . . .  STATIC   CODE   PROC     0000H  -----
+  handle . . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0002H  2
+  state. . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0005H  1
+delUserData. . . . . . . . . . . . . .  STATIC   CODE   PROC     0000H  -----
+_SPIFlashRead. . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+p_TimerCallback. . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  3
+HistoryList_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  63
+  head . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  tail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  size . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  measureData. . . . . . . . . . . . .  MEMBER   -----  ARRAY    0003H  60
+_SPIFlashWrite . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+_changeLxOptStatus . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  opt. . . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+_SpiFlashOperator. . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  opt. . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0000H  1
+BT_CMDFIFO . . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+_dmemcpy . . . . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+UserMeasureData. . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  weight . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  UTCTime. . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0002H  4
+BT_EVENTFIFO_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UtilTimer_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+C51 COMPILER V9.01   LXPROTOCOL                                                            03/23/2017 16:17:30 PAGE 33  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+_CS_Weight_T . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+_CS_ComState . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  4
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  fail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1709    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      1      39
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

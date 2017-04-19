@@ -1,0 +1,778 @@
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE SPIFLASH
+OBJECT MODULE PLACED IN out/spiflash.obj
+COMPILER INVOKED BY: C:\Keil\c51\bin\C51.exe spiflash.c OBJECT(out/spiflash.obj) OBJECTADVANCED OPTIMIZE(9,SPEED) BROWSE
+                    - CODE SYMBOLS DF(ENABLE_APE) PR(out/spiflash.lst) OT(7,SPEED) LARGE
+
+line level    source
+
+   1          #include "YC_Define.h"
+   2          #include "hwreg.h"
+   3          #include "YC_SYS.h"
+   4          #include "YC_Utilities.h"
+   5          #include "YC_Peripheral.h"
+   6          #include "btreg.h"
+   7          #include "BT_IPC.h"
+   8          #include "system.h"
+   9          #include "spiflash.h"
+  10          
+  11          #if 0
+              void SPIFlashInit(void)
+              {
+                      REG_SPID_CTRL = 0x40;
+                      REG_SPID_DELAY = 0;
+                      REG_GPIO_SELECT(1)  &=~0x03;
+                      REG_GPIO_SELECT(1) |= 0x02;
+              }
+              #endif
+  20          
+  21          u8_t SPIFlashReadSR(void)
+  22          {
+  23   1              u8_t status;
+  24   1              status = 0xff;
+  25   1              REG_SPID_RXLEN = ESWAP(1);
+  26   1              REG_SPID_TXLEN = ESWAP(1);
+  27   1              *SF_TX_BUF = SF_READ_STATUS_REG;
+  28   1              REG_SPID_TXADDR = ESWAP((u16_t)SF_TX_BUF);
+  29   1              REG_SPID_RXADDR = ESWAP((u16_t)(&status));
+  30   1              REG_MISC_CTRL = SPID_START;
+  31   1              while((REG_DMA_STATUS&(1<<3)) == 0);            //wait_spid_done
+  32   1              //YC_UARTSendData(&status, 1);
+  33   1              return status;
+  34   1      }
+  35          void SPIFlashWriteEnable(void)
+  36          {
+  37   1              REG_SPID_RXLEN = ESWAP(0);
+  38   1              REG_SPID_TXLEN = ESWAP(1);
+  39   1              *SF_TX_BUF = SF_WRITE_ENABLE;
+  40   1              REG_SPID_TXADDR = ESWAP((u16_t)SF_TX_BUF);
+  41   1              REG_MISC_CTRL = SPID_START;
+  42   1              while((REG_DMA_STATUS&(1<<3)) == 0);
+  43   1      }
+  44          void SPIFlashWaitBusy(void)
+  45          {
+  46   1              while((SPIFlashReadSR()&0x01) == 0x01) {        //wait for BUSY
+  47   2                      YC_Delay1ms(1);
+  48   2              }
+  49   1      }
+  50          void SPIFlashEraseSector(u32_t addr)
+  51          {
+  52   1              SPIFlashWriteEnable();
+  53   1              SPIFlashWaitBusy();
+  54   1              *(SF_TX_BUF) = SF_SECTOR_ERASE;
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 2   
+
+  55   1              *(SF_TX_BUF+1) = (addr>>16);
+  56   1              *(SF_TX_BUF+2) = (addr>>8);
+  57   1              *(SF_TX_BUF+3) = (addr&0xff);
+  58   1              REG_SPID_TXLEN = ESWAP(4);
+  59   1              REG_SPID_TXADDR = ESWAP((u16_t)SF_TX_BUF);
+  60   1              REG_SPID_RXLEN = ESWAP(0);
+  61   1              REG_MISC_CTRL = SPID_START;
+  62   1              while((REG_DMA_STATUS&(1<<3)) == 0);            //wait_spid_done
+  63   1              SPIFlashWaitBusy();
+  64   1      }
+  65          void SPIFlashWrite(u8_t *buf, u32_t addr, u8_t len)
+  66          {
+  67   1              u8_t i;
+  68   1              SPIFlashWriteEnable();
+  69   1              SPIFlashWaitBusy();
+  70   1              for(i=0;i<len;i++) {
+  71   2                      *(SF_TX_BUF+4+i) = buf[i];
+  72   2              }
+  73   1              *(SF_TX_BUF) = SF_PAGE_PROGRAM;
+  74   1              *(SF_TX_BUF+1) = (addr>>16);
+  75   1              *(SF_TX_BUF+2) = (addr>>8);
+  76   1              *(SF_TX_BUF+3) = (addr&0xff);
+  77   1              REG_SPID_TXLEN = ESWAP(len+4);
+  78   1              REG_SPID_TXADDR = ESWAP((u16_t)SF_TX_BUF);
+  79   1              REG_SPID_RXLEN = ESWAP(0);
+  80   1              REG_MISC_CTRL = SPID_START;
+  81   1              while((REG_DMA_STATUS&(1<<3)) == 0);            //wait_spid_done
+  82   1              SPIFlashWaitBusy();
+  83   1      }
+  84          void SPIFlashRead(u8_t *buf, u32_t addr, u8_t len)
+  85          {
+  86   1              REG_SPID_RXLEN = ESWAP(len);
+  87   1              REG_SPID_TXLEN = ESWAP(4);
+  88   1              *SF_TX_BUF = SF_READ_DATA;
+  89   1              *(SF_TX_BUF+1) = (addr>>16);
+  90   1              *(SF_TX_BUF+2) = (addr>>8);
+  91   1              *(SF_TX_BUF+3) = (addr&0xff);
+  92   1              REG_SPID_TXADDR = ESWAP((u16_t)SF_TX_BUF);
+  93   1              REG_SPID_RXADDR = ESWAP((u16_t)buf);
+  94   1              REG_SPID_CTRL  |=  (1<<6);
+  95   1              REG_MISC_CTRL = SPID_START;
+  96   1              //spi_read_flash_wait
+  97   1              while(REG_DMA_STATUS&(1<<7));   //waiting for spid write
+  98   1              while((REG_DMA_STATUS&(1<<3)) == 0);            //wait_spid_done
+  99   1              return;
+ 100   1      }
+ 101          
+ 102          
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 3   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION SPIFlashReadSR (BEGIN)
+                                           ; SOURCE LINE # 21
+                                           ; SOURCE LINE # 22
+                                           ; SOURCE LINE # 24
+                 R     MOV     DPTR,#status
+                       MOV     A,#0FFH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 25
+                       MOV     DPTR,#0808EH
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 26
+                       MOV     DPTR,#08088H
+                       INC     A
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 27
+                       MOV     DPTR,#01BCH
+                       MOV     A,#05H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 28
+                       MOV     DPTR,#0808AH
+                       MOV     A,#0BCH
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 29
+                 R     MOV     R5,#LOW status
+                       MOV     A,R5
+                       MOV     R2,A
+                 R     MOV     A,#HIGH status
+                       MOV     R7,A
+                       MOV     A,R2
+                       MOV     R6,A
+                       MOV     A,R7
+                       INC     DPTR
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 30
+                       MOV     DPTR,#08006H
+                       MOV     A,#02H
+                       MOVX    @DPTR,A
+             ?C0001:
+                                           ; SOURCE LINE # 31
+                       MOV     DPTR,#0812CH
+                       MOVX    A,@DPTR
+                 R     xJNB    ACC.3,?C0001
+             ?C0002:
+                                           ; SOURCE LINE # 33
+                 R     MOV     DPTR,#status
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 4   
+
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                                           ; SOURCE LINE # 34
+             ?C0003:
+                       RET     
+             ; FUNCTION SPIFlashReadSR (END)
+
+             ; FUNCTION SPIFlashWriteEnable (BEGIN)
+                                           ; SOURCE LINE # 35
+                                           ; SOURCE LINE # 36
+                                           ; SOURCE LINE # 37
+                       MOV     DPTR,#0808EH
+                       CLR     A
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 38
+                       MOV     DPTR,#08088H
+                       INC     A
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 39
+                       MOV     DPTR,#01BCH
+                       MOV     A,#06H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 40
+                       MOV     DPTR,#0808AH
+                       MOV     A,#0BCH
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 41
+                       MOV     DPTR,#08006H
+                       INC     A
+                       MOVX    @DPTR,A
+             ?C0004:
+                                           ; SOURCE LINE # 42
+                       MOV     DPTR,#0812CH
+                       MOVX    A,@DPTR
+                 R     xJNB    ACC.3,?C0004
+             ?C0005:
+                                           ; SOURCE LINE # 43
+             ?C0006:
+                       RET     
+             ; FUNCTION SPIFlashWriteEnable (END)
+
+             ; FUNCTION SPIFlashWaitBusy (BEGIN)
+                                           ; SOURCE LINE # 44
+                                           ; SOURCE LINE # 45
+             ?C0007:
+                                           ; SOURCE LINE # 46
+                 R     CALL    SPIFlashReadSR
+                       MOV     A,R7
+                 R     xJNB    ACC.0,?C0009
+                                           ; SOURCE LINE # 47
+                       MOV     R7,#01H
+                 E     CALL    _YC_Delay1ms
+                                           ; SOURCE LINE # 48
+                 R     xJMP    ?C0007
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 5   
+
+                                           ; SOURCE LINE # 49
+             ?C0009:
+                       RET     
+             ; FUNCTION SPIFlashWaitBusy (END)
+
+             ; FUNCTION _SPIFlashEraseSector (BEGIN)
+                                           ; SOURCE LINE # 50
+                 R     MOV     DPTR,#addr
+                 E     CALL    ?C?LSTXDATA
+                                           ; SOURCE LINE # 51
+                                           ; SOURCE LINE # 52
+                 R     CALL    SPIFlashWriteEnable
+                                           ; SOURCE LINE # 53
+                 R     CALL    SPIFlashWaitBusy
+                                           ; SOURCE LINE # 54
+                       MOV     DPTR,#01BCH
+                       MOV     A,#020H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 55
+                 R     MOV     DPTR,#addr
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     R0,#010H
+                 E     CALL    ?C?ULSHR
+                       MOV     DPTR,#01BDH
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 56
+                 R     MOV     DPTR,#addr
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     R0,#08H
+                 E     CALL    ?C?ULSHR
+                       MOV     DPTR,#01BEH
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 57
+                 R     MOV     DPTR,#addr
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 6   
+
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     DPTR,#01BFH
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 58
+                       MOV     DPTR,#08088H
+                       MOV     A,#04H
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 59
+                       INC     DPTR
+                       MOV     A,#0BCH
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 60
+                       MOV     DPTR,#0808EH
+                       CLR     A
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 61
+                       MOV     DPTR,#08006H
+                       MOV     A,#02H
+                       MOVX    @DPTR,A
+             ?C0010:
+                                           ; SOURCE LINE # 62
+                       MOV     DPTR,#0812CH
+                       MOVX    A,@DPTR
+                 R     xJNB    ACC.3,?C0010
+             ?C0011:
+                                           ; SOURCE LINE # 63
+                 R     CALL    SPIFlashWaitBusy
+                                           ; SOURCE LINE # 64
+                       RET     
+             ; FUNCTION _SPIFlashEraseSector (END)
+
+             ; FUNCTION _SPIFlashWrite (BEGIN)
+                                           ; SOURCE LINE # 65
+                 R     MOV     DPTR,#buf
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                 E     CALL    ?C?LSTXDATA
+                                           ; SOURCE LINE # 66
+                                           ; SOURCE LINE # 68
+                 R     CALL    SPIFlashWriteEnable
+                                           ; SOURCE LINE # 69
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 7   
+
+                 R     CALL    SPIFlashWaitBusy
+                                           ; SOURCE LINE # 70
+;---- Variable 'i' assigned to Register 'R7' ----
+                       CLR     A
+                       MOV     R7,A
+             ?C0013:
+                 R     MOV     DPTR,#len
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       MOV     A,R7
+                       CLR     C
+                       SUBB    A,R6
+                 R     xJGE    ?C0014
+                                           ; SOURCE LINE # 71
+                 R     MOV     DPTR,#buf
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPL,R7
+                       MOV     DPH,#00H
+                 E     CALL    ?C?CLDOPTR
+                       MOV     R6,A
+                       MOV     A,#0C0H
+                       ADD     A,R7
+                       MOV     DPL,A
+                       CLR     A
+                       ADDC    A,#01H
+                       MOV     DPH,A
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 72
+                       INC     R7
+                 R     xJMP    ?C0013
+             ?C0014:
+                                           ; SOURCE LINE # 73
+                       MOV     DPTR,#01BCH
+                       MOV     A,#02H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 74
+                 R     MOV     DPTR,#addr
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     R0,#010H
+                 E     CALL    ?C?ULSHR
+                       MOV     DPTR,#01BDH
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 75
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 8   
+
+                 R     MOV     DPTR,#addr
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     R0,#08H
+                 E     CALL    ?C?ULSHR
+                       MOV     DPTR,#01BEH
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 76
+                 R     MOV     DPTR,#addr
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     DPTR,#01BFH
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 77
+                 R     MOV     DPTR,#len
+                       MOVX    A,@DPTR
+                       ADD     A,#04H
+                       MOV     R5,A
+                       CLR     A
+                       RLC     A
+                       MOV     R4,A
+                       MOV     A,R5
+                       MOV     R2,A
+                       MOV     A,R4
+                       MOV     R7,A
+                       RLC     A
+                       SUBB    A,ACC
+                       MOV     A,R2
+                       MOV     R6,A
+                       MOV     A,R7
+                       MOV     DPTR,#08088H
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 78
+                       INC     DPTR
+                       MOV     A,#0BCH
+                       MOVX    @DPTR,A
+                       INC     DPTR
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 9   
+
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 79
+                       MOV     DPTR,#0808EH
+                       CLR     A
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 80
+                       MOV     DPTR,#08006H
+                       MOV     A,#02H
+                       MOVX    @DPTR,A
+             ?C0016:
+                                           ; SOURCE LINE # 81
+                       MOV     DPTR,#0812CH
+                       MOVX    A,@DPTR
+                 R     xJNB    ACC.3,?C0016
+             ?C0017:
+                                           ; SOURCE LINE # 82
+                 R     CALL    SPIFlashWaitBusy
+                                           ; SOURCE LINE # 83
+                       RET     
+             ; FUNCTION _SPIFlashWrite (END)
+
+             ; FUNCTION _SPIFlashRead (BEGIN)
+                                           ; SOURCE LINE # 84
+                 R     MOV     DPTR,#addr
+                 E     CALL    ?C?LSTXDATA
+;---- Variable 'buf' assigned to Register 'R1/R2/R3' ----
+                                           ; SOURCE LINE # 85
+                                           ; SOURCE LINE # 86
+                 R     MOV     DPTR,#len
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       MOV     R6,A
+                       CLR     A
+                       MOV     DPTR,#0808EH
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 87
+                       MOV     DPTR,#08088H
+                       MOV     A,#04H
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 88
+                       MOV     DPTR,#01BCH
+                       MOV     A,#03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 89
+                 R     MOV     DPTR,#addr
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 10  
+
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     R0,#010H
+                 E     CALL    ?C?ULSHR
+                       MOV     DPTR,#01BDH
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 90
+                 R     MOV     DPTR,#addr
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     R0,#08H
+                 E     CALL    ?C?ULSHR
+                       MOV     DPTR,#01BEH
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 91
+                 R     MOV     DPTR,#addr
+                       MOVX    A,@DPTR
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       CLR     A
+                       MOV     DPTR,#01BFH
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 92
+                       MOV     DPTR,#0808AH
+                       MOV     A,#0BCH
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 93
+                       MOV     A,R1
+                       MOV     R4,A
+                       MOV     A,R2
+                       MOV     R7,A
+                       MOV     A,R4
+                       MOV     R6,A
+                       MOV     A,R7
+                       INC     DPTR
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 11  
+
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 94
+                       MOV     DPTR,#08086H
+                       MOVX    A,@DPTR
+                       ORL     A,#040H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 95
+                       MOV     DPTR,#08006H
+                       MOV     A,#02H
+                       MOVX    @DPTR,A
+             ?C0019:
+                                           ; SOURCE LINE # 97
+                       MOV     DPTR,#0812CH
+                       MOVX    A,@DPTR
+                 R     xJB     ACC.7,?C0019
+             ?C0020:
+             ?C0021:
+                                           ; SOURCE LINE # 98
+                       MOV     DPTR,#0812CH
+                       MOVX    A,@DPTR
+                 R     xJNB    ACC.3,?C0021
+             ?C0022:
+                                           ; SOURCE LINE # 100
+             ?C0023:
+                       RET     
+             ; FUNCTION _SPIFlashRead (END)
+
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 12  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+s8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  CHAR     -----  1
+_YC_Delay1ms . . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+u8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+UART_CardProtcol . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+YC_UARTPARAM_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  15
+  uartCtrl . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pRxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  pTxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0004H  3
+  rxBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0007H  2
+  txBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0009H  2
+  baud . . . . . . . . . . . . . . . .  MEMBER   -----  U_LONG   000BH  4
+SPIFlashReadSR . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  status . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0000H  1
+pxdbyte. . . . . . . . . . . . . . . .  TYPEDEF  DATA   PTR      -----  2
+YC_LedBlink. . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  6
+  active_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  gpio_num . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  light_time . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  dark_time. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+pdbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  1
+UART_HalfDuplex. . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+DFIFO0 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0094H  1
+UART_Parity. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+DFIFO1 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0095H  1
+dbyte. . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_CHAR   -----  1
+DFIFO2 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   0096H  1
+SPIFlashWaitBusy . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+pxbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  2
+ibyte. . . . . . . . . . . . . . . . .  TYPEDEF  IDATA  U_CHAR   -----  1
+BT_EVENTFIFO . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UtilTimer . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
+YC_UARTPARAM . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  15
+  uartCtrl . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pRxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  pTxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0004H  3
+  rxBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0007H  2
+  txBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0009H  2
+  baud . . . . . . . . . . . . . . . .  MEMBER   -----  U_LONG   000BH  4
+bool . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+u32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+s16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  INT      -----  2
+xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
+u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
+byte . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+SPIFlashWriteEnable. . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+YC_UartCTRLBit_e . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+UART_DataLen . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+BT_CMDFIFO_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 13  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+_SPIFlashEraseSector . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  addr . . . . . . . . . . . . . . . .  AUTO     XDATA  U_LONG   0000H  4
+UART_BaudSet . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+YC_LedBlink_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  active_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  gpio_num . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  light_time . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  dark_time. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+_SPIFlashRead. . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  buf. . . . . . . . . . . . . . . . .  AUTO     DATA   PTR      0001H  3
+  addr . . . . . . . . . . . . . . . .  AUTO     XDATA  U_LONG   0003H  4
+  len. . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0007H  1
+p_TimerCallback. . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  3
+UART_Enable. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+UART_EnableFlowControl . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+_SPIFlashWrite . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  buf. . . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0000H  3
+  addr . . . . . . . . . . . . . . . .  AUTO     XDATA  U_LONG   0003H  4
+  len. . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0007H  1
+  i. . . . . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+BT_CMDFIFO . . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UartCTRLBit . . . . . . . . . . . .  * TAG *  -----  ENUM     -----  -----
+BT_EVENTFIFO_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UtilTimer_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    643    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      21
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

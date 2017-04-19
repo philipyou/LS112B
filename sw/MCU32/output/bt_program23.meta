@@ -1,0 +1,1559 @@
+define REVD   
+define PATCH  
+define ROMCODE
+define PROFESSIONAL
+define LUUID
+
+INCLUDE "bt_format"
+org 0x0000		// start from patch ram address start
+
+	bmark1 mark_ext_patch,patch_ext
+	beq patch00_6,p_connection_incontext
+	beq patch1a_1,p_hci_init_common
+	beq patch16_0,p_lpm_sleep
+	beq patch12_4,p_set_freq_tx
+	beq patch12_2,p_setfreq_rx
+	beq patch12_0,p_shutdown_radio
+	beq patch15_7,p_lpm_hibernate
+	branch p_assert
+	
+patch_ext:
+	beq patch39_5,p_module_init
+	beq patch39_6,p_module_lpm_init
+	beq patch2c_5,p_le_prepare_att
+	beq patch2d_7,p_le_parse_att
+	beq patch27_5,p_debug_test
+	beq patch29_3,p_le_transmit_receive_sifs
+	beq patch27_6,p_le_enable
+	beq patch29_4,p_le_transmit
+	beq patch29_6,p_le_send_adv_ind
+	beq patch30_7,p_ui_timer_check
+	beq patch31_1,p_ui_ipc_send_event
+	beq patch31_5,p_check_51cmd_once
+	beq patch2c_3,p_le_prepare_tx_cmd
+	beq patch2d_3,p_le_parse_ll
+	branch p_assert
+
+p_ui_ipc_send_event:
+	jam 0x7f,mem_seqi
+	branch ui_ipc_send_event+2
+
+p_le_parse_ll:
+	copy regc,pdata
+	beq LL_CONNECTION_UPDATE_REQ,le_parse_connection_update_req
+	beq LL_CHANNEL_MAP_REQ,le_parse_channel_map_req
+	beq LL_TERMINATE_IND,p_le_parse_terminate_ind
+	beq LL_ENC_REQ,le_parse_enc_req
+	beq LL_ENC_RSP,le_parse_enc_rsp
+	beq LL_START_ENC_REQ,le_parse_start_enc_req
+	beq LL_START_ENC_RSP,le_parse_start_enc_rsp
+	beq LL_UNKNOWN_RSP,le_parse_unknown_rsp
+	beq LL_FEATURE_REQ,le_parse_feature_req
+	beq LL_FEATURE_RSP,le_parse_feature_rsp
+	beq LL_PAUSE_ENC_REQ,le_parse_pause_enc_req
+	beq LL_PAUSE_ENC_RSP,le_parse_pause_enc_rsp
+	beq LL_VERSION_IND,le_parse_version_ind
+	beq LL_REJECT_IND,le_parse_reject_ind
+	store 1,mem_le_ll_unknow_type
+	jam XT_LL_UNKNOWN_RSP,mem_fifo_temp
+	branch le_xtype_fifo_in
+	
+p_le_parse_terminate_ind:
+	jam 1,mem_le_disc_reson
+	branch le_parse_terminate_ind
+
+p_lpm_hibernate:
+	call lpm_write_gpio_wakeup
+	hfetch 4,0x8138
+	set0 15,pdata						/* lowest lpo */
+	hstore 4,0x804c
+	call lpm_write_ctrl
+	//arg -1,temp
+	//branch lpm_sleep
+	arg param_hibernate_clks,temp
+	fetch 1,mem_le_sleep_flag
+	beq 2, lpm_hibernate_normal+1
+	branch lpm_sleep
+	
+
+p_ui_timer_timeout:
+	setarg 0x10
+	arg 3,queue
+	call lshift8_queue
+	iadd regb,regb
+	rtn
+p_ui_timer_check:
+	arg 0,rega
+	fetcht 4,mem_ui_timer_last_btclk
+	copy clkn_bt,regb
+	copy regb,pdata
+	isub temp,null
+	ncall p_ui_timer_timeout,positive
+	branch ui_timer_check_loop
+
+
+p_setfreq_rx:
+	storet 1,mem_last_freq
+	add temp,rx_freq_offset,rega			/* index to frequency */
+	branch set_freq_rx + 4	
+
+p_shutdown_radio:
+	branch shutdown_radio+2
+	branch shutdown_radio+2,33
+	fetch 1,mem_txdb
+	beq 0x0,p_shutdown_radio0db
+	beq 0x5,p_shutdown_radio5db
+	beq 0xfb,p_shutdown_radiof5db
+	branch p_shutdown_radio0db
+p_shutdown_radiof5db:
+	hjam 0xd8, 0x955	
+	nop 4
+	hjam 0xd7,0x955
+	nop 4
+	hjam 0xd6,0x955
+	nop 4 
+	hjam 0xd0,0x955
+	hjam 0xc0, 0x956
+	branch shutdown_radio+2
+p_shutdown_radio0db:
+	hjam 0xd8, 0x955	
+	nop 4
+	hjam 0xd7,0x955
+	nop 4
+	hjam 0xd6,0x955
+	nop 4 
+	hjam 0xd0,0x955
+	hjam 0xe0, 0x956
+	branch shutdown_radio+2
+p_shutdown_radio5db:
+	hjam 0xdf, 0x955	
+	nop 4
+	hjam 0xdd,0x955
+	nop 4
+	hjam 0xdb,0x955
+	nop 4 
+	hjam 0xd0,0x955
+	hjam 0xe0, 0x956
+	branch shutdown_radio+2
+
+p_set_freq_tx:
+	storet 1,mem_last_freq
+	add temp,tx_freq_offset,rega			/* index to frequency */
+	call rf_write_freq
+	setarg 0x500
+	call sleep
+p_txon:
+	hjam 0x1,0x8906
+	hjam 0x3c,0x8900
+	hjam 0xe0,0x8901
+	hjam 0x12,0x96d			/*Max added, for best Pout*/
+	nop 10 /* wait LDOs to turn ON*/
+	hjam 0x01, 0x8902
+	hjam 0x3d, 0x8902
+	nop 10 /* wait tx blocks to turn ON*/
+	hjam 0xb7,0x8903
+	nop 10 /* wait tx lo buffer to turn ON*/
+	hjam 0x7d, 0x8902
+	
+	fetch 1,mem_txdb
+	beq 0x0,p_txon0db
+	beq 0x5,p_txon5db
+	beq 0xfb,p_txonf5db
+	branch p_txon0db
+	
+p_txonf5db:
+	hjam 0xcb, 0x956   //hjam 0xce, 0x956 only for yc1021C1_#7, BQB, -2.9dBm. changed for ramp_up/down
+	nop 4
+	hjam 0xd1, 0x955
+	nop 4
+	hjam 0xd2, 0x955
+	nop 4
+	hjam 0xd3, 0x955
+	nop 4
+	hjam 0xd8, 0x955
+	rtn
+p_txon0db:
+	hjam 0xf0, 0x956
+	nop 4
+	hjam 0xd1, 0x955
+	nop 4
+	hjam 0xd2, 0x955
+	nop 4
+	hjam 0xd3, 0x955
+	nop 4
+	hjam 0xd8, 0x955
+	rtn
+p_txon5db:
+	hjam 0xff, 0x956   //hjam 0xce, 0x956 only for yc1021C1_#7, BQB, -2.9dBm. changed for ramp_up/down
+	nop 4
+	hjam 0xd1, 0x955
+	nop 4
+	hjam 0xd2, 0x955
+	nop 4
+	hjam 0xd8, 0x955
+	nop 4
+	//d0~df
+	hjam 0xdf, 0x955  //hjam 0xd7, 0x955 only for yc1021C1_#7, BQB, -2.9dBm. changed for ramp_up/down
+	rtn
+
+p_le_transmit:
+	call le_prep
+	call p_letx_setfreq
+	branch le_transmit+4
+
+p_letx_setfreq:
+	branch p_txon,match
+	call le_setfreq
+	branch set_freq_tx
+	
+
+p_assert:
+	branch p_assert
+
+p_loop:
+	branch p_loop
+
+
+p_gpio_check_active:
+	arg core_gpio_out0,contr
+	and temp,0x07,queue
+	rshift3 temp,pdata
+	and_into 3,pdata
+	iadd contr,contr
+	ifetch 1,contr
+	isolate1 7,temp
+	branch p_gpio_check_active_1,true
+	qisolate0 pdata
+	rtn
+p_gpio_check_active_1:
+	qisolate1 pdata
+	rtn
+	
+p_sleep_out_set:
+	call spid_init_flash
+	rtn
+
+p_sleep_in_set:
+	hjam 1,core_docd_ctrl//disable 51
+	
+	hfetch 1, core_gpio_sel1
+	set0 0, pdata
+	set0 1, pdata
+	hstore 1, core_gpio_sel1
+
+	hfetch 4, core_gpio_pu0
+	set0 23, pdata
+	set1 24, pdata
+	set0 25, pdata
+	set0 26, pdata
+	hstore 4, core_gpio_pu0
+
+	hfetch 4, core_gpio_pd0
+	set1 23, pdata
+	set0 24, pdata
+	set1 25, pdata
+	set1 26, pdata
+	hstore 4, core_gpio_pd0
+	
+	hfetch 4, core_gpio_oe0
+	set1 23, pdata
+	set1 24, pdata
+	set1 25, pdata
+	set1 26, pdata
+	hstore 4, core_gpio_oe0
+	
+	fetch 4, core_gpio_out0
+	set0 23, pdata
+	set1 24, pdata
+	set0 25, pdata
+	set0 26, pdata
+	hstore 4, core_gpio_out0
+	rtn
+
+/***********************LPM ABOUT****************************/
+p_module_before_lpm:
+	branch gpio_set_before_lpm_common
+
+gpio_set_before_lpm_common:
+	arg -1,rega
+	hfetch 1,core_gpio_sel1
+	isolate1 1,pdata
+	call neglact4_from_23_pin,true
+
+	and pdata,0x3,regb
+	sub regb,1,null
+	call neglact2_form_25_pin,zero
+	
+	isolate1 2,pdata
+	call neglect2_from_6_pin,true
+
+	isolate1 3,pdata
+	call neglect4_from_9_pin,true
+
+	//hfetch 4,core_gpio_oe0
+	//iand rega,rega
+	//call ice_break
+	hfetch 4,core_gpio_pu0
+	hfetcht 4,core_gpio_pd0
+	ior temp,pdata
+	invert pdata,pdata
+	iand rega,pdata
+	//set0 4,pdata	//revc
+	hstore 4,core_gpio_oe0
+
+	rtn
+neglect2_from_6_pin:	//uart
+	arg 6,queue
+	branch neglect_2_pin
+neglect4_from_9_pin:
+	arg 9,queue
+	branch neglact_4_pin
+neglact4_from_23_pin:
+	arg 23,queue
+	branch neglact_4_pin
+neglact2_form_25_pin:
+	arg 23,queue
+	branch neglect_2_pin
+neglact_4_pin:
+	arg 4,loopcnt
+	branch neglect_pin_loop
+neglect_2_pin:
+	arg 2,loopcnt
+neglect_pin_loop:
+	qset0 rega
+	increase 1,queue
+	loop neglect_pin_loop
+	rtn
+	
+//baud
+
+p_wakeup_c51:
+	call p_sleep_out_set
+	hjam 3,core_docd_ctrl	//enable C51
+	jam NOT_ENTER_LPM, mem_lpm_lock
+	rtn
+
+p_module_lpm_wake_init:
+	fetch 1,mem_le_sleep_flag
+	sub pdata,1,null
+	call p_module_wakeup,zero
+	fetcht 1,mem_ui_button_gpio
+	call gpio_get_bit
+	branch p_wakeup_c51,true	
+	fetcht 1,mem_module_wake_up_gpio
+	call gpio_get_bit
+	branch p_wakeup_c51,true
+	rtn
+
+/*******************module init&event**************************/
+p_module_init:
+	branch p_module_lpm_wake_init, wake	//wake from lpm
+	//rtn wake				//wake from lpm
+	//hfetch 1,0x813e		//bit7  1=wake from hibernate£¬ 0=wake from lpm
+	//rtnbit0 7		//wake from lpm
+	//hjam 1,core_docd_ctrl	//disable C51
+	copy auxcnt,pdata		//auxcnt is 0, timeout wakeup or reset
+	nbranch p_module_init_poweron_iowake,blank
+	hfetch 1,0x813e
+	isolate0,3,pdata
+	branch p_module_init_poweron_reset, true	//0x813e  bit3 = 0, power on reset
+	branch p_lpm_hibernate	//wake by timeout from hibernate
+
+p_module_init_poweron_iowake:
+	jam CS_NOTIFY_IOWAKE,mem_poweron_flag
+	branch p_module_init_poweron_common
+p_module_init_poweron_reset:
+	jam CS_NOTIFY_POWERON,mem_poweron_flag
+	//branch p_module_init_poweron_common
+p_module_init_poweron_common:
+	jam 0,mem_module_task
+	call p_scale_gpio_init
+	
+	setarg scale_process_idle	//
+	store 2,mem_cb_idle_process
+	setarg scale_process_bb_event //**
+	store 2,mem_cb_bb_event_process
+	setarg scale_process	//
+	store 2,mem_cb_le_process
+	setarg p_scale_lpm_lock
+	store 2,mem_cb_check_wakelock
+	setarg p_module_before_lpm	//
+	store 2,mem_cb_before_lpm
+
+	setarg mem_event_buf
+	store 2,mem_event_wptr
+	store 2,mem_event_rptr
+	setarg mem_cmd_buf
+	store 2,mem_cmd_wptr
+	setarg mem_cmd_buf
+	store 2,mem_cmd_rptr
+
+	call scale_hardware_init
+	//jam 0,mem_txdb
+	fetch 1,mem_conn_latency
+	store 1,mem_lpm_mult
+
+	fetch 2,mem_lpm_interval
+	increase -4,pdata
+	store 2,mem_le_adv_interval_min
+	store 2,mem_le_adv_interval_max
+	
+	call p_le_modified_name
+	fetch 6,mem_le_lap
+	call p_byteswap
+	call p_updata_mac
+	setarg 0
+	store 3,mem_att_send_handle
+	call p_wakeup_c51
+	call p_cs_poweron_notify
+	branch check_module_disabled	//0x3e2b
+	
+p_scale_gpio_init:
+	fetcht 1, mem_ui_button_gpio
+	call  gpio_config_input
+	fetcht 1,mem_module_wake_up_gpio
+	branch  gpio_config_input
+	
+p_scale_lpm_lock:
+	fetch 1,mem_lpm_lock
+	beq NOT_ENTER_LPM,app_get_lpm_wake_lock
+	fetcht 1,mem_ui_button_gpio
+	call gpio_get_bit
+	branch app_get_lpm_wake_lock,true	
+	fetcht 1,mem_module_wake_up_gpio
+	call gpio_get_bit
+	branch app_get_lpm_wake_lock,true
+	hjam 1,core_docd_ctrl	//disable C51
+	//hjam 5,core_docd_ctrl
+	branch app_put_lpm_wake_lock
+	rtn
+
+
+
+/*********************module le rx**************************/
+
+p_module_lpm_init:
+	jam 39,mem_le_ch_mapped
+	jam 0,mem_tester_emulate
+	jam 0,mem_debug_config
+	jam 0, mem_lch_code
+	setarg 0
+	store 5,mem_sp_state_start
+	branch  p_module_lpm_uart_init
+	
+p_module_wakeup:
+	copy auxcnt,pdata
+	branch p_lpm_hibernate,blank	//wake by timeout
+	jam CS_NOTIFY_IOWAKE,mem_poweron_flag
+	jam 0,mem_le_sleep_flag
+	//call p_wakeup_c51
+	rtn
+
+p_module_lpm_uart_init:
+	call init_filter_ram
+	setarg mem_module_rx_buf_custom
+	hstore 2,core_uart_rsaddr
+	setarg mem_module_rx_buf_end_custom
+	hstore 2,core_uart_readdr
+	setarg mem_module_tx_buf
+	hstore 2,core_uart_tsaddr
+	setarg mem_module_tx_buf_end
+	hstore 2,core_uart_teaddr
+	hfetch 1,core_gpio_sel1
+	set1 0x02,pdata
+	hstore 1,core_gpio_sel1
+	//hjam 0x4,core_gpio_sel1
+	jam 0xff,mem_ucode_id_local
+	hjam 0x0,core_uart_ctrl
+ 	setarg mem_module_tx_buf
+	hstore 2,core_uart_twptr
+	hstore 2,core_uart_trptrp
+	setarg mem_module_rx_buf_custom
+	hstore 2,core_uart_rrptr
+	branch hci_init_common 
+
+	
+/*************************for le throughput*********************************/
+	
+/******************updata att******************/
+p_le_send_att_handle_value_indication:
+p_le_send_att_handle_value_notification:
+	//call ice_break
+	fetcht 1,mem_scale_tx_length
+	branch le_send_packet
+	
+p_le_parse_att_write_request:
+	fetcht 2,mem_le_rxbuf+7
+
+	call le_att_get_handle_ptr
+	add contr,1,regb
+
+	increase -2,contr
+	ifetch 2,contr
+	arg CLIENT_CHARACTERTIC_CONFIGURATION,temp
+	isub temp,null
+	branch p_le_parse_write_req_configuration,zero
+	
+	fetch 1,mem_le_rxbuf+1
+	increase -7,pdata
+	branch le_parse_att_write_request_fail,blank
+	icopy loopcnt
+	copy loopcnt,rega
+	copy regb,contw
+	arg mem_le_rxbuf+9,contr
+	call memcpy
+	copy rega,loopcnt
+	arg mem_le_rxbuf+9,rega
+	call p_le_cs_rev_data
+	branch le_parse_att_write_request_fail
+
+p_le_parse_write_req_configuration:
+	arg 2,loopcnt
+	copy regb,contw
+	arg mem_le_rxbuf+9,contr
+	call memcpy	
+	
+	fetcht 2,mem_le_rxbuf+7
+	call le_att_find_notifyHandle
+	nbranch le_parse_att_write_request_fail, user	
+	storet 2,mem_att_send_handle
+	fetch 1,mem_le_rxbuf+9
+	store 1,mem_att_send_option
+	call p_le_open_tx_handle
+	branch le_parse_att_write_request_fail
+
+p_le_open_tx_handle:
+	arg mem_tmp_buffer,contw
+	setarg CS_PREFIX_EVENT	
+	istore 1,contw
+	setarg 0x04		//length
+	istore 1,contw
+	setarg CS_NOTIFY_OPENHANDLE	//event
+	istore 1,contw
+	fetch 2,mem_att_send_handle
+	istore 2,contw
+	fetch 1,mem_att_send_option
+	istore 1, contw  
+	branch p_cs_mem_to_event
+p_le_parse_att_write_command:
+	fetch 1,mem_le_rxbuf+1
+	increase -7,pdata
+	icopy loopcnt
+	arg mem_le_rxbuf+9,rega
+p_le_cs_rev_data:
+	arg mem_tmp_buffer,contw
+	setarg CS_PREFIX_EVENT	
+	istore 1,contw
+	add loopcnt,3,pdata	//length	
+	istore 1,contw
+	setarg CS_NOTIFY_DATA	//event
+	istore 1,contw
+	fetch 2,mem_le_rxbuf+7
+	istore 2,contw		//store handle
+	arg mem_le_rxbuf+9,contr
+	call memcpy
+	branch p_cs_mem_to_event
+
+p_le_parse_att_handle_value_confirm:
+	arg mem_tmp_buffer,contw
+	setarg CS_PREFIX_EVENT	
+	istore 1,contw
+	setarg 1		//length	
+	istore 1,contw
+	setarg CS_NOTIFY_INDICATE_CONFIRM	//event
+	istore 1,contw
+	branch p_cs_mem_to_event
+
+le_parse_att_read_request:
+	fetch 2,mem_le_rxbuf+7
+	store 2,mem_le_att_handle
+	store 2,mem_le_readHandle
+
+	copy pdata,queue
+	sub pdata,0x3F,null
+	branch le_parse_att_read_request_2,positive
+le_parse_att_read_request_1:	//handle is 0x40~0x7F
+	fetch 8,mem_le_readReqHandleFlag+8
+	branch le_parse_att_read_request_2+1
+le_parse_att_read_request_2:	//handle is 0x00~0x3F
+	fetch 8,mem_le_readReqHandleFlag
+	qisolate1 pdata
+	branch p_le_le_att_read_notify, true
+le_parse_att_read_request_OK:
+	jam ATTOP_READ_RESPONSE,mem_fifo_temp
+	branch le_xtype_fifo_in
+
+p_le_le_att_read_notify:
+	jam 20, mem_le_readReq_timeout
+	arg mem_tmp_buffer,contw
+	setarg CS_PREFIX_EVENT	
+	istore 1,contw
+	setarg 0x03		//length
+	istore 1,contw
+	setarg CS_NOTIFY_READ_REQ	//event
+	istore 1,contw
+	fetch 2,mem_le_readHandle
+	istore 2,contw		//store handle
+	branch p_cs_mem_to_event
+
+/***********************lpm mult***********************/
+
+p_debug_test:
+	//call ice_break
+	//call app_enter_hibernate
+	branch le_disconnect0
+
+	
+/*************att write req***********/
+p_le_parse_att:
+	ifetch 3,contr
+	store 3,mem_le_att_opcode
+	beq ATTOP_WRITE_REQUEST,p_le_parse_att_write_request
+	beq ATTOP_WRITE_COMMAND,p_le_parse_att_write_command
+	beq ATTOP_READ_REQUEST,le_parse_att_read_request
+	beq ATTOP_HANDLE_VALUE_CONFIRMATION,p_le_parse_att_handle_value_confirm
+	branch le_parse_att0
+
+scale_process_bb_event:
+	copy regc,pdata
+	beq BT_EVT_LE_CONNECTED,scale_process_le_conn
+	beq BT_EVT_LE_DISCONNECTED,scale_process_le_discon
+	and pdata,0x0f,temp
+	and_into BT_EVT_TIMER_MASK,pdata
+	beq BT_EVT_TIMER_INIT,p_cs_module_bb_event_timer
+	rtn
+
+p_cs_module_bb_event_timer:
+	call module_bb_event_timer
+	branch p_cs_read_req_timeout
+
+p_cs_read_req_timeout:
+	fetch 1,mem_le_readReq_timeout
+	rtn blank
+	increase -1,pdata
+	store 1,mem_le_readReq_timeout
+	nrtn blank
+	setarg 0x00
+	store 2,mem_le_readHandle
+	branch le_parse_att_read_request_OK
+	
+
+scale_process_le_conn:
+	jam 0,mem_le_disc_reson
+	call p_cs_conn_notify
+	call p_app_updata_le_param
+	branch module_stop_adv_discovery
+
+scale_process_le_discon:
+	//setarg 0
+	//store 1,mem_hci_curr_len
+	setarg 0x00
+	store 2,mem_le_readHandle
+	jam 0,mem_le_readReq_timeout
+	fetch 1,mem_conn_latency
+	store 1,mem_lpm_mult
+	setarg 0 
+	store 2, mem_l2cap_rxbuff1_len
+	setarg 0 
+	store 2, mem_l2cap_rxbuff2_len
+	setarg 0
+	store 3,mem_att_send_handle
+	call le_att_client_clr
+	call module_start_adv_discovery	
+	fetch 1, mem_le_sleep_flag	
+	bne 0,p_cs_sleep_enter	
+	branch p_cs_dis_notify
+
+scale_hardware_init:
+	rtn wake
+	call spid_init_flash
+	hfetch 1,core_uart_clksel
+	set0 0,pdata
+	hstore 1,core_uart_clksel
+	//setarg uart0_baud_115200 
+	//store uart_baud_len,mem_baud
+	branch p_module_lpm_uart_init
+
+scale_process:
+	branch scale_normal_dispatch
+
+scale_process_idle:
+	branch scale_normal_dispatch
+
+scale_debug:
+	//call ice_break
+	setarg 1
+	store 2,mem_current_packet_length
+	branch at_rev_end
+
+scale_normal_dispatch_ignore:
+	call p_cs_cmd_mem_zero
+	copy contr,pdata
+	store 2,mem_cmd_rptr
+	rtn
+
+p_cs_cmd_to_mem:
+	ifetch 1, contr
+	istore 1,contw		//length
+	copy pdata,loopcnt
+	call p_cs_cmd_mem_zero
+p_cs_cmd_to_mem_loop:
+	ifetch 1,contr
+	istore 1,contw
+	call p_cs_cmd_mem_zero
+	loop p_cs_cmd_to_mem_loop
+	copy contr,pdata
+	store 2,mem_cmd_rptr
+	rtn	
+
+scale_normal_dispatch:
+	//add main process
+	fetch 2,mem_cmd_rptr
+	fetcht 2,mem_cmd_wptr
+	isub temp,null
+	rtn zero
+	//have valid data in buffer
+	copy pdata,contr
+	ifetch 1,contr
+	bne CS_PREFIX_CMD,scale_normal_dispatch_ignore
+	call p_cs_cmd_mem_zero
+	arg mem_tmp_buffer,contw
+	call p_cs_cmd_to_mem
+	fetch 1,mem_tmp_buffer+1
+	beq CS_CMD_SLEEP_REQ,p_cs_sleep_req
+	beq CS_CMD_ADV_INTERV_SET_REQ,p_cs_adv_interv_set_req
+	beq CS_CMD_CONN_INTERV_SET_REQ,p_cs_conn_interval_set_req		
+	beq CS_CMD_TXPOWER_SET_REQ,p_cs_tx_power_set_req		
+	beq CS_CMD_LE_DISC_REQ,p_cs_le_dis_req							
+	beq CS_CMD_LE_TX_DAT,p_cs_tx_dat
+	beq CS_CMD_LE_WR_DAT,p_cs_wr_dat
+/*
+	beq CS_CMD_READ_FLASH,spiflash_read_data
+	beq CS_CMD_WRITE_FLASH,spiflash_write_data
+*/
+
+p_updata_mac:
+	fetcht 2,mem_adv_lap_ptr
+	rtn blank
+	istore 6,temp
+	rtn
+	
+p_byteswap:
+	store 6,mem_swap
+	fetch 1,mem_swap
+	store 1,mem_swap+11
+	ifetch 1,contr
+	store 1,mem_swap+10
+	ifetch 1,contr
+	store 1,mem_swap+9
+	ifetch 1,contr
+	store 1,mem_swap+8
+	ifetch 1,contr
+	store 1,mem_swap+7
+	ifetch 1,contr
+	store 1,mem_swap+6
+	fetch 6,mem_swap+6
+	rtn
+	
+wait_wakeup_pin_notactive:
+	fetcht 1,mem_module_wake_up_gpio
+	call gpio_get_bit
+	nrtn true
+	nop 10000
+	branch  wait_wakeup_pin_notactive
+
+p_cs_sleep_clr:
+	jam 0,mem_le_readReq_timeout
+	fetch 1,mem_conn_latency
+	store 1,mem_lpm_mult
+	setarg 0 
+	store 2, mem_l2cap_rxbuff1_len
+	store 2, mem_l2cap_rxbuff2_len
+	store 3,mem_att_send_handle
+	store 2,mem_le_readHandle
+	jam 0,mem_le_disc_reson
+	branch le_att_client_clr
+p_cs_sleep_req:
+	fetch 1,mem_tmp_buffer+2
+	beq 1,p_cs_sleep_req_hibernate
+p_cs_sleep_req_retation:
+	jam 0x81,mem_le_sleep_flag	
+	branch p_cs_sleep_req_ok
+p_cs_sleep_req_hibernate:
+	jam 0x82,mem_le_sleep_flag
+p_cs_sleep_req_ok:	
+	fetch 2,mem_ui_state_map
+	bbit1 UI_STATE_BLE_CONNECTED,app_ble_disconnect
+p_cs_sleep_enter:
+	call p_cs_sleep_clr
+	call wait_uarttx
+	call wait_wakeup_pin_notactive
+	fetch 1,mem_le_sleep_flag
+	set0 7,pdata
+	store 1, mem_le_sleep_flag
+	call p_sleep_in_set
+	branch app_bb_hibernate
+
+p_cs_adv_interv_set_req:
+	arg mem_tmp_buffer+2,contr
+	ifetch 2,contr
+	sub pdata,0x1f,null
+	rtn positive
+	store 2,mem_lpm_interval
+	increase -4,pdata
+	store 2,mem_le_adv_interval_min
+	store 2,mem_le_adv_interval_max
+	rtn
+	
+p_cs_conn_interval_set_req:
+	arg mem_tmp_buffer+2,contr
+	ifetch 2,contr
+	store 2,mem_conn_min_interv
+	ifetch 2,contr
+	store 2,mem_conn_max_interv
+	ifetch 1,contr
+	store 1,mem_conn_latency
+	ifetch 2,contr
+	store 2,mem_conn_timeout
+
+	fetch 2,mem_ui_state_map
+	isolate1 UI_STATE_BLE_CONNECTED,pdata
+	branch p_cs_conn_interval_send,true		//bluetooth is connected
+	fetch 1,mem_conn_latency
+	store 1,mem_lpm_mult
+	rtn
+p_cs_conn_interval_send:
+	jam BT_CMD_LE_UPDATE_CONN,mem_fifo_temp
+	branch  ui_ipc_send_cmd
+
+p_cs_tx_power_set_req:
+	fetch 1,mem_tmp_buffer+2
+	store 1,mem_txdb
+	beq 0x00,p_cs_tx_power_set_req0
+	beq 0x05,p_cs_tx_power_set_req5
+	beq 0xfb,p_cs_tx_power_set_reqfb
+	rtn
+p_cs_tx_power_set_req0:
+	hjam 0x4c, 0x957
+	hjam 0x6c, 0x958
+	hjam 0x50, 0x959
+	jam 0x4c,mem_module_uuid_list+260
+	jam 0x6c,mem_module_uuid_list+262
+	jam 0x50,mem_module_uuid_list+264
+	rtn
+p_cs_tx_power_set_req5:
+	hjam 0x4c, 0x957
+	hjam 0x6c, 0x958
+	hjam 0x10, 0x959
+	jam 0x4c,mem_module_uuid_list+260
+	jam 0x6c,mem_module_uuid_list+262
+	jam 0x10,mem_module_uuid_list+264
+	rtn
+p_cs_tx_power_set_reqfb:
+	hjam 0x4c, 0x957
+	hjam 0x6c, 0x958
+	hjam 0x50, 0x959
+	jam 0x4c,mem_module_uuid_list+260
+	jam 0x6c,mem_module_uuid_list+262
+	jam 0x50,mem_module_uuid_list+264
+	rtn
+	
+custom_ble_disconnect:
+	jam 2,mem_le_disc_reson
+	jam XT_LL_TERMINATE_IND,mem_fifo_temp
+	branch le_xtype_fifo_in
+	
+p_cs_le_dis_req:
+	fetch 2,mem_ui_state_map
+	bbit1 UI_STATE_BLE_CONNECTED,app_ble_disconnect
+	rtn
+		 
+p_reset_mcu:	
+	hjam 0x1, 0x8010	//reset mcu	
+	nop 10000
+
+//input: temp is notify value handle, output: temp is characteristic value handle
+le_att_find_notifyHandle:
+	disable user
+le_att_find_notifyHandle_loop:	
+	increase -1,temp
+	rtn zero	
+	call le_att_get_handle_ptr 	
+	rtn blank
+	nrtn zero
+	increase -2,contr
+	ifetch 2,contr
+	arg 0x2900, rega
+	isub rega,null
+	nbranch le_att_find_notifyHandle_ok, positive
+	arg 0x2905,rega
+	isub rega,null
+	branch le_att_find_notifyHandle_ok,positive
+	branch le_att_find_notifyHandle_loop
+le_att_find_notifyHandle_ok:
+	enable user
+	rtn
+
+le_att_client_clr:
+	arg mem_le_att_list,contr
+	arg CLIENT_CHARACTERTIC_CONFIGURATION,temp
+le_att_client_clr_loop:
+	ifetch 2,contr	//handle
+	rtn blank
+	ifetch 2,contr	//uuid
+	isub temp,null
+	nbranch le_att_client_clr_next,zero
+	setarg 0
+	increase 1,contr
+	istore 2,contr
+	increase 2, contr
+	branch le_att_client_clr_loop
+le_att_client_clr_next:
+	ifetch 1,contr			/* length */
+	iadd contr,contr
+	branch le_att_client_clr_loop
+
+le_att_get_client: 	
+	call le_att_get_handle_ptr 	
+	ifetch 1,contr			/* length */ 	
+	iadd contr,contr 	
+	disable user
+le_att_get_client_loop:	
+	ifetch 2,contr	//hande	
+	rtn blank	
+	ifetch 2,contr	//uuid	
+	arg CLIENT_CHARACTERTIC_CONFIGURATION,temp
+	isub temp,null	
+	branch le_att_get_client_ok,zero	
+	arg UUID_GATT_PRIMARY_SERVICE,temp
+	isub temp,null
+	rtn zero
+	ifetch 1,contr			/* length */	
+	iadd contr,contr	
+	branch le_att_get_client_loop
+le_att_get_client_ok:
+	enable user
+	rtn
+
+p_cs_wr_dat:
+	disable user
+	branch p_cs_tx_dat_common
+
+p_cs_tx_dat:
+	enable user 
+p_cs_tx_dat_common:
+	//save data in characteristic value
+	fetcht 2,mem_tmp_buffer+2
+	copy temp,rega	//save handle
+	call le_att_get_handle_ptr
+	nrtn,zero	//can't find the handle
+	ifetcht 1,contr	//characteristic length	
+	copy contr,regb	//save write pointer
+	fetch 1,mem_tmp_buffer
+	arg 4,regc
+	isub regc,pdata
+	nrtn positive
+	isub temp,regc
+	rtn positive	//size is larger than characteristic length, it's error
+	increase 1,pdata
+	icopy loopcnt
+	copy regb,contw
+	arg mem_tmp_buffer+4,contr
+	call memcpy
+	sub regc,-1,regc	
+	copy regc,loopcnt
+	call clear_mem
+	nbranch p_cs_wr_dat_end,user
+
+	//send data to phone
+	fetch 2,mem_ui_state_map
+	isolate1 UI_STATE_BLE_CONNECTED,pdata
+	nrtn,true		//bluetooth is disconnected
+	
+	copy rega,temp	
+	call le_att_get_client	
+	nrtn,user	//don't have client configure 
+	increase 1,contr	
+	ifetch 2,contr	
+p_cs_tx_dat_common_send:
+	bbit1 ATT_BIT_NOTIFICATION,p_cs_le_tx_notification
+	bbit1 ATT_BIT_INDICATION,p_cs_le_tx_indication
+	rtn
+
+p_cs_wr_dat_end:
+	fetch 2,mem_le_readHandle
+	isub rega,null
+	nrtn zero
+	store 2,mem_le_att_handle
+	setarg 0x00
+	store 2,mem_le_readHandle
+	jam 0,mem_le_readReq_timeout
+	branch le_parse_att_read_request_OK
+	
+ 	
+p_cs_le_tx_indication:
+	jam ATTOP_HANDLE_VALUE_INDICATION,mem_fifo_temp
+	branch p_cs_le_tx_common
+p_cs_le_tx_notification:
+ 	jam ATTOP_HANDLE_VALUE_NOTIFICATION,mem_fifo_temp
+p_cs_le_tx_common:
+	store 1,mem_att_send_option
+	copy rega,pdata
+	store 2,mem_att_send_handle
+	fetch 1,mem_tmp_buffer
+	arg 3,temp
+	isub temp,pdata
+	copy pdata,loopcnt
+	increase 7,pdata
+	store 1,mem_scale_tx_length
+	arg mem_le_l2cap+1,contw
+	fetch 2,mem_att_send_handle
+	istore 2,contw
+	arg mem_tmp_buffer+4,contr
+	call memcpy
+	call le_xtype_fifo_in
+	rtn
+
+p_cs_poweron_notify:
+	arg mem_tmp_buffer,contw
+	setarg CS_PREFIX_EVENT	
+	istore 1,contw
+	setarg 0x01		//length
+	istore 1,contw
+	setarg CS_NOTIFY_POWERON	//event
+	istore 1,contw
+	branch p_cs_mem_to_event
+p_cs_conn_notify:
+	arg mem_tmp_buffer,contw
+	setarg CS_PREFIX_EVENT	
+	istore 1,contw
+	setarg 0x01		//length
+	istore 1,contw
+	setarg CS_NOTIFY_CONN	//event
+	istore 1,contw
+	branch p_cs_mem_to_event
+p_cs_dis_notify:
+	arg mem_tmp_buffer,contw
+	setarg CS_PREFIX_EVENT	
+	istore 1,contw
+	setarg 0x02		//length
+	istore 1,contw
+	setarg CS_NOTIFY_DISC	//event
+	istore 1,contw
+	fetch 1,mem_le_disc_reson
+	istore 1, contw  
+	branch p_cs_mem_to_event
+
+p_cs_mem_to_event:
+	call p_wakeup_c51
+	fetch 2,mem_event_wptr
+	copy pdata,contw
+	fetch 1, mem_tmp_buffer
+	istore 1,contw		//prefix
+	call p_cs_event_mem_zero
+	ifetch 1, contr
+	istore 1,contw		//length
+	copy pdata,loopcnt
+	call p_cs_event_mem_zero
+p_cs_mem_to_event_loop:
+	ifetch 1,contr
+	istore 1,contw
+	call p_cs_event_mem_zero
+	loop p_cs_mem_to_event_loop
+	copy contw,pdata
+	store 2,mem_event_wptr
+	rtn
+
+p_cs_event_mem_zero:
+	setarg mem_event_buf_end+1
+	isub contw,null
+	nrtn zero
+	arg mem_event_buf,contw
+	rtn
+
+p_cs_cmd_mem_zero:
+	setarg mem_cmd_buf_end+1
+	isub contr,null
+	nrtn zero
+	arg mem_cmd_buf,contr
+	rtn
+	
+
+p_le_modified_name:
+	call le_modified_name_att_list
+p_le_modified_scan_rsp:	
+	fetch 1,mem_le_scan_data+1
+	sub pdata,GAP_ADTYPE_LOCAL_NAME_COMPLETE,null
+	nrtn zero	
+	fetch 1,mem_le_name_len
+	copy pdata,loopcnt
+	increase 1,pdata
+	store 1,mem_le_scan_data
+	arg mem_le_scan_data+2,contw
+	arg mem_le_name,contr
+	call memcpy
+	fetch 1,mem_le_scan_data
+	increase 1,pdata
+	store 1,mem_le_scan_data_len
+	rtn
+
+p_hci_init_common:
+	hfetch 2,core_clkoff
+	set0 0x0f,pdata
+	hstore 2,core_clkoff
+	call uart_set_baud_by_mem
+	hjam 0,core_uart_clksel
+	hjam uart_ctrl_h4,core_uart_ctrl
+	branch hci_init_queue_ack
+
+/******************updata att******************/
+p_le_prepare_att:
+	fetch 1,mem_le_l2cap
+	beq ATTOP_HANDLE_VALUE_NOTIFICATION,p_le_send_att_handle_value_notification
+	beq ATTOP_HANDLE_VALUE_INDICATION,p_le_send_att_handle_value_indication
+	beq ATTOP_READ_BY_GROUP_TYPE_RESPONSE,p_le_send_att_read_by_group_type_response
+	beq ATTOP_READ_BY_TYPE_RESPONSE,p_le_send_att_read_by_type_response
+	beq ATTOP_WRITE_RESPONSE,p_le_send_att_write_response
+	branch le_prepare_att0
+
+p_le_send_att_write_response:
+	fetcht 2,mem_le_att_handle
+	call le_att_get_handle_ptr
+	branch le_send_att_write_response_go,blank
+	increase -2,contr
+	ifetcht 2,contr
+	setarg CLIENT_CHARACTERTIC_CONFIGURATION
+	isub temp,null
+	nbranch le_send_att_write_response_go,zero
+	increase 1,contr
+	ifetcht 2,contr
+	setarg 0x0001
+	isub temp,null
+	branch le_send_att_write_response_go,zero
+	setarg 0x0000
+	isub temp,null
+	nbranch le_send_att_write_response_go,zero
+	branch le_send_att_write_response_go
+//mem_le_cur_att_type:uuid addr
+p_le_send_att_read_by_type_response:
+	fetcht 2,mem_le_search_att_type
+	setarg UUID_GATT_CHARACTERISTIC
+	isub temp,null
+	nbranch le_send_att_error_response_notfound,zero
+	fetch 2,mem_le_search_handle_start
+	store 2,mem_temp
+	enable user
+p_le_send_att_read_by_type_response_loop:
+	call p_le_att_handle_inrange
+	nbranch p_le_send_att_read_by_type_response_end,positive
+	fetcht 2,mem_temp
+	call p_le_att_get_handle_info
+	beq 1,p_le_send_att_read_by_type_response_end
+	call p_le_att_same_type
+	nbranch p_le_send_att_read_by_type_response_next_handle,zero
+	disable user
+	call p_le_send_att_read_by_type_write_properties
+	call p_le_att_next_handle
+	call p_le_att_get_handle_info
+	call p_le_send_att_read_by_type_write_uuid
+	branch p_le_send_att_read_by_type_response_end
+p_le_send_att_read_by_type_response_next_handle:
+	call p_le_att_next_handle
+	branch p_le_send_att_read_by_type_response_loop
+p_le_send_att_read_by_type_response_end:
+	branch le_send_att_error_response_notfound,user
+	branch p_le_send_auto_len_by_mem
+p_le_send_att_read_by_type_write_properties:
+	fetch 2,mem_temp
+	store 2,mem_le_l2cap_response+1
+	
+	fetch 1,mem_le_search_len
+	copy pdata,loopcnt
+	call p_get_contr
+	arg mem_le_l2cap_response+3,contw
+	call memcpy
+	branch p_store_contw
+p_le_send_att_read_by_type_write_uuid:
+	fetcht 2,mem_le_cur_att_type
+	rshift8 temp,pdata
+	bne 0x03,p_le_send_att_read_by_type_write_short_uuid
+	call p_get_contw
+	fetch 2,mem_temp
+	istore 2,contw
+	call p_store_contw
+	setarg mem_le_att_list
+	iadd temp,contr
+	ifetch 1,contr
+	copy contr,temp
+	copy pdata,loopcnt
+	increase 5,pdata
+	store 1,mem_le_l2cap_response
+	call p_get_contw
+	copy temp,contr
+	call memcpy
+	branch p_store_contw
+
+p_le_send_att_read_by_type_write_short_uuid:
+	call p_get_contw
+	fetch 2,mem_temp
+	istore 2,contw
+	fetch 2,mem_le_cur_att_type
+	istore 2,contw
+	call p_store_contw
+	jam 7,mem_le_l2cap_response
+	rtn
+	
+
+//mem_le_search_att_type
+//mem_le_search_handle_start
+//mem_le_search_handle_end
+//mem_le_l2cap_response  snd[0]
+//
+p_le_send_att_read_by_group_type_response:
+	arg 3,timeup
+	fetch 2,mem_le_search_handle_start
+	store 2,mem_temp
+	jam 0,mem_le_search_res
+	enable user
+p_le_send_att_read_by_group_type_response_loop:
+	call p_le_att_handle_inrange
+	nbranch p_le_send_att_read_by_group_type_end0,positive
+	fetcht 2,mem_temp
+	call p_le_att_get_handle_info
+	beq 1,p_le_send_att_read_by_group_type_end1
+	call p_le_att_same_type
+	nbranch p_le_send_att_read_by_group_type_next_handle,zero
+	fetch 1,mem_le_search_res
+	beq 1,p_le_send_att_read_by_group_type_end1
+	nbranch p_le_send_att_read_by_group_type_store_write_record,user		//un first
+	disable user
+	fetch 1,mem_le_search_len
+	increase 4,pdata
+	store 1,mem_le_l2cap_response
+	call p_store_contw
+	branch p_le_send_att_read_by_group_type_store_record
+p_le_send_att_read_by_group_type_store_write_record:
+	fetch 1,mem_le_search_len
+	sub pdata,0x10,null
+	branch p_le_send_att_read_by_group_type_end1,zero
+	fetch 1,mem_le_l2cap_response
+	sub pdata,0x10,null
+	branch p_le_send_att_read_by_group_type_end1,zero
+	fetch 2,mem_temp
+	increase -1,pdata
+	store 2,mem_le_cur_handle_end
+	call p_le_write_att_record
+p_le_send_att_read_by_group_type_store_record:
+	fetch 2,mem_temp
+	store 2,mem_le_cur_handle_start
+	call p_le_store_att_record
+	increase -1,timeup
+	branch p_le_send_att_read_by_group_type_last_find,zero		
+p_le_send_att_read_by_group_type_next_handle:
+	call p_le_att_next_handle
+	branch p_le_send_att_read_by_group_type_response_loop
+p_le_send_att_read_by_group_type_last_find:
+	jam 1,mem_le_search_res
+	branch p_le_send_att_read_by_group_type_next_handle
+p_le_send_att_read_by_group_type_end0:	//> att handle end
+	fetch 2,mem_temp
+	store 2,mem_le_cur_handle_end
+	branch p_le_send_att_read_by_group_type_end_common
+p_le_send_att_read_by_group_type_end1:	//>att max list handle or diff len 
+	fetch 2,mem_temp
+	increase -1,pdata
+	store 2,mem_le_cur_handle_end
+	branch p_le_send_att_read_by_group_type_end_common
+p_le_send_att_read_by_group_type_end_common:
+	branch le_send_att_error_response_notfound,user
+	call p_le_write_att_record
+	branch p_le_send_auto_len_by_mem
+
+
+p_le_att_next_handle:
+	fetcht 2,mem_temp
+	increase 1,temp
+	storet 2,mem_temp
+	rtn
+
+p_le_store_att_record:
+	fetch 1,mem_le_search_len
+	store 1, mem_tmp_buffer
+	copy pdata,loopcnt
+	call p_get_contr
+	branch memcpy
+	
+p_le_write_att_record:
+	call p_get_contw
+	fetch 2,mem_le_cur_handle_start
+	istore 2,contw
+	fetch 2,mem_le_cur_handle_end
+	istore 2,contw
+	fetch 1,mem_tmp_buffer
+	copy pdata,loopcnt
+	call memcpy
+	branch p_store_contw
+
+
+
+
+//len in mem_le_search_len
+//mem_contr payload
+//mem_le_cur_att_type type
+p_le_att_get_handle_info:
+	arg mem_le_att_list,contr
+	copy temp,rega
+p_le_att_get_handle_loop:
+	ifetch 2,contr
+	branch p_le_att_unfind_handle,blank
+	ifetcht 2,contr
+	storet 2,mem_le_cur_att_type
+	isub rega,null
+	branch p_le_att_finded_handle, zero
+	ifetch 1,contr			/* length */
+	iadd contr,contr
+	branch p_le_att_get_handle_loop
+p_le_att_unfind_handle:
+	setarg 1
+	rtn
+p_le_att_finded_handle:
+	ifetch 1,contr
+	store 1,mem_le_search_len
+	call p_store_contr
+	setarg 0
+	rtn
+	
+p_le_att_handle_inrange:
+	fetcht 2,mem_temp
+	fetch 2,mem_le_search_handle_end
+	isub temp,null
+	rtn
+
+p_le_att_same_type:
+	fetch 2,mem_le_search_att_type
+	fetcht 2,mem_le_cur_att_type
+	isub temp,null
+	rtn
+	
+p_le_send_auto_len_by_mem:
+	call p_get_contw
+	branch le_send_autolen
+p_get_contw:
+	fetch 2,mem_contw
+	copy pdata,contw
+	rtn
+p_get_contr:
+	fetch 2,mem_contr
+	copy pdata,contr
+	rtn
+p_store_contw:
+	copy contw,pdata
+	store 2,mem_contw
+	rtn
+p_store_contr:
+	copy contr,pdata
+	store 2,mem_contr
+	rtn
+
+p_connection_incontext:
+	call p_context_search_insniff
+	branch connection_incontext+3
+p_context_search_insniff:
+	arg p_context_search_sniff,regc
+	branch context_search
+p_context_search_sniff:
+	bbit0 1,context_search_next
+p_context_search_sniff_loop:
+	call context_get_anchor
+	call sign_pdata_temp
+	isub temp,pdata
+	increase 1,pdata
+	branch p_context_search_sniff_miss,positive
+	branch context_search_sniff_cont+3
+p_context_search_sniff_miss:
+	iforce regb
+	add rega,2,contr
+	ifetch 2,contr
+	branch context_search_meet,blank
+	call context_next_anchor
+	branch p_context_search_sniff_loop
+    // process 0-fffffff or fffffff-0
+sign_pdata_temp:
+	rshift16 pdata,timeup
+	rshift8 timeup,timeup
+	branch sign_pdata_temp_p0,zero
+	compare 0xf,timeup,0xf
+	nrtn true
+	rshift16 temp,timeup
+	rshift8 timeup,timeup
+	nrtn zero
+	set1 28,temp
+	rtn
+sign_pdata_temp_p0:
+	rshift16 temp,timeup
+	rshift8 timeup,timeup
+	compare 0xf,timeup,0xf
+	nrtn true
+	set1 28,pdata
+	rtn
+
+p_le_transmit_receive_sifs:
+	call le_transmit
+	fetcht 1,mem_last_freq
+	call set_freq_rx
+	call rf_rx_enable
+	enable swfine
+	arg 5500,timeup	// about 417us
+	//call ice_break
+	branch le_receive_rxon
+
+p_le_enable:
+	hjam 0x36,0x90f
+	hjam 0x5f,0x90b        
+	branch 0x53d4
+
+p_lpm_sleep:
+	call xtal_fast_wake
+	branch lpm_sleep+2
+	
+p_check_51cmd_once:
+	call ui_ipc_get_lock
+	arg mem_ipc_fifo_c512bt,rega
+	call fifo_out
+	copy pdata,temp
+	call ui_ipc_put_lock
+	copy temp,pdata
+	rtn blank
+ 	beq BT_CMD_START_DISCOVERY,check_51cmd_start_discovery
+	beq BT_CMD_STOP_DISCOVERY,check_51cmd_stop_discovery
+	beq BT_CMD_RECONNECT,check_51cmd_reconnect
+	beq BT_CMD_ENTER_SNIFF_SUBRATING,check_51cmd_enter_sniff_subrating
+	beq BT_CMD_EXIT_SNIFF_SUBRATING,check_51cmd_exit_sniff_subrating
+	beq BT_CMD_SNIFF_TEST,check_51cmd_sniff_test
+	beq BT_CMD_START_INQUIRY,check_51cmd_inq
+	beq BT_CMD_STOP_INQUIRY,check_51cmd_stop_inq
+	beq BT_CMD_START_ADV,check_51cmd_adv
+	beq BT_CMD_STOP_ADV,check_51cmd_stop_adv
+	beq BT_CMD_START_DIRECT_ADV,check_51cmd_direct_adv
+	beq BT_CMD_STOP_DIRECT_ADV,check_51cmd_stop_direct_adv
+	branch check_51cmd_once0
+	
+p_app_updata_le_param:
+	call  app_lpm_mult_enable
+	jam BT_CMD_LE_UPDATE_CONN,mem_fifo_temp
+	branch  ui_ipc_send_cmd
+
+p_le_prepare_tx_cmd:
+	fetch 1,mem_le_txpayload
+	beq LL_CONNECTION_PARAM_REQ,p_le_send_conn_param_req
+	beq LL_UNKNOWN_RSP,p_le_send_unknown_rsp
+	branch le_prepare_tx_cmd+10
+	
+p_le_send_unknown_rsp:
+	fetch 1,mem_le_ll_unknow_type
+	istore 1,contw
+	force 2,temp
+	branch le_send_packet
+p_le_send_conn_param_req:
+	increase -1,contw
+	setarg 0x000c
+	istore 2,contw //Length
+	setarg 0x0005
+	istore 2,contw	//CID
+	setarg 0xb412
+	istore 2,contw		
+	setarg 0x0008
+	istore 2,contw
+	fetch 2,mem_conn_min_interv
+	istore 2,contw //min interval
+	fetch 2,mem_conn_max_interv
+	istore 2,contw //max interval
+	fetch 1,mem_lpm_mult
+	istore 2,contw //latency
+	fetch 2, mem_conn_timeout
+	istore 2,contw //timeout	
+	force 2,type
+	branch le_send_autolen
+
+p_le_send_adv_ind:
+	fetch 1,mem_le_adv_type
+	beq ADV_DIRECT_IND,le_send_adv_direct_ind
+	fetcht 1,mem_le_adv_own_addr_type
+	lshift4 temp,temp
+	lshift2 temp,temp
+	ior temp,pdata
+	branch le_send_adv_ind + 7
+
+/*spi flash operator*/
+/*
+spiflash_write_data:
+	call app_get_lpm_wake_lock
+	call spid_init_flash
+	call spiflash_erase_by_sector
+	
+	call spid_unlock_flash
+	//pdata:addr, temp:length, rega:buffer
+	jam CMD_SPIFLASH_WRITE, mem_sf_data + 4
+	jam SPIFLASH_DATA_ADDR_B2, mem_sf_data + 5
+	jam SPIFLASH_DATA_ADDR_B1, mem_sf_data + 6
+	jam SPIFLASH_DATA_ADDR_B0, mem_sf_data + 7
+	fetch 3, mem_sf_data + 5
+	arg SPIFLASH_READ_LENGTH, temp
+	arg mem_sf_data + 4, rega
+	call spid_write_flash
+	call app_put_lpm_wake_lock
+	rtn
+	
+spiflash_read_data:
+	call app_get_lpm_wake_lock
+	call spid_init_flash
+	jam CMD_SPIFLASH_READ, mem_sf_data
+	jam SPIFLASH_DATA_ADDR_B2, mem_sf_data + 1
+	jam SPIFLASH_DATA_ADDR_B1, mem_sf_data + 2
+	jam SPIFLASH_DATA_ADDR_B0, mem_sf_data + 3
+	arg SPIFLASH_READ_LENGTH, temp
+	hstoret 2,core_spid_rxlen
+	setarg 4
+	hstore 2, core_spid_txlen
+	call spiflash_read
+	call app_put_lpm_wake_lock
+	rtn
+	
+//temp:rx length, rega: rx buffer, mem_tmp_buffer:tx buffer, pdata:flash addr
+spiflash_read:
+	arg mem_sf_data + 8, rega
+	setarg mem_sf_data
+	call spid_read_flash + 5
+	rtn
+
+spiflash_read_RDSR:
+	jam CMD_SPIFLASH_RDSR, mem_sf_data
+	arg 1, temp
+	hstoret 2,core_spid_rxlen
+	setarg 1
+	hstore 2, core_spid_txlen
+
+	arg mem_tmp_buffer, rega
+	setarg mem_sf_data
+	call spid_read_flash + 5
+
+	rtn
+	
+//mem_sf_data:cmd(4bytes) + data
+spiflash_erase_by_sector:
+	call spid_unlock_flash
+	arg 4, temp
+	hstoret 2,core_spid_txlen
+	jam CMD_SPIFLASH_SECTOR_ERASE, mem_sf_data + 4
+	jam SPIFLASH_DATA_ADDR_B2, mem_sf_data + 5
+	jam SPIFLASH_DATA_ADDR_B1, mem_sf_data + 6
+	jam SPIFLASH_DATA_ADDR_B0, mem_sf_data + 7
+	setarg mem_sf_data
+	hstore 2,core_spid_txaddr
+	call spid_write_flash + 12
+wait_spiflash_WIP_done:
+	call spiflash_read_RDSR
+	fetch 1, mem_tmp_buffer
+	bbit1 0, wait_spiflash_WIP_done
+	rtn
+*/

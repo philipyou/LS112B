@@ -1,0 +1,1670 @@
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE CS_SCALEDISPLAY
+OBJECT MODULE PLACED IN out/CS_ScaleDisplay.obj
+COMPILER INVOKED BY: C:\Keil\c51\bin\C51.exe CS_ScaleDisplay.c OBJECT(out/CS_ScaleDisplay.obj) OBJECTADVANCED OPTIMIZE(9
+                    -,SPEED) BROWSE CODE SYMBOLS DF(ENABLE_APE) PR(out/CS_ScaleDisplay.lst) OT(7,SPEED) LARGE
+
+line level    source
+
+   1          #include "YC_Define.h"
+   2          #include "YC_Peripheral.h"
+   3          #include "CS_Scale_Proc.h"
+   4          #include "CS_CommTo1186.h"
+   5          #include "CS_ScaleDisplay.h"
+   6          
+   7          
+   8          #include "retation_variable.h"
+   9          
+  10          u8_t xdata CS_lcd_showbuf[5];
+  11          u8_t xdata CS_Lcd_Send_Data[6];
+  12          u8_t xdata CS_Lcd_Send_Data_BAK[6];
+  13          
+  14          void CS_ScaleDisplay()
+  15          {
+  16   1              u32_t weight_temp;
+  17   1              
+  18   1              if(R_Display_Err==CS_ScaleDisplay_L_err)        //提示信息显示
+  19   1                      {
+  20   2                      if(CS_Scale_JudgeOverLoad(GetIfOverLoad)== true)        
+  21   2                              CS_ScaleDisplay_FreshBuf(DisplayOverLoad,0);                    
+  22   2                      if(CS_Scale_JudgeLowBat(GetIfLowBat)== true)
+  23   2                              CS_ScaleDisplay_FreshBuf(DisplayLowBat,0);      
+  24   2                      if(CS_Scale_ZeroProc(GetIfZeroErr,0)==true)
+  25   2                              CS_ScaleDisplay_FreshBuf(DisplayZeroErr,0);
+  26   2                      return;
+  27   2                      }
+  28   1              if(R_Selet_Unit == CS_ScaleDisplay_L_kg)
+  29   1                      {
+  30   2                      R_UnitWeight.kg = R_UnitWeight.origin;
+  31   2                      CS_ScaleDisplay_FreshBuf(Displaykg,R_UnitWeight.kg);
+  32   2                      }
+  33   1              if(R_Selet_Unit == CS_ScaleDisplay_L_gongjin)
+  34   1                      {
+  35   2                      R_UnitWeight.kg = R_UnitWeight.origin;
+  36   2                      CS_ScaleDisplay_FreshBuf(Displaygongjin,R_UnitWeight.kg);
+  37   2                      }
+  38   1              if(R_Selet_Unit == CS_ScaleDisplay_L_jin)
+  39   1                      {
+  40   2                      R_UnitWeight.jin = R_UnitWeight.origin *2;
+  41   2                      CS_ScaleDisplay_FreshBuf(Displayjin,R_UnitWeight.jin);
+  42   2                      }                               
+  43   1             if(R_Selet_Unit == CS_ScaleDisplay_L_lb )
+  44   1              {
+  45   2                      weight_temp   = (u32_t) R_UnitWeight.origin *22046;
+  46   2                      R_UnitWeight.lb = weight_temp / 10000;
+  47   2                      CS_ScaleDisplay_FreshBuf(Displaylb,R_UnitWeight.lb);
+  48   2              }               
+  49   1      }
+  50          
+  51          
+  52          
+  53          
+  54          
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 2   
+
+  55          void CS_ScaleDisplay_Debug()
+  56          {
+  57   1              u8_t buf[5];
+  58   1              CS_ScaleDisplay_HexToBcd(R_Debug_temp,buf);
+  59   1                      
+  60   1              CS_lcd_showbuf[0] = CS_ScaleDisplay_LookUpTable(buf[1]);
+  61   1              CS_lcd_showbuf[1] = CS_ScaleDisplay_LookUpTable(buf[2]);
+  62   1              CS_lcd_showbuf[2] = CS_ScaleDisplay_LookUpTable(buf[3]);
+  63   1              CS_lcd_showbuf[3] = CS_ScaleDisplay_LookUpTable(buf[4]);        
+  64   1                      
+  65   1              CS_ScaleDisplay_LcdBuf_rShift4();
+  66   1      
+  67   1              CS_CommTo1186_SendCmd(CS_CommTo1186_LcdDisplay,CS_Lcd_Send_Data);
+  68   1      
+  69   1      }
+  70          
+  71          
+  72          
+  73          void CS_ScaleDisplay_FreshBuf(u8_t option,u16_t showdata)
+  74          {
+  75   1              static  u8_t    data_buf[5];
+  76   1      
+  77   1              //////////////////////////////////////////
+  78   1              //数字部分赋值
+  79   1              if(option==DisplayOverLoad)
+  80   1              {
+  81   2              data_buf[0]=Lcdnull_Num;
+  82   2              data_buf[1]=Lcdup_Num;
+  83   2              data_buf[2]=Lcdup_Num;
+  84   2              data_buf[3]=Lcdup_Num;
+  85   2              data_buf[4]=Lcdup_Num;
+  86   2              }
+  87   1      
+  88   1              if(option==DisplayLowBat)
+  89   1              {
+  90   2              data_buf[0]=0;
+  91   2              data_buf[1]=Lcdnull_Num;
+  92   2              data_buf[2]=LcdchL_Num;
+  93   2              data_buf[3]=Lcdcho_Num;
+  94   2              data_buf[4]=Lcdnull_Num;
+  95   2              }
+  96   1      
+  97   1              if(option==DisplayZeroErr)
+  98   1              {
+  99   2              data_buf[0]=Lcdnull_Num;
+ 100   2              data_buf[1]=Lcdnull_Num;
+ 101   2              data_buf[2]=LcdchC_Num;
+ 102   2              data_buf[3]=Lcdnull_Num;
+ 103   2              data_buf[4]=Lcdnull_Num;
+ 104   2              }
+ 105   1              
+ 106   1              if(option==DisplayCal1||option==DisplayCal2||option==DisplayCal3||option==DisplayCal4)
+ 107   1              {
+ 108   2              data_buf[0]=0;
+ 109   2              data_buf[1]=LcdchC_Num;
+ 110   2              data_buf[2]=LcdchA_Num;
+ 111   2              data_buf[3]=LcdchL_Num;
+ 112   2                      if(option==DisplayCal1)
+ 113   2                              data_buf[4]=1;
+ 114   2                      if(option==DisplayCal2)
+ 115   2                              data_buf[4]=2;
+ 116   2                      if(option==DisplayCal3)
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 3   
+
+ 117   2                              data_buf[4]=3;
+ 118   2                      if(option==DisplayCal4)
+ 119   2                              data_buf[4]=4;
+ 120   2              }
+ 121   1      
+ 122   1              if(option==DisplayData||option==Displaykg||option==Displaylb||option==Displayjin||option==Displaygongjin)
+ 123   1              {
+ 124   2              CS_ScaleDisplay_HexToBcd(showdata,data_buf);
+ 125   2              
+ 126   2              if(option&showhigh4)            //显示高4位
+ 127   2                      {
+ 128   3                      data_buf[4]=data_buf[3];
+ 129   3                      data_buf[3]=data_buf[2];
+ 130   3                      data_buf[2]=data_buf[1];
+ 131   3                      data_buf[1]=data_buf[0];
+ 132   3                      data_buf[0]=0;
+ 133   3                      }
+ 134   2      
+ 135   2                      if(data_buf[0]==0 && data_buf[1]==0 )   
+ 136   2                              data_buf[1]=Lcdnull_Num;
+ 137   2                      if(data_buf[1]==Lcdnull_Num && data_buf[2]==0 ) 
+ 138   2                              data_buf[2]=Lcdnull_Num;
+ 139   2      
+ 140   2                      if(option&ShowNoDot)    //没有小数点还要判断多一位数字为0时是否不显示
+ 141   2                              {
+ 142   3                              if(data_buf[2]==Lcdnull_Num && data_buf[3]==0 ) 
+ 143   3                                      data_buf[3]=Lcdnull_Num;
+ 144   3                              }
+ 145   2              }
+ 146   1              
+ 147   1              CS_lcd_showbuf[0] = CS_ScaleDisplay_LookUpTable(data_buf[1]);
+ 148   1              CS_lcd_showbuf[1] = CS_ScaleDisplay_LookUpTable(data_buf[2]);
+ 149   1              CS_lcd_showbuf[2] = CS_ScaleDisplay_LookUpTable(data_buf[3]);
+ 150   1              CS_lcd_showbuf[3] = CS_ScaleDisplay_LookUpTable(data_buf[4]);
+ 151   1                              
+ 152   1              CS_ScaleDisplay_LcdBuf_rShift4();       //显示缓存跟实际液晶的逻辑对应有出入还要微调
+ 153   1      
+ 154   1                                                                                      //显示缓存数字还有符号部分的位置
+ 155   1      
+ 156   1              //////////////////////////////////////////
+ 157   1              //符号部分赋值
+ 158   1              CS_Lcd_Send_Data[4] &=0x0f;                     //清单位符号缓存        
+ 159   1              CS_Lcd_Buf_DOT2  &= ~S_DOT;                     //清显示小数点
+ 160   1      
+ 161   1              
+ 162   1              if(option==DisplayData)                         //最高位用蓝牙标志辅助显示
+ 163   1                      {       
+ 164   2                      CS_Lcd_Buf_SIGN &=~S_BLE;
+ 165   2                      if(data_buf[0]!=0)
+ 166   2                      CS_Lcd_Buf_SIGN |=S_BLE;
+ 167   2                      }       
+ 168   1              
+ 169   1              if(option==Displaykg)
+ 170   1                      {
+ 171   2                      CS_Lcd_Buf_DOT2 |= S_DOT;
+ 172   2                      CS_Lcd_Buf_Unit |= S_KG;                                                        
+ 173   2                      }       
+ 174   1      
+ 175   1              if(option==Displaylb)
+ 176   1                      {
+ 177   2                      CS_Lcd_Buf_DOT2 |= S_DOT;
+ 178   2                      CS_Lcd_Buf_Unit |= S_LB;                                                        
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 4   
+
+ 179   2                      }
+ 180   1              if(option==Displayjin)
+ 181   1                      {
+ 182   2                      CS_Lcd_Buf_DOT2 |= S_DOT;
+ 183   2                      CS_Lcd_Buf_Unit |= S_JIN;                                                       
+ 184   2                      }
+ 185   1              
+ 186   1              if(option==Displaygongjin)
+ 187   1                      {
+ 188   2                      CS_Lcd_Buf_DOT2 |= S_DOT;
+ 189   2                      CS_Lcd_Buf_Unit |= S_GONG | S_JIN;                                                      
+ 190   2                      }
+ 191   1      
+ 192   1              if(bleConnStatus==BLE_STATUS_CONN)
+ 193   1                      CS_Lcd_Buf_SIGN |=S_BLE;
+ 194   1              else
+ 195   1                      CS_Lcd_Buf_SIGN &=~S_BLE;
+ 196   1              
+ 197   1      }
+ 198          
+ 199          
+ 200          
+ 201          /*
+ 202                _   _        _        _
+ 203          ble | |     | |   | |      | |  
+ 204          dat  _    _        _        _           kg
+ 205               | |     | |          | |      | |  lb
+ 206                _  _    .   _      .  _           公斤
+ 207          
+ 208                2  3         4        5
+ 209          
+ 210                          SEG1    SEG2    SEG3    SEG4    SEG5    SEG6    SEG7    SEG8    SEG9    SEG10           
+ 211          COM1                    2F              2A              3F              3A              4F              4A              5F              5A              KG
+ 212          COM2    BLE             2G              2B              3G              3B              4G              4B              5G              5B              LB
+ 213          COM3    DAT             2E              2C              3E              3C              4E              4C              5E              5C              公
+ 214          COM4                    2D                              3D              .00             4D              .0              5D                              斤
+ 215          
+ 216            __               A
+ 217            
+ 218          |     |     F      B
+ 219            __            G
+ 220            
+ 221          |     |     E      C
+ 222            __            D
+ 223          
+ 224          #define S_A             CS_Lcd_Buf_Bit0
+ 225          #define S_B             CS_Lcd_Buf_Bit1
+ 226          #define S_C             CS_Lcd_Buf_Bit2
+ 227          
+ 228          #define S_F             CS_Lcd_Buf_Bit4
+ 229          #define S_G             CS_Lcd_Buf_Bit5
+ 230          #define S_E             CS_Lcd_Buf_Bit6
+ 231          #define S_D             CS_Lcd_Buf_Bit7
+ 232          */
+ 233          
+ 234          
+ 235          void CS_ScaleDisplay_LcdBuf_rShift4()
+ 236          {
+ 237   1              CS_lcd_showbuf[4] = (CS_lcd_showbuf[4] & 0xf0) | (CS_lcd_showbuf[3] & 0x0f);
+ 238   1              CS_lcd_showbuf[3] = (CS_lcd_showbuf[3] & 0xf0) | (CS_lcd_showbuf[2] & 0x0f);
+ 239   1              CS_lcd_showbuf[2] = (CS_lcd_showbuf[2] & 0xf0) | (CS_lcd_showbuf[1] & 0x0f);
+ 240   1              CS_lcd_showbuf[1] = (CS_lcd_showbuf[1] & 0xf0) | (CS_lcd_showbuf[0] & 0x0f);
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 5   
+
+ 241   1              CS_lcd_showbuf[0] = CS_lcd_showbuf[0] & 0xf0;
+ 242   1      
+ 243   1              //清显示缓存数字部分
+ 244   1              CS_Lcd_Send_Data[0]  &= 0x0f;
+ 245   1              CS_Lcd_Send_Data[1]  &= 0x08;
+ 246   1              CS_Lcd_Send_Data[2]  &= 0x08;
+ 247   1              CS_Lcd_Send_Data[3]  &= 0x08;
+ 248   1              CS_Lcd_Send_Data[4]  &= 0xf8;
+ 249   1      
+ 250   1              //显示缓存数字部分重新赋值
+ 251   1              CS_Lcd_Send_Data[0]  |= CS_lcd_showbuf[0];
+ 252   1              CS_Lcd_Send_Data[1]  |= CS_lcd_showbuf[1];
+ 253   1              CS_Lcd_Send_Data[2]  |= CS_lcd_showbuf[2];
+ 254   1              CS_Lcd_Send_Data[3]  |= CS_lcd_showbuf[3];
+ 255   1              CS_Lcd_Send_Data[4]  |= CS_lcd_showbuf[4];
+ 256   1                      
+ 257   1      }
+ 258          
+ 259          
+ 260          void CS_ScaleDisplay_HexToBcd(u16_t HexData,u8_t* buf)
+ 261          {
+ 262   1              u8_t  i;
+ 263   1              for(i=0;i<5;i++)
+ 264   1                      {
+ 265   2                      buf[4-i] =  HexData%10;
+ 266   2                      HexData = HexData /10;
+ 267   2                      }       
+ 268   1      }
+ 269          
+ 270          
+ 271          const u8_t CS_Lcd_Table[] = {
+ 272                  Lcdch0,Lcdch1,Lcdch2,Lcdch3,Lcdch4,     
+ 273                  Lcdch5,Lcdch6,Lcdch7,Lcdch8,Lcdch9,     
+ 274                  LcdchA,Lcdchb,LcdchC,Lcdchd,LcdchE,     
+ 275                  LcdchF,LcdchL,Lcdcho,LcdchP,Lcdchn,
+ 276                  Lcdchr,Lcdnull,Lcdup
+ 277          };
+ 278          
+ 279          
+ 280          u8_t CS_ScaleDisplay_LookUpTable(u8_t NumData)
+ 281          {
+ 282   1              u8_t     * data_ptr;
+ 283   1              data_ptr = CS_Lcd_Table;
+ 284   1              return  *(data_ptr + NumData);
+ 285   1      }
+ 286          
+ 287          
+ 288          
+ 289          
+ 290          void CS_ScaleDisplay_LcdShowNull(void)
+ 291          {
+ 292   1              CS_Lcd_Send_Data[0] = 0x00;
+ 293   1              CS_Lcd_Send_Data[1] = 0x00;
+ 294   1              CS_Lcd_Send_Data[2] = 0x00;
+ 295   1              CS_Lcd_Send_Data[3] = 0x00;
+ 296   1              CS_Lcd_Send_Data[4] = 0x00;
+ 297   1      }
+ 298          
+ 299          void CS_ScaleDisplay_LcdShowNoDigit(void)
+ 300          {
+ 301   1              CS_Lcd_Send_Data[0] &= 0x0f;
+ 302   1              CS_Lcd_Send_Data[1] &= 0x00;
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 6   
+
+ 303   1              CS_Lcd_Send_Data[2] &= 0x08;
+ 304   1              CS_Lcd_Send_Data[3] &= 0x08;
+ 305   1              CS_Lcd_Send_Data[4] &= 0xf0;
+ 306   1      }
+ 307          
+ 308          void CS_ScaleDisplay_LcdShowAll(void)
+ 309          {
+ 310   1              CS_Lcd_Send_Data[0] = 0xFF;
+ 311   1              CS_Lcd_Send_Data[1] = 0xFF;
+ 312   1              CS_Lcd_Send_Data[2] = 0xFF;
+ 313   1              CS_Lcd_Send_Data[3] = 0xFF;
+ 314   1              CS_Lcd_Send_Data[4] = 0xFF;
+ 315   1      }
+ 316          
+ 317          
+ 318          void CS_ScaleDisplay_LcdBackup(void)
+ 319          {
+ 320   1              CS_Lcd_Send_Data_BAK[0] = CS_Lcd_Send_Data[0];
+ 321   1              CS_Lcd_Send_Data_BAK[1] = CS_Lcd_Send_Data[1];
+ 322   1              CS_Lcd_Send_Data_BAK[2] = CS_Lcd_Send_Data[2];
+ 323   1              CS_Lcd_Send_Data_BAK[3] = CS_Lcd_Send_Data[3];
+ 324   1              CS_Lcd_Send_Data_BAK[4] = CS_Lcd_Send_Data[4];  
+ 325   1      }
+ 326          
+ 327          
+ 328          void CS_ScaleDisplay_LcdRestore(void)
+ 329          {
+ 330   1              CS_Lcd_Send_Data[0] = CS_Lcd_Send_Data_BAK[0];
+ 331   1              CS_Lcd_Send_Data[1] = CS_Lcd_Send_Data_BAK[1];
+ 332   1              CS_Lcd_Send_Data[2] = CS_Lcd_Send_Data_BAK[2];
+ 333   1              CS_Lcd_Send_Data[3] = CS_Lcd_Send_Data_BAK[3];
+ 334   1              CS_Lcd_Send_Data[4] = CS_Lcd_Send_Data_BAK[4];
+ 335   1      }
+ 336          
+ 337          
+ 338          void CS_ScaleDisplay_SteadyFlash(void)
+ 339          {        
+ 340   1      
+ 341   1              u8_t xdata R_Weight_FlashTime;
+ 342   1      
+ 343   1              
+ 344   1              if(CS_SoftTimer(GetIfTimeOut) == false)
+ 345   1                      {
+ 346   2                      R_Weight_FlashTime = CS_SoftTimer(GetSoftTimerTime);
+ 347   2                         if(R_Weight_FlashTime<30) 
+ 348   2                              CS_ScaleDisplay_LcdBackup();
+ 349   2                          else if(R_Weight_FlashTime<60) 
+ 350   2                                      CS_ScaleDisplay_LcdShowNoDigit();
+ 351   2                                      else if(R_Weight_FlashTime<90)
+ 352   2                                              CS_ScaleDisplay_LcdRestore();
+ 353   2                                              else if(R_Weight_FlashTime<120) 
+ 354   2                                                      CS_ScaleDisplay_LcdShowNoDigit();
+ 355   2                                                      else if(R_Weight_FlashTime<150)
+ 356   2                                                              CS_ScaleDisplay_LcdRestore();           
+ 357   2                      }
+ 358   1      }
+ 359          
+ 360          
+ 361          
+ 362          
+ 363          
+ 364          
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 7   
+
+ 365          
+ 366          
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 8   
+
+ASSEMBLY LISTING OF GENERATED OBJECT CODE
+
+
+             ; FUNCTION CS_ScaleDisplay (BEGIN)
+                                           ; SOURCE LINE # 14
+                                           ; SOURCE LINE # 15
+                                           ; SOURCE LINE # 18
+                 E     MOV     DPTR,#R_Display_Err
+                       MOVX    A,@DPTR
+                       XRL     A,#04H
+                 R     xJNZ    ?C0001
+                                           ; SOURCE LINE # 19
+                                           ; SOURCE LINE # 20
+                       MOV     R7,#01H
+                 E     CALL    _CS_Scale_JudgeOverLoad
+                 R     xJNE    R7,#01H,?C0002
+                                           ; SOURCE LINE # 21
+                       CLR     A
+                       MOV     R5,A
+                       MOV     R4,A
+                       MOV     R7,#085H
+                 R     CALL    _CS_ScaleDisplay_FreshBuf
+             ?C0002:
+                                           ; SOURCE LINE # 22
+                       MOV     R7,#01H
+                 E     CALL    _CS_Scale_JudgeLowBat
+                 R     xJNE    R7,#01H,?C0003
+                                           ; SOURCE LINE # 23
+                       CLR     A
+                       MOV     R5,A
+                       MOV     R4,A
+                       MOV     R7,#086H
+                 R     CALL    _CS_ScaleDisplay_FreshBuf
+             ?C0003:
+                                           ; SOURCE LINE # 24
+                       CLR     A
+                       MOV     R5,A
+                       MOV     R4,A
+                       MOV     R7,#09H
+                 E     CALL    _CS_Scale_ZeroProc
+                       MOV     A,R7
+                       XRL     A,#01H
+                       ORL     A,R6
+                 R     xJNZ    ?C0005
+                                           ; SOURCE LINE # 25
+                       MOV     R5,A
+                       MOV     R4,A
+                       MOV     R7,#087H
+                 R     CALL    _CS_ScaleDisplay_FreshBuf
+                       RET     
+                                           ; SOURCE LINE # 27
+             ?C0001:
+                                           ; SOURCE LINE # 28
+                 E     MOV     DPTR,#R_Selet_Unit
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0006
+                                           ; SOURCE LINE # 29
+                                           ; SOURCE LINE # 30
+                 E     MOV     DPTR,#R_UnitWeight
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 9   
+
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       INC     DPTR
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       MOV     R4,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                       MOV     R5,A
+                                           ; SOURCE LINE # 31
+                       MOV     R7,#041H
+                 R     CALL    _CS_ScaleDisplay_FreshBuf
+                                           ; SOURCE LINE # 32
+             ?C0006:
+                                           ; SOURCE LINE # 33
+                 E     MOV     DPTR,#R_Selet_Unit
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#02H,?C0007
+                                           ; SOURCE LINE # 34
+                                           ; SOURCE LINE # 35
+                 E     MOV     DPTR,#R_UnitWeight
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       INC     DPTR
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       MOV     R4,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                       MOV     R5,A
+                                           ; SOURCE LINE # 36
+                       MOV     R7,#044H
+                 R     CALL    _CS_ScaleDisplay_FreshBuf
+                                           ; SOURCE LINE # 37
+             ?C0007:
+                                           ; SOURCE LINE # 38
+                 E     MOV     DPTR,#R_Selet_Unit
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#03H,?C0008
+                                           ; SOURCE LINE # 39
+                                           ; SOURCE LINE # 40
+                 E     MOV     DPTR,#R_UnitWeight+01H
+                       MOVX    A,@DPTR
+                       ADD     A,ACC
+                       MOV     R7,A
+                 E     MOV     DPTR,#R_UnitWeight
+                       MOVX    A,@DPTR
+                       RLC     A
+                       MOV     R6,A
+                 E     MOV     DPTR,#R_UnitWeight+08H
+                       MOVX    @DPTR,A
+                       MOV     R4,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                       MOV     R5,A
+                                           ; SOURCE LINE # 41
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 10  
+
+                       MOV     R7,#043H
+                 R     CALL    _CS_ScaleDisplay_FreshBuf
+                                           ; SOURCE LINE # 42
+             ?C0008:
+                                           ; SOURCE LINE # 43
+                 E     MOV     DPTR,#R_Selet_Unit
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#01H,?C0005
+                                           ; SOURCE LINE # 44
+                                           ; SOURCE LINE # 45
+                 E     MOV     DPTR,#R_UnitWeight
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     R4,#056H
+                       MOV     R5,#01EH
+                 E     CALL    ?C?LIMUL
+;---- Variable 'weight_temp' assigned to Register 'R4/R5/R6/R7' ----
+                                           ; SOURCE LINE # 46
+                       CLR     A
+                       MOV     R3,#010H
+                       MOV     R2,#027H
+                       MOV     R1,A
+                       MOV     R0,A
+                 E     CALL    ?C?ULDIV
+                 E     MOV     DPTR,#R_UnitWeight+04H
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       MOV     R4,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                       MOV     R5,A
+                                           ; SOURCE LINE # 47
+                       MOV     R7,#042H
+                 R     CALL    _CS_ScaleDisplay_FreshBuf
+                                           ; SOURCE LINE # 48
+                                           ; SOURCE LINE # 49
+             ?C0005:
+                       RET     
+             ; FUNCTION CS_ScaleDisplay (END)
+
+             ; FUNCTION CS_ScaleDisplay_Debug (BEGIN)
+                                           ; SOURCE LINE # 55
+                                           ; SOURCE LINE # 56
+                                           ; SOURCE LINE # 58
+                 E     MOV     DPTR,#R_Debug_temp
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH buf
+                 R     MOV     R1,#LOW buf
+                 R     CALL    _CS_ScaleDisplay_HexToBcd
+                                           ; SOURCE LINE # 60
+                 R     MOV     DPTR,#buf+01H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 11  
+
+                 R     CALL    _CS_ScaleDisplay_LookUpTable
+                 R     MOV     DPTR,#CS_lcd_showbuf
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 61
+                 R     MOV     DPTR,#buf+02H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     CALL    _CS_ScaleDisplay_LookUpTable
+                 R     MOV     DPTR,#CS_lcd_showbuf+01H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 62
+                 R     MOV     DPTR,#buf+03H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     CALL    _CS_ScaleDisplay_LookUpTable
+                 R     MOV     DPTR,#CS_lcd_showbuf+02H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 63
+                 R     MOV     DPTR,#buf+04H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     CALL    _CS_ScaleDisplay_LookUpTable
+                 R     MOV     DPTR,#CS_lcd_showbuf+03H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 65
+                 R     CALL    CS_ScaleDisplay_LcdBuf_rShift4
+                                           ; SOURCE LINE # 67
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH CS_Lcd_Send_Data
+                 R     MOV     R1,#LOW CS_Lcd_Send_Data
+                       MOV     R7,#0E0H
+                 E     CALL    _CS_CommTo1186_SendCmd
+                                           ; SOURCE LINE # 69
+                       RET     
+             ; FUNCTION CS_ScaleDisplay_Debug (END)
+
+             ; FUNCTION _CS_ScaleDisplay_FreshBuf (BEGIN)
+                                           ; SOURCE LINE # 73
+;---- Variable 'showdata' assigned to Register 'R4/R5' ----
+                 R     MOV     DPTR,#option
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 74
+                                           ; SOURCE LINE # 79
+                 R     xJNE    R7,#085H,?C0011
+                                           ; SOURCE LINE # 80
+                                           ; SOURCE LINE # 81
+                 R     MOV     DPTR,#data_buf
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 82
+                       INC     DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 83
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 84
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 12  
+
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 85
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 86
+             ?C0011:
+                                           ; SOURCE LINE # 88
+                 R     MOV     DPTR,#option
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     xJNE    A,#086H,?C0012
+                                           ; SOURCE LINE # 89
+                                           ; SOURCE LINE # 90
+                       CLR     A
+                 R     MOV     DPTR,#data_buf
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 91
+                       INC     DPTR
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 92
+                       INC     DPTR
+                       MOV     A,#010H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 93
+                       INC     DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 94
+                       INC     DPTR
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 95
+             ?C0012:
+                                           ; SOURCE LINE # 97
+                       MOV     A,R7
+                 R     xJNE    A,#087H,?C0013
+                                           ; SOURCE LINE # 98
+                                           ; SOURCE LINE # 99
+                 R     MOV     DPTR,#data_buf
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 100
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 101
+                       INC     DPTR
+                       MOV     A,#0CH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 102
+                       INC     DPTR
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 103
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 104
+             ?C0013:
+                                           ; SOURCE LINE # 106
+                       MOV     A,R7
+                       XRL     A,#081H
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 13  
+
+                 R     xJZ     ?C0015
+                       MOV     A,R7
+                       XRL     A,#082H
+                 R     xJZ     ?C0015
+                       MOV     A,R7
+                       XRL     A,#083H
+                 R     xJZ     ?C0015
+                       MOV     A,R7
+                       XRL     A,#084H
+                 R     xJNZ    ?C0014
+             ?C0015:
+                                           ; SOURCE LINE # 107
+                                           ; SOURCE LINE # 108
+                       CLR     A
+                 R     MOV     DPTR,#data_buf
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 109
+                       INC     DPTR
+                       MOV     A,#0CH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 110
+                       INC     DPTR
+                       MOV     A,#0AH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 111
+                       INC     DPTR
+                       MOV     A,#010H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 112
+                       MOV     A,R7
+                 R     xJNE    A,#081H,?C0016
+                                           ; SOURCE LINE # 113
+                       INC     DPTR
+                       MOV     A,#01H
+                       MOVX    @DPTR,A
+             ?C0016:
+                                           ; SOURCE LINE # 114
+                 R     MOV     DPTR,#option
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#082H,?C0017
+                                           ; SOURCE LINE # 115
+                 R     MOV     DPTR,#data_buf+04H
+                       MOV     A,#02H
+                       MOVX    @DPTR,A
+             ?C0017:
+                                           ; SOURCE LINE # 116
+                 R     MOV     DPTR,#option
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     xJNE    A,#083H,?C0018
+                                           ; SOURCE LINE # 117
+                 R     MOV     DPTR,#data_buf+04H
+                       MOV     A,#03H
+                       MOVX    @DPTR,A
+             ?C0018:
+                                           ; SOURCE LINE # 118
+                       MOV     A,R7
+                 R     xJNE    A,#084H,?C0014
+                                           ; SOURCE LINE # 119
+                 R     MOV     DPTR,#data_buf+04H
+                       MOV     A,#04H
+                       MOVX    @DPTR,A
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 14  
+
+                                           ; SOURCE LINE # 120
+             ?C0014:
+                                           ; SOURCE LINE # 122
+                 R     MOV     DPTR,#option
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       XRL     A,#021H
+                 R     xJZ     ?C0021
+                       MOV     A,R7
+                       XRL     A,#041H
+                 R     xJZ     ?C0021
+                       MOV     A,R7
+                       XRL     A,#042H
+                 R     xJZ     ?C0021
+                       MOV     A,R7
+                       XRL     A,#043H
+                 R     xJZ     ?C0021
+                       MOV     A,R7
+                       XRL     A,#044H
+                 R     xJNZ    ?C0020
+             ?C0021:
+                                           ; SOURCE LINE # 123
+                                           ; SOURCE LINE # 124
+                       MOV     R6,AR4
+                       MOV     R7,AR5
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH data_buf
+                 R     MOV     R1,#LOW data_buf
+                 R     CALL    _CS_ScaleDisplay_HexToBcd
+                                           ; SOURCE LINE # 126
+                 R     MOV     DPTR,#option
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     xJNB    ACC.6,?C0022
+                                           ; SOURCE LINE # 127
+                                           ; SOURCE LINE # 128
+                 R     MOV     DPTR,#data_buf+03H
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 129
+                 R     MOV     DPTR,#data_buf+02H
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 130
+                 R     MOV     DPTR,#data_buf+01H
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 131
+                 R     MOV     DPTR,#data_buf
+                       MOVX    A,@DPTR
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 132
+                       CLR     A
+                 R     MOV     DPTR,#data_buf
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 133
+             ?C0022:
+                                           ; SOURCE LINE # 135
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 15  
+
+                 R     MOV     DPTR,#data_buf
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0023
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0023
+                                           ; SOURCE LINE # 136
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+             ?C0023:
+                                           ; SOURCE LINE # 137
+                 R     MOV     DPTR,#data_buf+01H
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#015H,?C0024
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0024
+                                           ; SOURCE LINE # 138
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+             ?C0024:
+                                           ; SOURCE LINE # 140
+                       MOV     A,R7
+                 R     xJNB    ACC.5,?C0020
+                                           ; SOURCE LINE # 141
+                                           ; SOURCE LINE # 142
+                 R     MOV     DPTR,#data_buf+02H
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#015H,?C0020
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                 R     xJNZ    ?C0020
+                                           ; SOURCE LINE # 143
+                       MOV     A,#015H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 144
+                                           ; SOURCE LINE # 145
+             ?C0020:
+                                           ; SOURCE LINE # 147
+                 R     MOV     DPTR,#data_buf+01H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     CALL    _CS_ScaleDisplay_LookUpTable
+                 R     MOV     DPTR,#CS_lcd_showbuf
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 148
+                 R     MOV     DPTR,#data_buf+02H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     CALL    _CS_ScaleDisplay_LookUpTable
+                 R     MOV     DPTR,#CS_lcd_showbuf+01H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 149
+                 R     MOV     DPTR,#data_buf+03H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     CALL    _CS_ScaleDisplay_LookUpTable
+                 R     MOV     DPTR,#CS_lcd_showbuf+02H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 16  
+
+                                           ; SOURCE LINE # 150
+                 R     MOV     DPTR,#data_buf+04H
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     CALL    _CS_ScaleDisplay_LookUpTable
+                 R     MOV     DPTR,#CS_lcd_showbuf+03H
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 152
+                 R     CALL    CS_ScaleDisplay_LcdBuf_rShift4
+                                           ; SOURCE LINE # 158
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+04H
+                       MOVX    A,@DPTR
+                       ANL     A,#0FH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 159
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+03H
+                       MOVX    A,@DPTR
+                       ANL     A,#0F7H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 162
+                 R     MOV     DPTR,#option
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                 R     xJNE    A,#021H,?C0027
+                                           ; SOURCE LINE # 163
+                                           ; SOURCE LINE # 164
+                 R     MOV     DPTR,#CS_Lcd_Send_Data
+                       MOVX    A,@DPTR
+                       ANL     A,#0FDH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 165
+                 R     MOV     DPTR,#data_buf
+                       MOVX    A,@DPTR
+                 R     xJZ     ?C0027
+                                           ; SOURCE LINE # 166
+                 R     MOV     DPTR,#CS_Lcd_Send_Data
+                       MOVX    A,@DPTR
+                       ORL     A,#02H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 167
+             ?C0027:
+                                           ; SOURCE LINE # 169
+                       MOV     A,R5
+                 R     xJNE    A,#041H,?C0029
+                                           ; SOURCE LINE # 170
+                                           ; SOURCE LINE # 171
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+03H
+                       MOVX    A,@DPTR
+                       ORL     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 172
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ORL     A,#010H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 173
+             ?C0029:
+                                           ; SOURCE LINE # 175
+                 R     MOV     DPTR,#option
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#042H,?C0030
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 17  
+
+                                           ; SOURCE LINE # 176
+                                           ; SOURCE LINE # 177
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+03H
+                       MOVX    A,@DPTR
+                       ORL     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 178
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ORL     A,#020H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 179
+             ?C0030:
+                                           ; SOURCE LINE # 180
+                 R     MOV     DPTR,#option
+                       MOVX    A,@DPTR
+                       MOV     R5,A
+                 R     xJNE    A,#043H,?C0031
+                                           ; SOURCE LINE # 181
+                                           ; SOURCE LINE # 182
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+03H
+                       MOVX    A,@DPTR
+                       ORL     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 183
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ORL     A,#080H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 184
+             ?C0031:
+                                           ; SOURCE LINE # 186
+                       MOV     A,R5
+                 R     xJNE    A,#044H,?C0032
+                                           ; SOURCE LINE # 187
+                                           ; SOURCE LINE # 188
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+03H
+                       MOVX    A,@DPTR
+                       ORL     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 189
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ORL     A,#0C0H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 190
+             ?C0032:
+                                           ; SOURCE LINE # 192
+                 E     MOV     DPTR,#bleConnStatus
+                       MOVX    A,@DPTR
+                 R     xJNE    A,#01H,?C0033
+                                           ; SOURCE LINE # 193
+                 R     MOV     DPTR,#CS_Lcd_Send_Data
+                       MOVX    A,@DPTR
+                       ORL     A,#02H
+                       MOVX    @DPTR,A
+                       RET     
+             ?C0033:
+                                           ; SOURCE LINE # 195
+                 R     MOV     DPTR,#CS_Lcd_Send_Data
+                       MOVX    A,@DPTR
+                       ANL     A,#0FDH
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 18  
+
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 197
+             ?C0035:
+                       RET     
+             ; FUNCTION _CS_ScaleDisplay_FreshBuf (END)
+
+             ; FUNCTION CS_ScaleDisplay_LcdBuf_rShift4 (BEGIN)
+                                           ; SOURCE LINE # 235
+                                           ; SOURCE LINE # 236
+                                           ; SOURCE LINE # 237
+                 R     MOV     DPTR,#CS_lcd_showbuf+03H
+                       MOVX    A,@DPTR
+                       ANL     A,#0FH
+                       MOV     R7,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ANL     A,#0F0H
+                       ORL     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 238
+                 R     MOV     DPTR,#CS_lcd_showbuf+02H
+                       MOVX    A,@DPTR
+                       ANL     A,#0FH
+                       MOV     R7,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ANL     A,#0F0H
+                       ORL     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 239
+                 R     MOV     DPTR,#CS_lcd_showbuf+01H
+                       MOVX    A,@DPTR
+                       ANL     A,#0FH
+                       MOV     R7,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ANL     A,#0F0H
+                       ORL     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 240
+                 R     MOV     DPTR,#CS_lcd_showbuf
+                       MOVX    A,@DPTR
+                       ANL     A,#0FH
+                       MOV     R7,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ANL     A,#0F0H
+                       ORL     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 241
+                 R     MOV     DPTR,#CS_lcd_showbuf
+                       MOVX    A,@DPTR
+                       ANL     A,#0F0H
+                       MOV     R7,A
+                       MOVX    @DPTR,A
+                       MOV     R5,A
+                                           ; SOURCE LINE # 244
+                 R     MOV     DPTR,#CS_Lcd_Send_Data
+                       MOVX    A,@DPTR
+                       ANL     A,#0FH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 245
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 19  
+
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ANL     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 246
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ANL     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 247
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ANL     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 248
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ANL     A,#0F8H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 251
+                 R     MOV     DPTR,#CS_Lcd_Send_Data
+                       MOVX    A,@DPTR
+                       ORL     A,R5
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 252
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#CS_lcd_showbuf+01H
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       MOV     A,R7
+                       ORL     A,R6
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 253
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#CS_lcd_showbuf+02H
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       MOV     A,R7
+                       ORL     A,R6
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+02H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 254
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#CS_lcd_showbuf+03H
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       MOV     A,R7
+                       ORL     A,R6
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 255
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                 R     MOV     DPTR,#CS_lcd_showbuf+04H
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 20  
+
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       MOV     A,R7
+                       ORL     A,R6
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 257
+                       RET     
+             ; FUNCTION CS_ScaleDisplay_LcdBuf_rShift4 (END)
+
+             ; FUNCTION _CS_ScaleDisplay_HexToBcd (BEGIN)
+                                           ; SOURCE LINE # 260
+                 R     MOV     DPTR,#HexData
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R3
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R2
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R1
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 261
+                                           ; SOURCE LINE # 263
+                       CLR     A
+                       INC     DPTR
+                       MOVX    @DPTR,A
+             ?C0037:
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       MOV     R3,A
+                       CLR     C
+                       SUBB    A,#05H
+                 R     xJGE    ?C0040
+                                           ; SOURCE LINE # 264
+                                           ; SOURCE LINE # 265
+                 R     MOV     DPTR,#HexData
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     R4,#00H
+                       MOV     R5,#0AH
+                 E     CALL    ?C?UIDIV
+                       MOV     R7,AR5
+                       MOV     A,R3
+                       MOV     R5,A
+                       CLR     C
+                       MOV     A,#04H
+                       SUBB    A,R5
+                       MOV     R5,A
+                       CLR     A
+                       SUBB    A,#00H
+                       MOV     R4,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 21  
+
+                       MOV     R3,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R2,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R1,A
+                       MOV     DPL,R5
+                       MOV     DPH,R4
+                       MOV     A,R7
+                 E     CALL    ?C?CSTOPTR
+                                           ; SOURCE LINE # 266
+                 R     MOV     DPTR,#HexData
+                       MOVX    A,@DPTR
+                       MOV     R6,A
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       MOV     R7,A
+                       MOV     R4,#00H
+                       MOV     R5,#0AH
+                 E     CALL    ?C?UIDIV
+                 R     MOV     DPTR,#HexData
+                       MOV     A,R6
+                       MOVX    @DPTR,A
+                       INC     DPTR
+                       MOV     A,R7
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 267
+                 R     MOV     DPTR,#i
+                       MOVX    A,@DPTR
+                       INC     A
+                       MOVX    @DPTR,A
+                 R     xJMP    ?C0037
+                                           ; SOURCE LINE # 268
+             ?C0040:
+                       RET     
+             ; FUNCTION _CS_ScaleDisplay_HexToBcd (END)
+
+             ; FUNCTION _CS_ScaleDisplay_LookUpTable (BEGIN)
+                                           ; SOURCE LINE # 280
+;---- Variable 'NumData' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 281
+                                           ; SOURCE LINE # 283
+                       MOV     R3,#01H
+                 R     MOV     R2,#HIGH CS_Lcd_Table
+                 R     MOV     R1,#LOW CS_Lcd_Table
+;---- Variable 'data_ptr' assigned to Register 'R1/R2/R3' ----
+                                           ; SOURCE LINE # 284
+                       MOV     DPL,R7
+                       MOV     DPH,#00H
+                 E     CALL    ?C?CLDOPTR
+                       MOV     R7,A
+                                           ; SOURCE LINE # 285
+             ?C0041:
+                       RET     
+             ; FUNCTION _CS_ScaleDisplay_LookUpTable (END)
+
+             ; FUNCTION CS_ScaleDisplay_LcdShowNull (BEGIN)
+                                           ; SOURCE LINE # 290
+                                           ; SOURCE LINE # 291
+                                           ; SOURCE LINE # 292
+                       CLR     A
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 22  
+
+                 R     MOV     DPTR,#CS_Lcd_Send_Data
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 293
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 294
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 295
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 296
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 297
+                       RET     
+             ; FUNCTION CS_ScaleDisplay_LcdShowNull (END)
+
+             ; FUNCTION CS_ScaleDisplay_LcdShowNoDigit (BEGIN)
+                                           ; SOURCE LINE # 299
+                                           ; SOURCE LINE # 300
+                                           ; SOURCE LINE # 301
+                 R     MOV     DPTR,#CS_Lcd_Send_Data
+                       MOVX    A,@DPTR
+                       ANL     A,#0FH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 302
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       CLR     A
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 303
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ANL     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 304
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ANL     A,#08H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 305
+                       INC     DPTR
+                       MOVX    A,@DPTR
+                       ANL     A,#0F0H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 306
+                       RET     
+             ; FUNCTION CS_ScaleDisplay_LcdShowNoDigit (END)
+
+             ; FUNCTION CS_ScaleDisplay_LcdShowAll (BEGIN)
+                                           ; SOURCE LINE # 308
+                                           ; SOURCE LINE # 309
+                                           ; SOURCE LINE # 310
+                 R     MOV     DPTR,#CS_Lcd_Send_Data
+                       MOV     A,#0FFH
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 311
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 312
+                       INC     DPTR
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 23  
+
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 313
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 314
+                       INC     DPTR
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 315
+                       RET     
+             ; FUNCTION CS_ScaleDisplay_LcdShowAll (END)
+
+             ; FUNCTION CS_ScaleDisplay_LcdBackup (BEGIN)
+                                           ; SOURCE LINE # 318
+                                           ; SOURCE LINE # 319
+                                           ; SOURCE LINE # 320
+                 R     MOV     DPTR,#CS_Lcd_Send_Data
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#CS_Lcd_Send_Data_BAK
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 321
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+01H
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#CS_Lcd_Send_Data_BAK+01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 322
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+02H
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#CS_Lcd_Send_Data_BAK+02H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 323
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+03H
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#CS_Lcd_Send_Data_BAK+03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 324
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+04H
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#CS_Lcd_Send_Data_BAK+04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 325
+                       RET     
+             ; FUNCTION CS_ScaleDisplay_LcdBackup (END)
+
+             ; FUNCTION CS_ScaleDisplay_LcdRestore (BEGIN)
+                                           ; SOURCE LINE # 328
+                                           ; SOURCE LINE # 329
+                                           ; SOURCE LINE # 330
+                 R     MOV     DPTR,#CS_Lcd_Send_Data_BAK
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#CS_Lcd_Send_Data
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 331
+                 R     MOV     DPTR,#CS_Lcd_Send_Data_BAK+01H
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+01H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 332
+                 R     MOV     DPTR,#CS_Lcd_Send_Data_BAK+02H
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+02H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 333
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 24  
+
+                 R     MOV     DPTR,#CS_Lcd_Send_Data_BAK+03H
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+03H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 334
+                 R     MOV     DPTR,#CS_Lcd_Send_Data_BAK+04H
+                       MOVX    A,@DPTR
+                 R     MOV     DPTR,#CS_Lcd_Send_Data+04H
+                       MOVX    @DPTR,A
+                                           ; SOURCE LINE # 335
+                       RET     
+             ; FUNCTION CS_ScaleDisplay_LcdRestore (END)
+
+             ; FUNCTION CS_ScaleDisplay_SteadyFlash (BEGIN)
+                                           ; SOURCE LINE # 338
+                                           ; SOURCE LINE # 339
+                                           ; SOURCE LINE # 344
+                       MOV     R7,#03H
+                 E     CALL    _CS_SoftTimer
+                       MOV     A,R7
+                 R     xJNZ    ?C0057
+                                           ; SOURCE LINE # 345
+                                           ; SOURCE LINE # 346
+                       MOV     R7,#01H
+                 E     CALL    _CS_SoftTimer
+;---- Variable 'R_Weight_FlashTime' assigned to Register 'R7' ----
+                                           ; SOURCE LINE # 347
+                       MOV     A,R7
+                       CLR     C
+                       SUBB    A,#01EH
+                 R     xJGE    ?C0048
+                                           ; SOURCE LINE # 348
+                 R     CALL    CS_ScaleDisplay_LcdBackup
+                       RET     
+             ?C0048:
+                                           ; SOURCE LINE # 349
+                       MOV     A,R7
+                       CLR     C
+                       SUBB    A,#03CH
+                 R     xJGE    ?C0050
+                                           ; SOURCE LINE # 350
+                 R     CALL    CS_ScaleDisplay_LcdShowNoDigit
+                       RET     
+             ?C0050:
+                                           ; SOURCE LINE # 351
+                       MOV     A,R7
+                       CLR     C
+                       SUBB    A,#05AH
+                 R     xJGE    ?C0052
+                                           ; SOURCE LINE # 352
+                 R     CALL    CS_ScaleDisplay_LcdRestore
+                       RET     
+             ?C0052:
+                                           ; SOURCE LINE # 353
+                       MOV     A,R7
+                       CLR     C
+                       SUBB    A,#078H
+                 R     xJGE    ?C0054
+                                           ; SOURCE LINE # 354
+                 R     CALL    CS_ScaleDisplay_LcdShowNoDigit
+                       RET     
+             ?C0054:
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 25  
+
+                                           ; SOURCE LINE # 355
+                       MOV     A,R7
+                       CLR     C
+                       SUBB    A,#096H
+                 R     xJGE    ?C0057
+                                           ; SOURCE LINE # 356
+                 R     CALL    CS_ScaleDisplay_LcdRestore
+                                           ; SOURCE LINE # 357
+                                           ; SOURCE LINE # 358
+             ?C0057:
+                       RET     
+             ; FUNCTION CS_ScaleDisplay_SteadyFlash (END)
+
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 26  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+s8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  CHAR     -----  1
+_CS_Scale_JudgeLowBat. . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+u8_t . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+UART_CardProtcol . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+YC_UARTPARAM_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  15
+  uartCtrl . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pRxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  pTxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0004H  3
+  rxBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0007H  2
+  txBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0009H  2
+  baud . . . . . . . . . . . . . . . .  MEMBER   -----  U_LONG   000BH  4
+CS_Lcd_Send_Data_BAK . . . . . . . . .  PUBLIC   XDATA  ARRAY    0005H  6
+pxdbyte. . . . . . . . . . . . . . . .  TYPEDEF  DATA   PTR      -----  2
+YC_LedBlink. . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  6
+  active_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  gpio_num . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  light_time . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  dark_time. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+CS_ScaleDisplay_Debug. . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  buf. . . . . . . . . . . . . . . . .  AUTO     XDATA  ARRAY    0000H  5
+CS_ScaleDisplay_LcdShowNoDigit . . . .  PUBLIC   CODE   PROC     0000H  -----
+pdbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  1
+CS_ScaleDisplay_LcdBackup. . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+CS_lcd_showbuf . . . . . . . . . . . .  PUBLIC   XDATA  ARRAY    000BH  5
+UART_HalfDuplex. . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+_CS_ScaleDisplay_HexToBcd. . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  HexData. . . . . . . . . . . . . . .  AUTO     XDATA  U_INT    0000H  2
+  buf. . . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0002H  3
+  i. . . . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0005H  1
+CS_Weight_T. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+R_Display_Err. . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+_CS_SoftTimer. . . . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+UART_Parity. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+dbyte. . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_CHAR   -----  1
+CS_ScaleDisplay_LcdRestore . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+CS_ComState. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  3
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+_CS_CommTo1186_SendCmd . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+pxbyte . . . . . . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  2
+ibyte. . . . . . . . . . . . . . . . .  TYPEDEF  IDATA  U_CHAR   -----  1
+BT_EVENTFIFO . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UtilTimer . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
+YC_UARTPARAM . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  15
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 27  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  uartCtrl . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pRxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0001H  3
+  pTxBuff. . . . . . . . . . . . . . .  MEMBER   -----  PTR      0004H  3
+  rxBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0007H  2
+  txBuffLen. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0009H  2
+  baud . . . . . . . . . . . . . . . .  MEMBER   -----  U_LONG   000BH  4
+bool . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
+u32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_LONG   -----  4
+s16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  INT      -----  2
+xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
+u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
+R_Selet_Unit . . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+R_Debug_temp . . . . . . . . . . . . .  EXTERN   XDATA  U_INT    -----  2
+byte . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+DeviceInfo_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  10
+  registerFlag . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  bindFlag . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  loginFlag. . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  userNum. . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0003H  1
+  deviceID . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0004H  6
+_CS_ScaleDisplay_FreshBuf. . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  option . . . . . . . . . . . . . . .  AUTO     XDATA  U_CHAR   0000H  1
+  showdata . . . . . . . . . . . . . .  * REG *  DATA   U_INT    0004H  2
+  data_buf . . . . . . . . . . . . . .  STATIC   XDATA  ARRAY    0000H  5
+YC_UartCTRLBit_e . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
+UART_DataLen . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+CS_ScaleDisplay. . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  weight_temp. . . . . . . . . . . . .  * REG *  DATA   U_LONG   0004H  4
+R_UnitWeight . . . . . . . . . . . . .  EXTERN   XDATA  STRUCT   -----  10
+uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
+BT_CMDFIFO_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+UART_BaudSet . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+bleConnStatus. . . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
+CS_Lcd_Send_Data . . . . . . . . . . .  PUBLIC   XDATA  ARRAY    0010H  6
+CS_Lcd_Table . . . . . . . . . . . . .  PUBLIC   XDATA  ARRAY    0016H  23
+_CS_Scale_JudgeOverLoad. . . . . . . .  EXTERN   CODE   PROC     -----  -----
+CS_ScaleDisplay_LcdBuf_rShift4 . . . .  PUBLIC   CODE   PROC     0000H  -----
+YC_LedBlink_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  active_state . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  gpio_num . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  light_time . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  dark_time. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+p_TimerCallback. . . . . . . . . . . .  TYPEDEF  -----  PTR      -----  3
+_CS_ScaleDisplay_LookUpTable . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  NumData. . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+  data_ptr . . . . . . . . . . . . . .  * REG *  DATA   PTR      0001H  3
+UART_Enable. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+HistoryList_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  63
+  head . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  tail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  size . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+  measureData. . . . . . . . . . . . .  MEMBER   -----  ARRAY    0003H  60
+UART_EnableFlowControl . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
+BT_CMDFIFO . . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/18/2017 13:28:34 PAGE 28  
+
+NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
+====                                    =====   ======  ====    ======  ====
+
+
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+CS_ScaleDisplay_LcdShowAll . . . . . .  PUBLIC   CODE   PROC     0000H  -----
+YC_UartCTRLBit . . . . . . . . . . . .  * TAG *  -----  ENUM     -----  -----
+CS_ScaleDisplay_LcdShowNull. . . . . .  PUBLIC   CODE   PROC     0000H  -----
+UserMeasureData. . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
+  weight . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  UTCTime. . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0002H  4
+BT_EVENTFIFO_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
+  len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+YC_UtilTimer_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  61
+  timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
+  timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
+  last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
+_CS_Weight_T . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  10
+  origin . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
+  kg . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
+  lb . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
+  st . . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0006H  2
+  jin. . . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0008H  2
+_CS_ComState . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  3
+  now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
+  pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
+  sucess . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
+_CS_Scale_ZeroProc . . . . . . . . . .  EXTERN   CODE   PROC     -----  -----
+CS_ScaleDisplay_SteadyFlash. . . . . .  PUBLIC   CODE   PROC     0000H  -----
+  R_Weight_FlashTime . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1407    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     45      12
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
