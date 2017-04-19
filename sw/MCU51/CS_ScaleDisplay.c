@@ -189,6 +189,13 @@ void CS_ScaleDisplay_FreshBuf(u8_t option,u16_t showdata)
 		CS_Lcd_Buf_Unit	|= S_GONG | S_JIN;							
 		}
 
+	/*
+	if( xxxStatus==xxxx)
+		CS_Lcd_Buf_SIGN |=S_DAT;
+	else
+		CS_Lcd_Buf_SIGN &=~S_DAT;
+	*/
+	
 	if(bleConnStatus==BLE_STATUS_CONN)
 		CS_Lcd_Buf_SIGN |=S_BLE;
 	else

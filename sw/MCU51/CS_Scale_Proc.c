@@ -28,8 +28,6 @@ u8_t	  xdata  R_1186sys_state;		//1186系统状态
 u8_t   xdata  B_Weight_AdOk;		//AD准备好标志
 
 
-
-
 u8_t xdata  R_1186_RTC[4];			//1186的RTC时间
 
 
@@ -46,7 +44,7 @@ CS_Weight_T  xdata R_UnitWeight;	//重量值
 #define	CS_Scale_MinLockWeight			250			//最小锁定重量2.50kg
 #define	CS_Scale_RetLockWeightInc		1000		//加重解锁重量10kg
 #define	CS_Scale_RetLockWeightDec		300			//减重解锁重量3kg
-#define	CS_Scale_SameWeightRange		50			//判断是同一个重量的阈值50个AD内码
+#define	CS_Scale_SameWeightRange		20			//判断是同一个重量的阈值20个AD内码
 #define	CS_Scale_TimeOut_Zero			15			//零位超时关机时间15s
 #define	CS_Scale_TimeOut_Lock			15			//锁定超时关机时间15s
 #define	CS_Scale_TimeOut_Unstable		15			//不稳定关机时间15s
@@ -62,7 +60,7 @@ CS_Weight_T  xdata R_UnitWeight;	//重量值
 #define   CS_SmallWeight_Steadytimes		6			//判断稳定的次数
 #define   CS_BigWeight_Steadytimes		6			//判断稳定的次数
 #define   CS_Cali_Steadytimes				15			//标定时判断稳定的次数
-
+#define	CS_MemoryRange				25			//记忆重量范围
 
 
 //////////////////////////////////////////////内部函数声明
@@ -624,7 +622,7 @@ u8_t CS_Scale_JudgeLowBat(u8_t option)
 {
 	static	u8_t xdata B_Weight_LowBat;			//低电标志
 	
-	if(R_1186sys_state&CS_Scale_LowBatBit==false)
+	if(R_1186sys_state&CS_Scale_LowBatBit==true)
 		{
 		B_Weight_LowBat = true;
 		R_Display_Err=CS_ScaleDisplay_L_err;
@@ -675,6 +673,7 @@ u8_t CS_Scale_JudgeSteady(u8_t option)
 {
 
 	u16_t	weight_temp;
+	u16_t	R_Weight_Temp;
 	static	u16_t xdata R_Weight_kg_old;
 	static	u8_t	  xdata R_Weight_SameTimes;
 	static	u8_t xdata B_Weight_SmallSteady;		//小重量稳定标志
@@ -725,7 +724,23 @@ u8_t CS_Scale_JudgeSteady(u8_t option)
 			{			
 			if(R_Weight_SameTimes>CS_BigWeight_Steadytimes)
 				{
-				B_Weight_HeavySteady = true;		
+				B_Weight_HeavySteady = true;	
+
+				if(R_UnitWeight.origin>R_Weight_Mem)
+				R_Weight_Temp = R_UnitWeight.origin -R_Weight_Mem;
+				else
+				R_Weight_Temp = R_Weight_Mem - R_UnitWeight.origin;
+
+				//在记忆范围内记忆
+				if(R_UnitWeight.origin > ScaleStartMemoryWeight)
+					{
+					if(R_Weight_Temp<CS_MemoryRange)
+					R_UnitWeight.origin = R_Weight_Mem;
+					}
+			
+				R_Weight_Lock = R_UnitWeight.origin;
+				R_Weight_Mem = R_UnitWeight.origin;
+				
 				R_Scale_state = CS_Scale_state_locking;
 				CS_SoftTimer(ResetSoftTimer);		//软件定时器开始用于锁定闪显示计时
 				CS_Scale_SteadyProc(SteadyProcReset);
@@ -741,12 +756,12 @@ u8_t CS_Scale_JudgeSteady(u8_t option)
 
 ///////////////////////////////////锁定流程
 
-#define	CS_MemoryRange	25
+
 
 void CS_Scale_SteadyProc(u8_t option)
 {
 	u16_t	R_AD_BUF;	
-	u16_t	R_Weight_Temp;
+
 	static	u8_t xdata B_Debug_Send;	
 	static 	u8_t xdata ReadUTC;
 	UserMeasureData SendData;
@@ -763,21 +778,7 @@ void CS_Scale_SteadyProc(u8_t option)
 			{
 			
 			CS_Scale_JudgeSteady(ResetSteady);
-
-			if(R_UnitWeight.origin>R_Weight_Mem)
-				R_Weight_Temp = R_UnitWeight.origin -R_Weight_Mem;
-			else
-				R_Weight_Temp = R_Weight_Mem - R_UnitWeight.origin;
-
-			//在记忆范围内记忆
-			if(R_UnitWeight.origin > ScaleStartMemoryWeight)
-				{
-				if(R_Weight_Temp<CS_MemoryRange)
-					R_UnitWeight.origin = R_Weight_Mem;
-				}
-			
-			R_Weight_Lock = R_UnitWeight.origin;
-			R_Weight_Mem = R_UnitWeight.origin;
+		
 			CS_Scale_ZeroProc(ClrLockDownCheckFlag,0);
 			ReadUTC = false;	//初始化读ADC
 			}
