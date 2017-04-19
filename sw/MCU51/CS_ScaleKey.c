@@ -8,7 +8,7 @@
 
 
 #define KEY_SHORT_PUSH_CNT		3			
-#define KEY_LONG_PUSH_CNT			150		//10ms	为单位
+#define KEY_LONG_PUSH_CNT			80		//10ms	为单位
 #define KEY_SHORT_PRESS_TIME		18
 #define KEY_DOWN					0
 #define KEY_UP						1
@@ -24,9 +24,13 @@ void CS_KeyScan(void)
 	static u8_t xdata ShortPressCount=0;
 	static u8_t xdata PressTimesCount=0;
 	static u8_t xdata Press;
+	static u8_t xdata stanby;
 	
 	
 	keyState = YC_GPIOGetInputStatus(5);	//GPIO5	
+
+	if(R_Scale_state == CS_Scale_state_standby)
+		stanby=true;
 
 	if(ShortPressCount<255)		//短按计时
 		ShortPressCount++;
@@ -42,9 +46,10 @@ void CS_KeyScan(void)
 		KeyPressDeal=0;
 		KeyLongPressDeal=0;
 
-		if(ShortPressCount>KEY_SHORT_PRESS_TIME&&PressTimesCount==1)
+		if(ShortPressCount>=KEY_SHORT_PRESS_TIME&&PressTimesCount==1)
 			{
 			PressTimesCount = 0;
+			if(stanby==false)
 			CS_Scale_ChangeUnit();	
 			}
 		
@@ -58,10 +63,15 @@ void CS_KeyScan(void)
 			else
 				{
 				PressTimesCount = 0;
+				PressTimesCount = 0;
+				if(stanby==false)
 				CS_Scale_ChangeUnit();	
 				}
 			ShortPressCount =0;	
 			}
+		
+			if(stanby==true)				//待机起来第一次按键不处理
+			stanby=false;
 		}
 	else
 		{

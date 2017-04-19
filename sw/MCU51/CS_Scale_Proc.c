@@ -44,7 +44,7 @@ CS_Weight_T  xdata R_UnitWeight;	//重量值
 #define	CS_Scale_MinLockWeight			250			//最小锁定重量2.50kg
 #define	CS_Scale_RetLockWeightInc		1000		//加重解锁重量10kg
 #define	CS_Scale_RetLockWeightDec		300			//减重解锁重量3kg
-#define	CS_Scale_SameWeightRange		20			//判断是同一个重量的阈值20个AD内码
+#define	CS_Scale_SameWeightRange		10			//判断是同一个重量的阈值20个AD内码
 #define	CS_Scale_TimeOut_Zero			15			//零位超时关机时间15s
 #define	CS_Scale_TimeOut_Lock			15			//锁定超时关机时间15s
 #define	CS_Scale_TimeOut_Unstable		15			//不稳定关机时间15s
@@ -54,11 +54,11 @@ CS_Weight_T  xdata R_UnitWeight;	//重量值
 #define	ScaleWeightMin					10			//秤体重量左边界值
 #define	ScaleWeightMax					15			//秤体重量右边界值
 #define	ScaleStartMemoryWeight			600			//秤开始记忆重量范围
-#define	CS_CaliStateData_Up				6000			//标定数据有效值上限(对应AD内码)
-#define	CS_CaliStateData_Down			1000			//标定数据有效值下限(对应AD内码)
+#define	CS_CaliStateData_Up				6000		//标定数据有效值上限(对应AD内码)
+#define	CS_CaliStateData_Down			1000		//标定数据有效值下限(对应AD内码)
 #define   CS_PowerOnAD_Steadytimes		10			//稳定开机稳定次数
 #define   CS_SmallWeight_Steadytimes		6			//判断稳定的次数
-#define   CS_BigWeight_Steadytimes		6			//判断稳定的次数
+#define   CS_BigWeight_Steadytimes		5			//判断稳定的次数
 #define   CS_Cali_Steadytimes				12			//标定时判断稳定的次数
 #define	CS_MemoryRange				25			//记忆重量范围
 
@@ -148,7 +148,11 @@ void CS_Scale_Proc(void)
 			if(R_Scale_state == CS_Scale_state_locking)
 				{					
 				CS_ScaleDisplay_SteadyFlash();
-				CS_Scale_SteadyProc(SteadyProcRun);
+				if(CS_SoftTimer(GetIfTimeOut) == true)	//锁定闪现时间到
+					{
+					CS_Scale_SteadyProc(SteadyProcRun);
+					CS_ScaleDisplay();
+					}
 				}
 			if(R_Scale_state == CS_Scale_state_caling)
 				{
@@ -175,7 +179,7 @@ void CS_Scale_PowerOn(void)
 		R_Weight_Com_Coo.pre =CS_CommTo1186_Null;	
 		R_Weight_Com_Coo.now = CS_CommTo1186_Null;	
 		//R_Scale_state =	CS_Scale_state_weighting;
-		R_Selet_Unit = CS_ScaleDisplay_L_kg;
+		R_Selet_Unit = CS_ScaleDisplay_L_gongjin;
 
 		R_Debug_temp = 0;
 		B_Debug_Test =false;
@@ -368,20 +372,22 @@ void CS_Scale_ChangeUnit()
 {
 	switch(R_Selet_Unit)
 		{
+		/*
 		case CS_ScaleDisplay_L_kg:
 			R_Selet_Unit=CS_ScaleDisplay_L_lb;
 			break;
 		case CS_ScaleDisplay_L_lb:
 			R_Selet_Unit=CS_ScaleDisplay_L_jin;
 			break;
+		*/
 		case CS_ScaleDisplay_L_jin:
 			R_Selet_Unit=CS_ScaleDisplay_L_gongjin;
 			break;
 		case CS_ScaleDisplay_L_gongjin:
-			R_Selet_Unit=CS_ScaleDisplay_L_kg;
+			R_Selet_Unit=CS_ScaleDisplay_L_jin;
 			break;
 		default :
-			R_Selet_Unit=CS_ScaleDisplay_L_kg;
+			R_Selet_Unit=CS_ScaleDisplay_L_gongjin;
 			break;
 		}
 }
@@ -772,8 +778,7 @@ void CS_Scale_SteadyProc(u8_t option)
 		return;
 		}
 	
-	if(CS_SoftTimer(GetIfTimeOut) == true)	//锁定闪现时间到
-		{
+	
 		if(CS_Scale_JudgeSteady(GetIfHeavySteady) == true)
 			{
 			
@@ -828,9 +833,11 @@ void CS_Scale_SteadyProc(u8_t option)
 				R_AD_BUF = CS_Scale_AdcFilter(ScaleAdcFilterRun,R_AD_BUF);
 				CS_Scale_GetWeight(R_AD_BUF);				
 				CS_Scale_ReturnLock();
+				
+				 R_UnitWeight.origin = R_Weight_Lock;	//锁定重量
 				}
 			}
-		}
+	
 
 			/*
 			if(CS_SoftTimer(GetSoftTimerTime)<200)
@@ -1254,7 +1261,7 @@ void CS_Scale_StandbyProc(u8_t B_Reset)
 			R_Display_Err = 0;
 			
 			R_Scale_state = CS_Scale_state_weighting;
-
+			
 			CS_Scale_1186ComSend(CS_CommTo1186_ReadAd);
 			
 			}

@@ -148,7 +148,7 @@ void CS_ScaleDisplay_FreshBuf(u8_t option,u16_t showdata)
 	CS_lcd_showbuf[1] = CS_ScaleDisplay_LookUpTable(data_buf[2]);
 	CS_lcd_showbuf[2] = CS_ScaleDisplay_LookUpTable(data_buf[3]);
 	CS_lcd_showbuf[3] = CS_ScaleDisplay_LookUpTable(data_buf[4]);
-			
+
 	CS_ScaleDisplay_LcdBuf_rShift4();	//显示缓存跟实际液晶的逻辑对应有出入还要微调
 
 										//显示缓存数字还有符号部分的位置
@@ -158,14 +158,7 @@ void CS_ScaleDisplay_FreshBuf(u8_t option,u16_t showdata)
 	CS_Lcd_Send_Data[4] &=0x0f;			//清单位符号缓存	
 	CS_Lcd_Buf_DOT2	 &= ~S_DOT;			//清显示小数点
 
-	
-	if(option==DisplayData)				//最高位用蓝牙标志辅助显示
-		{	
-		CS_Lcd_Buf_SIGN &=~S_BLE;
-		if(data_buf[0]!=0)
-		CS_Lcd_Buf_SIGN |=S_BLE;
-		}	
-	
+		
 	if(option==Displaykg)
 		{
 		CS_Lcd_Buf_DOT2	|= S_DOT;
@@ -200,8 +193,16 @@ void CS_ScaleDisplay_FreshBuf(u8_t option,u16_t showdata)
 		CS_Lcd_Buf_SIGN |=S_BLE;
 	else
 		CS_Lcd_Buf_SIGN &=~S_BLE;
+										
+	if(option==DisplayData)				//最高位用蓝牙标志辅助显示
+		{	
+		CS_Lcd_Buf_SIGN &=~S_BLE;
+		if(data_buf[0]!=0)
+		CS_Lcd_Buf_SIGN |=S_BLE;
+		}
 	
 }
+
 
 
 
