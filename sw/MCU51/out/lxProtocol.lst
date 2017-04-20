@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 1   
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE LXPROTOCOL
@@ -62,7 +62,7 @@ line level    source
   52   1              //data[0]:total length, data[1~2]:handle
   53   1              //data[3]:frame control,data[4]:length,data[5~N]:content
   54   1              u8_t frameControl = event->DATA[3];
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 2   
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 2   
 
   55   1              u16_t cmd;
   56   1              
@@ -126,7 +126,7 @@ line level    source
  114   3                              if(lxOptStatus == OPT_REGISTER_RSP_WAIT_ACK)
  115   3                              {
  116   4                                      xmemset(mem_register_buf , 0, 10);
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 3   
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 3   
 
  117   4                                      //update adv flag
  118   4                                      *(mem_le_adv_data + 13) = 0;
@@ -190,7 +190,7 @@ line level    source
  176   3                                      //lcd display result
  177   3                                      deviceInfo.bindFlag = BIND_SUCCESS;
  178   3                              }
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 4   
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 4   
 
  179   2                              else
  180   2                              {
@@ -254,7 +254,7 @@ line level    source
  238   5                                              }
  239   4                                      }
  240   3                                      //login success:sync time
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 5   
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 5   
 
  241   3                                      lxOptStatus = OPT_INIT_REQ;
  242   3                              }
@@ -318,7 +318,7 @@ line level    source
  300   2                              else
  301   2                              {
  302   3                                      lxSettingDeviceRespone(CMD_UNIT_SETTING_REQ, DEVICE_RSP_FAIL);
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 6   
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 6   
 
  303   3                              }
  304   2                              lxOptStatus = OPT_UNIT_SETTING_RSP_WAIT_ACK;
@@ -382,7 +382,7 @@ line level    source
  362   1              btCmdBuf.DATA[8] = HI_UINT16(cmd);
  363   1              btCmdBuf.DATA[9] = state;
  364   1      
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 7   
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 7   
 
  365   1              bigLittleEndianSwap(&(btCmdBuf.DATA[5]), DEVICE_RSP_DATA_LEN);
  366   1              BT_CmdFifoIn(&btCmdBuf);
@@ -446,7 +446,7 @@ line level    source
  424   3                      }
  425   2                      crc32 = cal_crc32_multiple(0, LX_SEND_BUF, total_len - 4);
  426   2                      dmemcpy(LX_SEND_BUF + (sizeof(UserMeasureData) * i) + 8, (u8_t *)&crc32, sizeof(crc32));
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 8   
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 8   
 
  427   2                      bigLittleEndianSwap(LX_SEND_BUF, total_len);
  428   2                      
@@ -510,7 +510,7 @@ line level    source
               #endif
  487   1      }
  488          
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 9   
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 9   
 
  489          
  490          
@@ -554,7 +554,7 @@ line level    source
  527          
  528          
  529          
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 10  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 10  
 
 ASSEMBLY LISTING OF GENERATED OBJECT CODE
 
@@ -618,7 +618,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R3,A
                        INC     DPTR
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 11  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 11  
 
                        MOV     R2,A
                        INC     DPTR
@@ -682,7 +682,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                        MOV     R2,A
                        INC     DPTR
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 12  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 12  
 
                        MOVX    A,@DPTR
                        MOV     R1,A
@@ -746,7 +746,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        INC     A
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 13  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 13  
 
                                            ; SOURCE LINE # 44
                        INC     DPTR
@@ -810,7 +810,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R1,A
                        MOV     DPTR,#05H
                  E     CALL    ?C?CLDOPTR
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 14  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 14  
 
                        MOV     R5,A
                        MOV     R4,#00H
@@ -874,7 +874,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    A,@DPTR
                        MOV     R2,A
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 15  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 15  
 
                        INC     DPTR
                        MOVX    A,@DPTR
@@ -938,7 +938,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 80
              ?C0012:
                                            ; SOURCE LINE # 81
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 16  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 16  
 
                        MOV     R7,#022H
                  R     CALL    _changeLxOptStatus
@@ -1002,7 +1002,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 106
                                            ; SOURCE LINE # 107
                        MOV     R7,#041H
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 17  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 17  
 
                  R     CALL    _SpiFlashOperator
                                            ; SOURCE LINE # 108
@@ -1066,7 +1066,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 133
                                            ; SOURCE LINE # 134
                                            ; SOURCE LINE # 137
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 18  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 18  
 
                  E     MOV     DPTR,#btCmdBuf+01H
                        MOV     A,#030H
@@ -1130,7 +1130,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  E     CALL    _dmemcpy
                                            ; SOURCE LINE # 150
                  E     MOV     DPTR,#deviceInfo
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 19  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 19  
 
                        MOV     A,#01H
                        MOVX    @DPTR,A
@@ -1194,7 +1194,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
              ?C0031:
                                            ; SOURCE LINE # 172
                        MOV     DPTR,#048A2H
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 20  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 20  
 
                        MOVX    A,@DPTR
                        CLR     C
@@ -1258,7 +1258,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 191
                        CLR     A
                        INC     DPTR
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 21  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 21  
 
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 192
@@ -1322,7 +1322,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R6,A
                        ADD     A,#0E8H
                        MOV     DPL,A
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 22  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 22  
 
                        CLR     A
                        ADDC    A,#043H
@@ -1386,7 +1386,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  E     MOV     R1,#LOW btCmdBuf
                  E     CALL    _BT_CmdFifoIn
                                            ; SOURCE LINE # 221
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 23  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 23  
 
                        MOV     R7,#0AH
                  E     CALL    _YC_Delay10ms
@@ -1450,7 +1450,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     xJZ     ?C0044
                                            ; SOURCE LINE # 232
                                            ; SOURCE LINE # 234
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 24  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 24  
 
                  E     MOV     DPTR,#btCmdBuf
                        MOV     A,#01H
@@ -1514,7 +1514,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 259
                        INC     DPTR
                        MOV     A,#010H
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 25  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 25  
 
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 260
@@ -1578,7 +1578,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 276
                        RET     
                                            ; SOURCE LINE # 278
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 26  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 26  
 
              ?C0053:
                                            ; SOURCE LINE # 279
@@ -1642,7 +1642,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 304
                  E     MOV     DPTR,#lxOptStatus
                        MOV     A,#029H
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 27  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 27  
 
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 305
@@ -1706,7 +1706,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 340
                  E     MOV     DPTR,#lxOptStatus
                        MOV     A,#037H
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 28  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 28  
 
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 341
@@ -1770,7 +1770,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 365
                        MOV     R3,#01H
                  E     MOV     R2,#HIGH btCmdBuf+06H
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 29  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 29  
 
                  E     MOV     R1,#LOW btCmdBuf+06H
                        MOV     R5,#05H
@@ -1834,7 +1834,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 402
                  E     MOV     DPTR,#historyUserData+02H
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 30  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 30  
 
                        MOVX    A,@DPTR
                  R     MOV     DPTR,#size
@@ -1898,7 +1898,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 410
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 31  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 31  
 
                        MOV     DPTR,#048D2H
                        MOV     A,#02H
@@ -1962,7 +1962,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                        INC     DPTR
                        MOV     A,R1
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 32  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 32  
 
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 423
@@ -2026,7 +2026,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  E     CALL    ?C?LSTXDATA
                                            ; SOURCE LINE # 426
                  R     MOV     DPTR,#i
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 33  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 33  
 
                        MOVX    A,@DPTR
                        MOV     B,#06H
@@ -2090,7 +2090,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                  E     MOV     DPTR,#btCmdBuf+05H
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 34  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 34  
 
                                            ; SOURCE LINE # 435
                  R     xJMP    ?C0078
@@ -2154,7 +2154,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 447
                  R     MOV     DPTR,#i
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 35  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 35  
 
                        INC     A
                        MOVX    @DPTR,A
@@ -2218,7 +2218,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R6,#048H
                  E     CALL    _xmemset
                                            ; SOURCE LINE # 462
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 36  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 36  
 
              ?C0081:
                                            ; SOURCE LINE # 463
@@ -2282,7 +2282,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     xJNE    A,#041H,?C0086
                                            ; SOURCE LINE # 477
                                            ; SOURCE LINE # 478
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 37  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 37  
 
                        MOV     R7,#00H
                        MOV     R6,#0A0H
@@ -2346,7 +2346,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R2,#00H
                        MOV     R1,#00H
                        RET     
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 38  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 38  
 
              ?C0088:
                                            ; SOURCE LINE # 510
@@ -2410,7 +2410,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,R2
                        MOVX    @DPTR,A
                        INC     DPTR
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 39  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 39  
 
                        MOV     A,R1
                        MOVX    @DPTR,A
@@ -2474,7 +2474,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        RET     
              ; FUNCTION _QueuePush (END)
 
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 40  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 40  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -2537,7 +2537,7 @@ _QueuePush . . . . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
 s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
 bool . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   BIT      -----  1
 _lxRecvDataFromApp . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 41  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 41  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -2600,7 +2600,7 @@ YC_UtilTimer_t . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  61
   timer_flages . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
   callback . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
   timer_end. . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0019H  32
-C51 COMPILER V9.01   LXPROTOCOL                                                            04/18/2017 13:28:35 PAGE 42  
+C51 COMPILER V9.01   LXPROTOCOL                                                            04/20/2017 16:55:10 PAGE 42  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====

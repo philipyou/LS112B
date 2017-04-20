@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 1   
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE CS_COMMTO1186
@@ -62,7 +62,7 @@ line level    source
   52   3                              case CS_Scale_state_caling:
   53   3                              case CS_Scale_state_locking:
   54   3                                      CS_1186Com_ReadTime_Proc();
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 2   
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 2   
 
   55   3                                      CS_1186Com_ReadAdc_Proc();
   56   3                                      CS_1186Com_SetLcd_Proc();
@@ -126,7 +126,7 @@ line level    source
  114   4                                      //R_Debug_temp= uartRcvBuf[5];  //测试用
  115   4      
  116   4                                      //数据放错地址，部分数据手动赋值
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 3   
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 3   
 
  117   4                                      uartRcvBuf[9]= uartRcvBuf[6];
  118   4                                      uartRcvBuf[8]=0x55;
@@ -190,7 +190,7 @@ line level    source
  176   4                                      if(R_Scale_state==CS_Scale_state_init)
  177   4                                              R_Weight_Com_Coo.now = CS_CommTo1186_Null;
  178   4                                      else
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 4   
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 4   
 
  179   4                                              R_Weight_Com_Coo.now = CS_CommTo1186_LcdDisplay;
  180   4                                      R_Weight_Com_Coo.sucess=true;
@@ -254,7 +254,7 @@ line level    source
  238   3                                      {                       
  239   4                                      //读到时间的操作
  240   4                                      R_1186_RTC[3] = uartRcvBuf[4];
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 5   
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 5   
 
  241   4                                      R_1186_RTC[2] = uartRcvBuf[5];
  242   4                                      R_1186_RTC[1] = uartRcvBuf[6];
@@ -318,7 +318,7 @@ line level    source
  300   2                      YC_UARTClearBuffer();
  301   2                      }
  302   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_SetSleepModeStandby)
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 6   
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 6   
 
  303   1                      {
  304   2                      if(YC_UARTReciveDataExpected(uartRcvBuf, 5)==5)
@@ -382,7 +382,7 @@ line level    source
  362   1              u16_t   R_AD_Zero;
  363   1              
  364   1              if(R_Weight_Com_Coo.now == CS_CommTo1186_ReadAdZero)
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 7   
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 7   
 
  365   1                      {
  366   2                      CS_CommTo1186_SendCmd(CS_CommTo1186_ReadAdZero,0);
@@ -446,7 +446,7 @@ line level    source
  424   1             u8_t len;
  425   1      
  426   1               buf[0] = 0xc5;                                                 //包头数据
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 8   
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 8   
 
  427   1              switch(cmd_code)
  428   1                      {
@@ -510,7 +510,7 @@ line level    source
  486   2                      case CS_CommTo1186_SetOpenWeight:        // 8 
  487   2                              buf[1] = 0x06;
  488   2                              buf[2] = 0xA1;
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 9   
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 9   
 
  489   2                              buf[3] = databuf[4];
  490   2                              buf[4] = databuf[3];    
@@ -574,7 +574,7 @@ line level    source
  548          
  549          
  550          
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 10  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 10  
 
  551          
  552          
@@ -589,7 +589,7 @@ line level    source
  561          
  562          
  563          
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 11  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 11  
 
 ASSEMBLY LISTING OF GENERATED OBJECT CODE
 
@@ -653,7 +653,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     CALL    CS_1186Com_ReadTime_Proc
                                            ; SOURCE LINE # 43
                  R     CALL    CS_1186Com_SetOpenWeight_Proc
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 12  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 12  
 
                                            ; SOURCE LINE # 44
                  R     CALL    CS_1186Com_SetLcd_Proc
@@ -717,7 +717,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#i
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 92
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 13  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 13  
 
                        INC     DPTR
                  R     MOV     A,#HIGH i
@@ -781,7 +781,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        XRL     A,#0BH
                        ORL     A,R6
                  R     xJNZ    ?C0019
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 14  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 14  
 
                                            ; SOURCE LINE # 108
                                            ; SOURCE LINE # 109
@@ -845,7 +845,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,#015H
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 140
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 15  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 15  
 
                                            ; SOURCE LINE # 141
                                            ; SOURCE LINE # 142
@@ -909,7 +909,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 162
                                            ; SOURCE LINE # 165
                  R     MOV     DPTR,#uartRcvBuf+07H
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 16  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 16  
 
                        MOVX    A,@DPTR
                  E     MOV     DPTR,#R_1186sys_state
@@ -973,7 +973,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,R3
                        ADD     A,R7
                        MOV     R7,A
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 17  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 17  
 
                        MOV     A,R6
                        ADDC    A,R2
@@ -1037,7 +1037,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 195
                                            ; SOURCE LINE # 196
                        MOV     R3,#01H
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 18  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 18  
 
                  E     MOV     R2,#HIGH CS_Lcd_Send_Data
                  E     MOV     R1,#LOW CS_Lcd_Send_Data
@@ -1101,7 +1101,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,#01H
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 213
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 19  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 19  
 
                        RET     
              ?C0032:
@@ -1165,7 +1165,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     xJNZ    ?C0042
                                            ; SOURCE LINE # 236
                                            ; SOURCE LINE # 237
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 20  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 20  
 
                  R     MOV     DPTR,#uartRcvBuf+03H
                        MOVX    A,@DPTR
@@ -1229,7 +1229,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R5,AR7
                        MOV     R4,AR6
                                            ; SOURCE LINE # 285
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 21  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 21  
 
                  R     MOV     DPTR,#R_Weight_Com_Coo
                        MOVX    A,@DPTR
@@ -1293,7 +1293,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 299
                        CLR     A
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 22  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 22  
 
                  R     MOV     DPTR,#uartTimeoutCnt
                        MOVX    @DPTR,A
@@ -1357,7 +1357,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 324
                  R     MOV     DPTR,#R_Weight_Com_Coo
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 23  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 23  
 
                        XRL     A,#0A1H
                  R     xJNZ    ?C0049
@@ -1421,7 +1421,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 335
                  E     CALL    YC_UARTClearBuffer
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 24  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 24  
 
                                            ; SOURCE LINE # 336
              ?C0049:
@@ -1485,7 +1485,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     CALL    _CS_CommTo1186_SendCmd
                                            ; SOURCE LINE # 367
                  R     MOV     DPTR,#R_Weight_Com_Coo+01H
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 25  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 25  
 
                        MOV     A,#085H
                        MOVX    @DPTR,A
@@ -1549,7 +1549,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R5,A
                        MOV     R6,A
                        MOV     A,R3
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 26  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 26  
 
                        ADD     A,R7
                        MOV     R7,A
@@ -1613,7 +1613,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,#015H
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 390
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 27  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 27  
 
                                            ; SOURCE LINE # 391
                                            ; SOURCE LINE # 392
@@ -1677,7 +1677,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    A,@DPTR
                        MOV     R2,A
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 28  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 28  
 
                        INC     DPTR
                        MOVX    A,@DPTR
@@ -1741,7 +1741,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOV     A,R1
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 29  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 29  
 
                                            ; SOURCE LINE # 422
                                            ; SOURCE LINE # 423
@@ -1805,7 +1805,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#len
                        MOV     A,#03H
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 30  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 30  
 
                                            ; SOURCE LINE # 434
                  R     xJMP    ?C0067
@@ -1869,7 +1869,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 452
                  R     xJMP    ?C0067
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 31  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 31  
 
                                            ; SOURCE LINE # 453
              ?C0072:
@@ -1933,7 +1933,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R2,A
                        INC     DPTR
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 32  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 32  
 
                        MOV     R1,A
                        MOV     DPTR,#02H
@@ -1997,7 +1997,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 479
                  R     MOV     DPTR,#databuf
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 33  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 33  
 
                        MOV     R3,A
                        INC     DPTR
@@ -2061,7 +2061,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R1,A
                        MOV     DPTR,#04H
                  E     CALL    ?C?CLDOPTR
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 34  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 34  
 
                  R     MOV     DPTR,#buf+03H
                        MOVX    @DPTR,A
@@ -2125,7 +2125,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 501
                        MOV     DPTR,#02H
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 35  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 35  
 
                  E     CALL    ?C?CLDOPTR
                  R     MOV     DPTR,#buf+04H
@@ -2189,7 +2189,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 513
                        MOV     R3,#01H
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 36  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 36  
 
                  R     MOV     R2,#HIGH buf
                  R     MOV     R1,#LOW buf
@@ -2253,7 +2253,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#buf+08H
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 525
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 37  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 37  
 
                        MOV     R3,#01H
                  R     MOV     R2,#HIGH buf
@@ -2295,7 +2295,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        RET     
              ; FUNCTION _CS_CommTo1186_SendCmd (END)
 
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 38  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 38  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -2358,7 +2358,7 @@ uartTxBuf. . . . . . . . . . . . . . .  PUBLIC   XDATA  ARRAY    0013H  16
 s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
 YC_UARTPARAM . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  15
   uartCtrl . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 39  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 39  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -2421,7 +2421,7 @@ BT_CMDFIFO . . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
   len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
   DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
 CS_1186Com_SetSleepMode_Proc . . . . .  PUBLIC   CODE   PROC     0000H  -----
-C51 COMPILER V9.01   CS_COMMTO1186                                                         04/18/2017 13:28:33 PAGE 40  
+C51 COMPILER V9.01   CS_COMMTO1186                                                         04/20/2017 16:55:07 PAGE 40  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====

@@ -50,6 +50,7 @@ CS_Weight_T  xdata R_UnitWeight;	//重量值
 #define	CS_Scale_TimeOut_Unstable		15			//不稳定关机时间15s
 #define	CS_Scale_TimeOut_OverLoad		3			//超重关机时间3s
 #define	CS_Scale_TimeOut_LowBat		3			//低电关机时间3s
+#define	CS_Scale_TimeOut_ZeroErr		3			//零点错误显示时间3s  *
 #define	SameZeroRange					10			//认为是同一个零点的误差范围
 #define	ScaleWeightMin					10			//秤体重量左边界值
 #define	ScaleWeightMax					15			//秤体重量右边界值
@@ -81,6 +82,10 @@ u16_t CS_Scale_AdcFilter(u8_t option,u16_t R_AD_BUF);
 
 void CS_Scale_GetWeight(u16_t R_AD_BUF);
 
+#define	Run							0
+#define	ResetTimes					1
+#define	GetTimes					2
+u8_t CS_Scale_SameWeightTimes(u8_t option);
 
 #define	JudgeSteadyRun				0
 #define	ResetSteady					1
@@ -206,10 +211,11 @@ void CS_Scale_WeightProc(void)
 	R_AD_BUF = CS_Scale_GetDeltaAD(GetDeltaAD);
 	R_AD_BUF = CS_Scale_AdcFilter(ScaleAdcFilterRun,R_AD_BUF);
 	CS_Scale_GetWeight(R_AD_BUF);
+	CS_Scale_SameWeightTimes(Run);
 	CS_Scale_ZeroProc(RunningZero,0);
 	CS_Scale_LockProc(LockProcRun);
 	CS_Scale_JudgeOverLoad(0);
-	CS_Scale_JudgeLowBat(0);
+	//CS_Scale_JudgeLowBat(0);
 	CS_Scale_JudgeSteady(JudgeSteadyRun);
 	
 }
@@ -467,16 +473,19 @@ u16_t  CS_Scale_ZeroProc(u8_t option,u16_t setdata)
 	//3kg以下才追零包括负重量
 	B_Weight_Pos = CS_Scale_GetDeltaAD(GetADDirection);		//获取AD方向
 	R_Open_Weight = CS_Scale_CaliProc(CaliProcGetOpenWeight);	//获取开机重量值
+
+
+	
 	
 	if(R_UnitWeight.origin <= 300 ||B_Weight_Pos ==false)	
 		B_Weight_Zero = true;
 
 		if(R_UnitWeight.origin <= 200 || B_Weight_Pos==false)
 			{		
-				if(CS_Scale_JudgeSteady(GetIfSmallSteady)==true)
+				if(CS_Scale_SameWeightTimes(GetTimes)>CS_SmallWeight_Steadytimes	)
 					{
 
-					CS_Scale_JudgeSteady(ResetSteady);
+					CS_Scale_SameWeightTimes(ResetTimes);
 					
 					//非锁定状态正常追零
 					if(CS_Scale_LockProc(GetIfLock)==false)	
@@ -488,11 +497,16 @@ u16_t  CS_Scale_ZeroProc(u8_t option,u16_t setdata)
 								R_AD_Zero = R_AD_Original;
 							}
 						else
-							R_AD_Zero = R_AD_Original;
+							R_AD_Zero = R_AD_Original;					
 						}
 					//锁定状态下秤第一次追零做防提起处理
 					else			
 						{
+		
+						//R_Debug_temp=555;
+						//CS_ScaleDisplay_Debug();
+						//while(1);
+						
 						if(B_LockDownCheck==false)
 							{
 							if(R_AD_Original>R_AD_Zero)
@@ -500,6 +514,8 @@ u16_t  CS_Scale_ZeroProc(u8_t option,u16_t setdata)
 							else
 								weight_temp = R_AD_Zero - R_AD_Original;
 
+
+							
 							//跟锁定前的零点做比较不等于一个秤体重量的处理
 							//if(weight_temp<ScaleWeightMin&&weight_temp>ScaleWeightMax)
 								//{
@@ -509,16 +525,26 @@ u16_t  CS_Scale_ZeroProc(u8_t option,u16_t setdata)
 									//跟称重前不是一个零点报零点错并解锁
 									B_WeightZeroErr=true;
 									R_Display_Err=CS_ScaleDisplay_L_err;
-									CS_Scale_LockProc(LockProcUnLock);
+									CS_SoftTimer(ResetSoftTimer);
+					
 									}
 								B_LockDownCheck=true;
-								//}
+								}
 
-							}						
-						}
-					
+							}				
+							
 					}
 			}
+
+	if(B_WeightZeroErr==true)
+		{
+		if(CS_SoftTimer(GetSoftTimerTime)>200)
+			{
+			R_Display_Err=0;
+			B_WeightZeroErr=false;
+			CS_Scale_LockProc(LockProcUnLock);
+			}					
+		}
 	return	0;		
 	}
 
@@ -674,27 +700,55 @@ u8_t CS_Scale_JudgeOverLoad(u8_t option)
 
 
 
+u8_t CS_Scale_SameWeightTimes(u8_t option)
+{
+	u16_t	weight_temp;
+	static	u16_t xdata R_Weight_kg_old;
+	static	u8_t	  xdata R_Weight_SameTimes;
+
+	if(option==ResetTimes)
+		{
+		R_Weight_SameTimes = 0;
+		return 0;
+		}	
+
+	if(option==GetTimes)
+		return R_Weight_SameTimes;
+	
+	
+	if(R_UnitWeight.origin > R_Weight_kg_old)
+		weight_temp = R_UnitWeight.origin -R_Weight_kg_old;
+	else
+		weight_temp = R_Weight_kg_old -R_UnitWeight.origin;
+		
+	if(weight_temp <  CS_Scale_SameWeightRange)
+		{
+		if(R_Weight_SameTimes<255)
+		R_Weight_SameTimes++;
+		}
+		else
+		R_Weight_SameTimes = 0;
+
+	R_Weight_kg_old = R_UnitWeight.origin;
+
+	return 0;	
+}
+
+
+
 
 u8_t CS_Scale_JudgeSteady(u8_t option)
 {
 
-	u16_t	weight_temp;
 	u16_t	R_Weight_Temp;
-	static	u16_t xdata R_Weight_kg_old;
-	static	u8_t	  xdata R_Weight_SameTimes;
-	static	u8_t xdata B_Weight_SmallSteady;		//小重量稳定标志
+	//static	u8_t xdata B_Weight_SmallSteady;		//小重量稳定标志
 	static	u8_t xdata B_Weight_HeavySteady;	//大重量稳定标志
 	
 	if(option==ResetSteady)
 		{
-		R_Weight_SameTimes = 0;
-		B_Weight_SmallSteady = false;
 		B_Weight_HeavySteady = false;
 		return 0;
 		}	
-
-	if(option==GetIfSmallSteady)
-		return B_Weight_SmallSteady;
 
 	if(option==GetIfHeavySteady)
 		return B_Weight_HeavySteady;
@@ -702,33 +756,10 @@ u8_t CS_Scale_JudgeSteady(u8_t option)
 	if(CS_Scale_LockProc(GetIfLock)==false)
 		{
 	
-		if(R_UnitWeight.origin > R_Weight_kg_old)
-			weight_temp = R_UnitWeight.origin -R_Weight_kg_old;
-		else
-			weight_temp = R_Weight_kg_old -R_UnitWeight.origin;
-		
-		if(weight_temp <  CS_Scale_SameWeightRange)
-			{
-			if(R_Weight_SameTimes<255)
-				R_Weight_SameTimes++;
-			}
-		else
-			R_Weight_SameTimes = 0;
-	
-		
-		R_Weight_kg_old = R_UnitWeight.origin;
-
-		B_Weight_SmallSteady = false;
 		B_Weight_HeavySteady = false;
-		
-		if(R_UnitWeight.origin < CS_Scale_MinLockWeight)
-			{
-			if(R_Weight_SameTimes>CS_SmallWeight_Steadytimes)
-				B_Weight_SmallSteady = true;		
-			}
-		else
-			{			
-			if(R_Weight_SameTimes>CS_BigWeight_Steadytimes)
+		if(R_UnitWeight.origin>=CS_Scale_MinLockWeight	)
+		{
+			if(CS_Scale_SameWeightTimes(GetTimes)>CS_BigWeight_Steadytimes)
 				{
 				B_Weight_HeavySteady = true;	
 
@@ -737,16 +768,16 @@ u8_t CS_Scale_JudgeSteady(u8_t option)
 				else
 				R_Weight_Temp = R_Weight_Mem - R_UnitWeight.origin;
 
-				//在记忆范围内记忆
+					//在记忆范围内记忆
 				if(R_UnitWeight.origin > ScaleStartMemoryWeight)
 					{
 					if(R_Weight_Temp<CS_MemoryRange)
 					R_UnitWeight.origin = R_Weight_Mem;
 					}
-			
+				
 				R_Weight_Lock = R_UnitWeight.origin;
 				R_Weight_Mem = R_UnitWeight.origin;
-				
+					
 				R_Scale_state = CS_Scale_state_locking;
 				CS_SoftTimer(ResetSoftTimer);		//软件定时器开始用于锁定闪显示计时
 				CS_Scale_SteadyProc(SteadyProcReset);
@@ -1440,7 +1471,6 @@ typedef struct _CS_TimeOut_T{
 }CS_TimeOut_T;
 
 
-
 void CS_Scale_TimeOutProc(u8_t option)
 {
 	static	CS_TimeOut_T xdata R_TimeOut;
@@ -1479,6 +1509,7 @@ void CS_Scale_TimeOutProc(u8_t option)
 	{
 		B_TimeBase_1s = false;
 
+		
 		//低电超时处理
 		if(CS_Scale_JudgeLowBat(GetIfLowBat) == true)
 		{

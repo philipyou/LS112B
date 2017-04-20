@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 1   
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE SPIFLASH
@@ -62,7 +62,7 @@ line level    source
   52   1              SPIFlashWriteEnable();
   53   1              SPIFlashWaitBusy();
   54   1              *(SF_TX_BUF) = SF_SECTOR_ERASE;
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 2   
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 2   
 
   55   1              *(SF_TX_BUF+1) = (addr>>16);
   56   1              *(SF_TX_BUF+2) = (addr>>8);
@@ -112,7 +112,7 @@ line level    source
  100   1      }
  101          
  102          
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 3   
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 3   
 
 ASSEMBLY LISTING OF GENERATED OBJECT CODE
 
@@ -176,7 +176,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
              ?C0002:
                                            ; SOURCE LINE # 33
                  R     MOV     DPTR,#status
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 4   
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 4   
 
                        MOVX    A,@DPTR
                        MOV     R7,A
@@ -240,7 +240,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  E     CALL    _YC_Delay1ms
                                            ; SOURCE LINE # 48
                  R     xJMP    ?C0007
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 5   
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 5   
 
                                            ; SOURCE LINE # 49
              ?C0009:
@@ -304,7 +304,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                        MOV     R5,A
                        INC     DPTR
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 6   
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 6   
 
                        MOVX    A,@DPTR
                        MOV     R6,A
@@ -368,7 +368,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 68
                  R     CALL    SPIFlashWriteEnable
                                            ; SOURCE LINE # 69
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 7   
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 7   
 
                  R     CALL    SPIFlashWaitBusy
                                            ; SOURCE LINE # 70
@@ -432,7 +432,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,R7
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 75
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 8   
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 8   
 
                  R     MOV     DPTR,#addr
                        MOVX    A,@DPTR
@@ -496,7 +496,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,#0BCH
                        MOVX    @DPTR,A
                        INC     DPTR
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 9   
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 9   
 
                        MOV     A,#01H
                        MOVX    @DPTR,A
@@ -560,7 +560,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R5,A
                        INC     DPTR
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 10  
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 10  
 
                        MOV     R6,A
                        INC     DPTR
@@ -624,7 +624,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOV     A,R6
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 11  
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 11  
 
                        INC     DPTR
                        MOV     A,R7
@@ -655,7 +655,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        RET     
              ; FUNCTION _SPIFlashRead (END)
 
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 12  
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 12  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -718,7 +718,7 @@ YC_UartCTRLBit_e . . . . . . . . . . .  TYPEDEF  -----  U_CHAR   -----  1
 UART_DataLen . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
 uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
 BT_CMDFIFO_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
-C51 COMPILER V9.01   SPIFLASH                                                              04/18/2017 13:28:32 PAGE 13  
+C51 COMPILER V9.01   SPIFLASH                                                              04/20/2017 16:55:03 PAGE 13  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====

@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 1   
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE YC_PERIPHERAL
@@ -62,7 +62,7 @@ line level    source
   52          
   53          
   54          
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 2   
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 2   
 
   55          
   56          /*===============EEPROM======================================================================*/
@@ -126,7 +126,7 @@ line level    source
                       REG_IICD_RXADDR = ESWAP((u16_t)pbuff);
                       REG_IICD_CTRL = 1;
                       REG_MISC_CTRL |= 1 << 2;        //start iic dma
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 3   
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 3   
 
                       YC_WaitIICDone();       
               }
@@ -190,7 +190,7 @@ line level    source
               }
               
               void YC_GPIOSetOe(u8_t gpio_num, bool bit_val)
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 4   
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 4   
 
               {
                       YC_GPIOSetBit(gpio_num, &REG_GPIO_OE(0), bit_val);      
@@ -254,7 +254,7 @@ line level    source
  238          */
  239          /*==============LED======================================================================*/
  240          #ifdef YC_PERIPHERAL_LED
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 5   
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 5   
 
               void YC_LedOn(u8_t gpio_num, bool active_state)
               {
@@ -318,7 +318,7 @@ line level    source
                       //RX buffer and R/W pointer setting
                       REG_UART_RX_ADDR_S = ESWAP((short)param->pRxBuff);
                       REG_UART_RX_ADDR_E = ESWAP((short)param->pRxBuff + param->rxBuffLen - 1);
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 6   
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 6   
 
                       REG_UART_RX_PTR_R = REG_UART_RX_ADDR_S;
               
@@ -382,7 +382,7 @@ line level    source
  362   3                              REG_UART_TX_PTR_W = REG_UART_TX_ADDR_E;
  363   3                              while(ESWAP(REG_UART_TX_ITEMS));
  364   3                              
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 7   
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 7   
 
  365   3                              twptr = (u8_t *)ESWAP(REG_UART_TX_ADDR_S);      //reset twptr
  366   3                      }       
@@ -446,7 +446,7 @@ line level    source
               void YC_PWMCloseClock()
               {       
                       REG_CLK_OFF(1) |= 1 << PWM_CLOCK;       //turn off PWM clock    
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 8   
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 8   
 
               }
               
@@ -510,7 +510,7 @@ line level    source
                       default:
                               break;
                       }
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 9   
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 9   
 
               }
               
@@ -574,7 +574,7 @@ line level    source
                               case 5:
                                       REG_GPIO_SELECT(1) &= ~(1 << 7);                                        //close PWM1 output pin
                                       break;                  
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 10  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 10  
 
                               case 4:                                                                                                 //close PWM0 output pin
                                       REG_GPIO_SELECT(1) &= ~(1 << 6);
@@ -638,7 +638,7 @@ line level    source
                       }
               }
               
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 11  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 11  
 
               void YC_TimeClose(YC_TimeChanel_e time_num)
               {
@@ -702,7 +702,7 @@ line level    source
                       byte i, t[4];
                       u32_t a = (u32_t)(x * YC_MAG);
                       u32_t b = (u32_t)(y * YC_MAG);
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 12  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 12  
 
                       REG_CLK_OFF(0) &= ~(1 << 5);
                       
@@ -766,7 +766,7 @@ line level    source
                               return YC_CompensateArcsin(x,0.8745117188,0.8754882813,1.0644281445,1.0664453271) ;
                       else if ((x>0.8896484375) & (x<0.8901367188))
                               return YC_CompensateArcsin(x,0.8896484375,0.8901367188,1.0965747116,1.0976451051);
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 13  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 13  
 
                       else if ((x>0.9013671875) & (x<0.9038085938))
                               return YC_CompensateArcsin(x,0.9013671875,0.9038085938,1.1229162861,1.1285874144);
@@ -819,7 +819,7 @@ line level    source
               }
               
               #endif
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 14  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 14  
 
 ASSEMBLY LISTING OF GENERATED OBJECT CODE
 
@@ -883,7 +883,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#pbuff
                        MOV     A,R3
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 15  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 15  
 
                        INC     DPTR
                        MOV     A,R2
@@ -947,7 +947,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                        INC     DPTR
                        CLR     A
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 16  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 16  
 
                        MOV     B,#01H
                  E     CALL    ?C?ILDIX
@@ -1011,7 +1011,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 363
                        MOV     DPTR,#0810EH
                        INC     DPTR
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 17  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 17  
 
                        MOVX    A,@DPTR
                        MOV     R4,A
@@ -1075,7 +1075,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R7,A
                        RLC     A
                        SUBB    A,ACC
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 18  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 18  
 
                        MOV     R3,AR7
                        MOV     A,R5
@@ -1139,7 +1139,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 381
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 19  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 19  
 
                        MOV     DPTR,#08058H
                        INC     DPTR
@@ -1203,7 +1203,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        SUBB    A,R7
                  R     MOV     DPTR,#i
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 20  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 20  
 
                        SUBB    A,R6
                  R     xJGE    ?C0015
@@ -1267,7 +1267,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,R4
                        MOV     R6,A
                        MOV     A,R7
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 21  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 21  
 
                  R     MOV     DPTR,#rrptr
                        MOV     A,R6
@@ -1331,7 +1331,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#i
                        MOVX    A,@DPTR
                        ADDC    A,#00H
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 22  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 22  
 
                        MOV     R6,A
                        RET     
@@ -1395,7 +1395,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    A,@DPTR
                        MOV     DPTR,#08058H
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 23  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 23  
 
                        XCH     A,R7
                        MOVX    @DPTR,A
@@ -1406,7 +1406,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        RET     
              ; FUNCTION YC_UARTClearBuffer (END)
 
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 24  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 24  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -1469,7 +1469,7 @@ SADEN0 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00B9H  1
 INT2 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0094H  1
 SADEN1 . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00BAH  1
 RXD0 . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00B0H  1
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 25  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 25  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -1532,7 +1532,7 @@ _YC_UARTSendData . . . . . . . . . . .  PUBLIC   CODE   PROC     0000H  -----
   twptr. . . . . . . . . . . . . . . .  AUTO     XDATA  PTR      0007H  3
 SMOD_1 . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00DFH  1
 ACC. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00E0H  1
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 26  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 26  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -1595,7 +1595,7 @@ YC_LedBlink_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
   light_time . . . . . . . . . . . . .  MEMBER   -----  U_INT    0002H  2
   dark_time. . . . . . . . . . . . . .  MEMBER   -----  U_INT    0004H  2
 PX4. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00FAH  1
-C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/18/2017 13:28:31 PAGE 27  
+C51 COMPILER V9.01   YC_PERIPHERAL                                                         04/20/2017 16:55:02 PAGE 27  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====

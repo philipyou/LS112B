@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/18/2017 13:28:34 PAGE 1   
+C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/20/2017 16:55:09 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE RETATION_VARIABLE
@@ -56,12 +56,12 @@ line level    source
   46          
   47          
   48          
-C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/18/2017 13:28:34 PAGE 2   
+C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/20/2017 16:55:09 PAGE 2   
 
 ASSEMBLY LISTING OF GENERATED OBJECT CODE
 
 
-C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/18/2017 13:28:34 PAGE 3   
+C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/20/2017 16:55:09 PAGE 3   
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -124,7 +124,7 @@ BT_CmdWptr . . . . . . . . . . . . . .  PUBLIC   XDATA  U_INT    4A02H  2
 uint . . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
 BT_CMDFIFO_t . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  25
   len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
-C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/18/2017 13:28:34 PAGE 4   
+C51 COMPILER V9.01   RETATION_VARIABLE                                                     04/20/2017 16:55:09 PAGE 4   
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====

@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   MAIN                                                                  04/18/2017 13:28:30 PAGE 1   
+C51 COMPILER V9.01   MAIN                                                                  04/20/2017 16:55:01 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
@@ -45,7 +45,7 @@ line level    source
   35   1      }
   36          
   37          
-C51 COMPILER V9.01   MAIN                                                                  04/18/2017 13:28:30 PAGE 2   
+C51 COMPILER V9.01   MAIN                                                                  04/20/2017 16:55:01 PAGE 2   
 
 ASSEMBLY LISTING OF GENERATED OBJECT CODE
 
@@ -84,7 +84,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        RET     
              ; FUNCTION main (END)
 
-C51 COMPILER V9.01   MAIN                                                                  04/18/2017 13:28:30 PAGE 3   
+C51 COMPILER V9.01   MAIN                                                                  04/20/2017 16:55:01 PAGE 3   
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -147,7 +147,7 @@ RI . . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      0098H  1
 CS_ComState. . . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  3
   now. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
   pre. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
-C51 COMPILER V9.01   MAIN                                                                  04/18/2017 13:28:30 PAGE 4   
+C51 COMPILER V9.01   MAIN                                                                  04/20/2017 16:55:01 PAGE 4   
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -210,7 +210,7 @@ xbyte. . . . . . . . . . . . . . . . .  TYPEDEF  XDATA  U_CHAR   -----  1
 TCLK . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00CCH  1
 u16_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  U_INT    -----  2
 dint . . . . . . . . . . . . . . . . .  TYPEDEF  DATA   U_INT    -----  2
-C51 COMPILER V9.01   MAIN                                                                  04/18/2017 13:28:30 PAGE 5   
+C51 COMPILER V9.01   MAIN                                                                  04/20/2017 16:55:01 PAGE 5   
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -273,7 +273,7 @@ TL1. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   008BH  1
 EX5. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00EBH  1
 SM2. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      009DH  1
 TL2. . . . . . . . . . . . . . . . . .  SFR      DATA   U_CHAR   00CCH  1
-C51 COMPILER V9.01   MAIN                                                                  04/18/2017 13:28:30 PAGE 6   
+C51 COMPILER V9.01   MAIN                                                                  04/20/2017 16:55:01 PAGE 6   
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -336,7 +336,7 @@ POR. . . . . . . . . . . . . . . . . .  ABSBIT   -----  BIT      00DEH  1
 YC_UartCTRLBit . . . . . . . . . . . .  * TAG *  -----  ENUM     -----  -----
 UserMeasureData. . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  6
   weight . . . . . . . . . . . . . . .  MEMBER   -----  U_INT    0000H  2
-C51 COMPILER V9.01   MAIN                                                                  04/18/2017 13:28:30 PAGE 7   
+C51 COMPILER V9.01   MAIN                                                                  04/20/2017 16:55:01 PAGE 7   
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====

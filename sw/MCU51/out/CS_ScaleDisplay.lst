@@ -1,4 +1,4 @@
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 1   
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 1   
 
 
 C51 COMPILER V9.01, COMPILATION OF MODULE CS_SCALEDISPLAY
@@ -62,7 +62,7 @@ line level    source
   52          
   53          
   54          
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 2   
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 2   
 
   55          void CS_ScaleDisplay_Debug()
   56          {
@@ -126,7 +126,7 @@ line level    source
  114   2                      if(option==DisplayCal2)
  115   2                              data_buf[4]=2;
  116   2                      if(option==DisplayCal3)
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 3   
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 3   
 
  117   2                              data_buf[4]=3;
  118   2                      if(option==DisplayCal4)
@@ -190,7 +190,7 @@ line level    source
  176   2                      CS_Lcd_Buf_Unit |= S_JIN;                                                       
  177   2                      }
  178   1              
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 4   
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 4   
 
  179   1              if(option==Displaygongjin)
  180   1                      {
@@ -198,12 +198,12 @@ line level    source
  182   2                      CS_Lcd_Buf_Unit |= S_GONG | S_JIN;                                                      
  183   2                      }
  184   1      
- 185   1              
+ 185   1              /*
  186   1              if( R_1186sys_state&0x02)
  187   1                      CS_Lcd_Buf_SIGN |=S_DAT;
  188   1              else
  189   1                      CS_Lcd_Buf_SIGN &=~S_DAT;
- 190   1              
+ 190   1              */
  191   1              
  192   1              if(bleConnStatus==BLE_STATUS_CONN)
  193   1                      CS_Lcd_Buf_SIGN |=S_BLE;
@@ -254,7 +254,7 @@ line level    source
  238          #define S_E             CS_Lcd_Buf_Bit6
  239          #define S_D             CS_Lcd_Buf_Bit7
  240          */
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 5   
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 5   
 
  241          
  242          
@@ -318,7 +318,7 @@ line level    source
  300   1              CS_Lcd_Send_Data[0] = 0x00;
  301   1              CS_Lcd_Send_Data[1] = 0x00;
  302   1              CS_Lcd_Send_Data[2] = 0x00;
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 6   
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 6   
 
  303   1              CS_Lcd_Send_Data[3] = 0x00;
  304   1              CS_Lcd_Send_Data[4] = 0x00;
@@ -382,7 +382,7 @@ line level    source
  362   2                                                      CS_ScaleDisplay_LcdShowNoDigit();
  363   2                                                      else if(R_Weight_FlashTime<150)
  364   2                                                              CS_ScaleDisplay_LcdRestore();           
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 7   
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 7   
 
  365   2                      }
  366   1      }
@@ -394,7 +394,7 @@ line level    source
  372          
  373          
  374          
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 8   
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 8   
 
 ASSEMBLY LISTING OF GENERATED OBJECT CODE
 
@@ -458,7 +458,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                        MOV     R6,A
                        INC     DPTR
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 9   
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 9   
 
                        MOVX    A,@DPTR
                        MOV     R7,A
@@ -522,7 +522,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                        MOV     R5,A
                                            ; SOURCE LINE # 41
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 10  
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 10  
 
                        MOV     R7,#043H
                  R     CALL    _CS_ScaleDisplay_FreshBuf
@@ -586,7 +586,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#buf+01H
                        MOVX    A,@DPTR
                        MOV     R7,A
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 11  
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 11  
 
                  R     CALL    _CS_ScaleDisplay_LookUpTable
                  R     MOV     DPTR,#CS_lcd_showbuf
@@ -650,7 +650,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 84
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 12  
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 12  
 
                        INC     DPTR
                        MOVX    @DPTR,A
@@ -714,7 +714,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 106
                        MOV     A,R7
                        XRL     A,#081H
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 13  
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 13  
 
                  R     xJZ     ?C0015
                        MOV     A,R7
@@ -778,7 +778,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#data_buf+04H
                        MOV     A,#04H
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 14  
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 14  
 
                                            ; SOURCE LINE # 120
              ?C0014:
@@ -842,7 +842,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 133
              ?C0022:
                                            ; SOURCE LINE # 135
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 15  
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 15  
 
                  R     MOV     DPTR,#data_buf
                        MOVX    A,@DPTR
@@ -906,7 +906,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#CS_lcd_showbuf+02H
                        MOV     A,R7
                        MOVX    @DPTR,A
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 16  
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 16  
 
                                            ; SOURCE LINE # 150
                  R     MOV     DPTR,#data_buf+04H
@@ -970,7 +970,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 175
                  R     MOV     DPTR,#CS_Lcd_Send_Data+03H
                        MOVX    A,@DPTR
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 17  
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 17  
 
                        ORL     A,#08H
                        MOVX    @DPTR,A
@@ -999,45 +999,26 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 183
              ?C0030:
-                                           ; SOURCE LINE # 186
-                 E     MOV     DPTR,#R_1186sys_state
-                       MOVX    A,@DPTR
-                 R     xJNB    ACC.1,?C0031
-                                           ; SOURCE LINE # 187
-                 R     MOV     DPTR,#CS_Lcd_Send_Data
-                       MOVX    A,@DPTR
-                       ORL     A,#04H
-                       MOVX    @DPTR,A
-                 R     xJMP    ?C0032
-             ?C0031:
-                                           ; SOURCE LINE # 189
-                 R     MOV     DPTR,#CS_Lcd_Send_Data
-                       MOVX    A,@DPTR
-                       ANL     A,#0FBH
-                       MOVX    @DPTR,A
-             ?C0032:
                                            ; SOURCE LINE # 192
                  E     MOV     DPTR,#bleConnStatus
                        MOVX    A,@DPTR
-                 R     xJNE    A,#01H,?C0033
+                 R     xJNE    A,#01H,?C0031
                                            ; SOURCE LINE # 193
                  R     MOV     DPTR,#CS_Lcd_Send_Data
                        MOVX    A,@DPTR
                        ORL     A,#02H
                        MOVX    @DPTR,A
-                 R     xJMP    ?C0034
-             ?C0033:
+                 R     xJMP    ?C0032
+             ?C0031:
                                            ; SOURCE LINE # 195
                  R     MOV     DPTR,#CS_Lcd_Send_Data
                        MOVX    A,@DPTR
                        ANL     A,#0FDH
                        MOVX    @DPTR,A
-             ?C0034:
+             ?C0032:
                                            ; SOURCE LINE # 197
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 18  
-
                        MOV     A,R5
-                 R     xJNE    A,#021H,?C0037
+                 R     xJNE    A,#021H,?C0035
                                            ; SOURCE LINE # 198
                                            ; SOURCE LINE # 199
                  R     MOV     DPTR,#CS_Lcd_Send_Data
@@ -1047,15 +1028,17 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 200
                  R     MOV     DPTR,#data_buf
                        MOVX    A,@DPTR
-                 R     xJZ     ?C0037
+                 R     xJZ     ?C0035
                                            ; SOURCE LINE # 201
                  R     MOV     DPTR,#CS_Lcd_Send_Data
                        MOVX    A,@DPTR
                        ORL     A,#02H
                        MOVX    @DPTR,A
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 18  
+
                                            ; SOURCE LINE # 202
                                            ; SOURCE LINE # 204
-             ?C0037:
+             ?C0035:
                        RET     
              ; FUNCTION _CS_ScaleDisplay_FreshBuf (END)
 
@@ -1098,8 +1081,6 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        ANL     A,#0FH
                        MOV     R7,A
                        INC     DPTR
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 19  
-
                        MOVX    A,@DPTR
                        ANL     A,#0F0H
                        ORL     A,R7
@@ -1117,6 +1098,8 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        ANL     A,#0FH
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 253
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 19  
+
                        INC     DPTR
                        MOVX    A,@DPTR
                        ANL     A,#08H
@@ -1162,8 +1145,6 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,R7
                        ORL     A,R6
                  R     MOV     DPTR,#CS_Lcd_Send_Data+02H
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 20  
-
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 262
                        INC     DPTR
@@ -1181,6 +1162,8 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                        MOV     R7,A
                  R     MOV     DPTR,#CS_lcd_showbuf+04H
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 20  
+
                        MOVX    A,@DPTR
                        MOV     R6,A
                        MOV     A,R7
@@ -1213,21 +1196,19 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        CLR     A
                        INC     DPTR
                        MOVX    @DPTR,A
-             ?C0039:
+             ?C0037:
                  R     MOV     DPTR,#i
                        MOVX    A,@DPTR
                        MOV     R3,A
                        CLR     C
                        SUBB    A,#05H
-                 R     xJGE    ?C0042
+                 R     xJGE    ?C0040
                                            ; SOURCE LINE # 272
                                            ; SOURCE LINE # 273
                  R     MOV     DPTR,#HexData
                        MOVX    A,@DPTR
                        MOV     R6,A
                        INC     DPTR
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 21  
-
                        MOVX    A,@DPTR
                        MOV     R7,A
                        MOV     R4,#00H
@@ -1245,6 +1226,8 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R4,A
                        INC     DPTR
                        MOVX    A,@DPTR
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 21  
+
                        MOV     R3,A
                        INC     DPTR
                        MOVX    A,@DPTR
@@ -1277,9 +1260,9 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    A,@DPTR
                        INC     A
                        MOVX    @DPTR,A
-                 R     xJMP    ?C0039
+                 R     xJMP    ?C0037
                                            ; SOURCE LINE # 276
-             ?C0042:
+             ?C0040:
                        RET     
              ; FUNCTION _CS_ScaleDisplay_HexToBcd (END)
 
@@ -1290,8 +1273,6 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 291
                        MOV     R3,#01H
                  R     MOV     R2,#HIGH CS_Lcd_Table
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 22  
-
                  R     MOV     R1,#LOW CS_Lcd_Table
 ;---- Variable 'data_ptr' assigned to Register 'R1/R2/R3' ----
                                            ; SOURCE LINE # 292
@@ -1300,7 +1281,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  E     CALL    ?C?CLDOPTR
                        MOV     R7,A
                                            ; SOURCE LINE # 293
-             ?C0043:
+             ?C0041:
                        RET     
              ; FUNCTION _CS_ScaleDisplay_LookUpTable (END)
 
@@ -1309,6 +1290,8 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                                            ; SOURCE LINE # 299
                                            ; SOURCE LINE # 300
                        CLR     A
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 22  
+
                  R     MOV     DPTR,#CS_Lcd_Send_Data
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 301
@@ -1354,8 +1337,6 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        INC     DPTR
                        MOVX    A,@DPTR
                        ANL     A,#0F0H
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 23  
-
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 314
                        RET     
@@ -1373,6 +1354,8 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 320
                        INC     DPTR
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 23  
+
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 321
                        INC     DPTR
@@ -1418,8 +1401,6 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
 
              ; FUNCTION CS_ScaleDisplay_LcdRestore (BEGIN)
                                            ; SOURCE LINE # 336
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 24  
-
                                            ; SOURCE LINE # 337
                                            ; SOURCE LINE # 338
                  R     MOV     DPTR,#CS_Lcd_Send_Data_BAK
@@ -1437,6 +1418,8 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                  R     MOV     DPTR,#CS_Lcd_Send_Data+02H
                        MOVX    @DPTR,A
                                            ; SOURCE LINE # 341
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 24  
+
                  R     MOV     DPTR,#CS_Lcd_Send_Data_BAK+03H
                        MOVX    A,@DPTR
                  R     MOV     DPTR,#CS_Lcd_Send_Data+03H
@@ -1457,7 +1440,7 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     R7,#03H
                  E     CALL    _CS_SoftTimer
                        MOV     A,R7
-                 R     xJNZ    ?C0059
+                 R     xJNZ    ?C0057
                                            ; SOURCE LINE # 353
                                            ; SOURCE LINE # 354
                        MOV     R7,#01H
@@ -1467,54 +1450,54 @@ ASSEMBLY LISTING OF GENERATED OBJECT CODE
                        MOV     A,R7
                        CLR     C
                        SUBB    A,#01EH
-                 R     xJGE    ?C0050
+                 R     xJGE    ?C0048
                                            ; SOURCE LINE # 356
                  R     CALL    CS_ScaleDisplay_LcdBackup
                        RET     
-             ?C0050:
+             ?C0048:
                                            ; SOURCE LINE # 357
                        MOV     A,R7
                        CLR     C
                        SUBB    A,#03CH
-                 R     xJGE    ?C0052
+                 R     xJGE    ?C0050
                                            ; SOURCE LINE # 358
                  R     CALL    CS_ScaleDisplay_LcdShowNoDigit
                        RET     
-             ?C0052:
+             ?C0050:
                                            ; SOURCE LINE # 359
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 25  
-
                        MOV     A,R7
                        CLR     C
                        SUBB    A,#05AH
-                 R     xJGE    ?C0054
+                 R     xJGE    ?C0052
                                            ; SOURCE LINE # 360
                  R     CALL    CS_ScaleDisplay_LcdRestore
                        RET     
-             ?C0054:
+             ?C0052:
                                            ; SOURCE LINE # 361
                        MOV     A,R7
                        CLR     C
                        SUBB    A,#078H
-                 R     xJGE    ?C0056
+                 R     xJGE    ?C0054
                                            ; SOURCE LINE # 362
                  R     CALL    CS_ScaleDisplay_LcdShowNoDigit
                        RET     
-             ?C0056:
+             ?C0054:
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 25  
+
                                            ; SOURCE LINE # 363
                        MOV     A,R7
                        CLR     C
                        SUBB    A,#096H
-                 R     xJGE    ?C0059
+                 R     xJGE    ?C0057
                                            ; SOURCE LINE # 364
                  R     CALL    CS_ScaleDisplay_LcdRestore
                                            ; SOURCE LINE # 365
                                            ; SOURCE LINE # 366
-             ?C0059:
+             ?C0057:
                        RET     
              ; FUNCTION CS_ScaleDisplay_SteadyFlash (END)
 
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 26  
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 26  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -1577,7 +1560,7 @@ YC_UtilTimer . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  61
   last_timer . . . . . . . . . . . . .  MEMBER   -----  U_LONG   0039H  4
 s32_t. . . . . . . . . . . . . . . . .  TYPEDEF  -----  LONG     -----  4
 YC_UARTPARAM . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  15
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 27  
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 27  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
@@ -1633,20 +1616,19 @@ _CS_ScaleDisplay_LookUpTable . . . . .  PUBLIC   CODE   PROC     0000H  -----
   NumData. . . . . . . . . . . . . . .  * REG *  DATA   U_CHAR   0007H  1
   data_ptr . . . . . . . . . . . . . .  * REG *  DATA   PTR      0001H  3
 UART_Enable. . . . . . . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
-R_1186sys_state. . . . . . . . . . . .  EXTERN   XDATA  U_CHAR   -----  1
 HistoryList_t. . . . . . . . . . . . .  TYPEDEF  -----  STRUCT   -----  63
   head . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
   tail . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0001H  1
   size . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0002H  1
   measureData. . . . . . . . . . . . .  MEMBER   -----  ARRAY    0003H  60
 UART_EnableFlowControl . . . . . . . .  E_CONST  -----  U_CHAR   -----  1
-C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/19/2017 14:43:06 PAGE 28  
+BT_CMDFIFO . . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
+C51 COMPILER V9.01   CS_SCALEDISPLAY                                                       04/20/2017 16:55:08 PAGE 28  
 
 NAME                                    CLASS   MSPACE  TYPE    OFFSET  SIZE
 ====                                    =====   ======  ====    ======  ====
 
 
-BT_CMDFIFO . . . . . . . . . . . . . .  * TAG *  -----  STRUCT   -----  25
   len. . . . . . . . . . . . . . . . .  MEMBER   -----  U_CHAR   0000H  1
   DATA . . . . . . . . . . . . . . . .  MEMBER   -----  ARRAY    0001H  24
 CS_ScaleDisplay_LcdShowAll . . . . . .  PUBLIC   CODE   PROC     0000H  -----
@@ -1679,7 +1661,7 @@ CS_ScaleDisplay_SteadyFlash. . . . . .  PUBLIC   CODE   PROC     0000H  -----
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1436    ----
+   CODE SIZE        =   1409    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =     45      12
    PDATA SIZE       =   ----    ----
